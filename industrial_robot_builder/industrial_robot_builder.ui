@@ -66,7 +66,7 @@
         </property>
        </column>
       </widget>
-      <widget class="QTabWidget" name="tabWidget">
+      <widget class="QTabWidget" name="mainTabWidget">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>1</horstretch>
@@ -74,9 +74,9 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="link_details_tab">
         <attribute name="title">
          <string>Link Details</string>
         </attribute>
@@ -140,7 +140,7 @@
                <property name="title">
                 <string>Geometry:</string>
                </property>
-               <widget class="QWidget" name="">
+               <widget class="QWidget" name="layoutWidget">
                 <property name="geometry">
                  <rect>
                   <x>10</x>
@@ -229,7 +229,7 @@
                     <attribute name="title">
                      <string>Box</string>
                     </attribute>
-                    <widget class="QWidget" name="">
+                    <widget class="QWidget" name="layoutWidget">
                      <property name="geometry">
                       <rect>
                        <x>10</x>
@@ -276,7 +276,7 @@
                     <attribute name="title">
                      <string>Cylinder</string>
                     </attribute>
-                    <widget class="QWidget" name="">
+                    <widget class="QWidget" name="layoutWidget">
                      <property name="geometry">
                       <rect>
                        <x>10</x>
@@ -313,7 +313,7 @@
                     <attribute name="title">
                      <string>Sphere</string>
                     </attribute>
-                    <widget class="QWidget" name="">
+                    <widget class="QWidget" name="layoutWidget">
                      <property name="geometry">
                       <rect>
                        <x>10</x>
@@ -340,7 +340,7 @@
                     <attribute name="title">
                      <string>Mesh</string>
                     </attribute>
-                    <widget class="QWidget" name="">
+                    <widget class="QWidget" name="layoutWidget">
                      <property name="geometry">
                       <rect>
                        <x>11</x>
@@ -569,7 +569,7 @@
                <property name="checked">
                 <bool>false</bool>
                </property>
-               <widget class="QWidget" name="">
+               <widget class="QWidget" name="layoutWidget">
                 <property name="geometry">
                  <rect>
                   <x>10</x>
@@ -1458,9 +1458,14 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="joint_details_tab">
         <attribute name="title">
          <string>Joint Details</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="visualizer_tab">
+        <attribute name="title">
+         <string>Visualizer</string>
         </attribute>
        </widget>
       </widget>

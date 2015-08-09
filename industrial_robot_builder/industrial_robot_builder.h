@@ -29,6 +29,8 @@ QString getValidName(QString prefix, QList<QString> &current_names);
 private slots:
 void on_robotTreeWidget_customContextMenuRequested(const QPoint &pos);
 
+void on_robotTreeWidget_itemClicked(QTreeWidgetItem *item, int column);
+
 private:
   Ui::IndustrialRobotBuilder *ui;
   QTreeWidgetItem *root_;
@@ -36,6 +38,8 @@ private:
   QTreeWidgetItem *joints_;
   QList<QString> link_names;
   QList<QString> joint_names;
+  QWidget *link_page_;
+  QWidget *joint_page_;
 };
 
 #endif // INDUSTRIAL_ROBOT_BUILDER_H

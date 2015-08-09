@@ -8,6 +8,11 @@ IndustrialRobotBuilder::IndustrialRobotBuilder(QWidget *parent) :
 {
   ui->setupUi(this);
 
+  link_page_ = ui->mainTabWidget->widget(0);
+  joint_page_ = ui->mainTabWidget->widget(1);
+  ui->mainTabWidget->removeTab(0);
+  ui->mainTabWidget->removeTab(0);
+
   root_ = new QTreeWidgetItem(ui->robotTreeWidget);
   root_->setText(0, "RobotModel");
   ui->robotTreeWidget->addTopLevelItem(root_);
@@ -121,5 +126,39 @@ void IndustrialRobotBuilder::on_robotTreeWidget_customContextMenuRequested(const
     delete menu;
 }
 
+void IndustrialRobotBuilder::on_robotTreeWidget_itemClicked(QTreeWidgetItem *item, int column)
+{
 
-
+  if (item->parent() == links_)
+  {
+    if (ui->mainTabWidget->count() == 1)
+    {
+      ui->mainTabWidget->insertTab(0, link_page_, "Link Details");
+    }
+    else if (ui->mainTabWidget->widget(0) != link_page_)
+    {
+      ui->mainTabWidget->removeTab(0);
+      ui->mainTabWidget->insertTab(0, link_page_, "Link Details");
+    }
+  }
+  else if (isJoint(item))
+  {
+    if (ui->mainTabWidget->count() == 1)
+    {
+      ui->mainTabWidget->insertTab(0, joint_page_, "Joint Details");
+    }
+    else if (ui->mainTabWidget->widget(0) != joint_page_)
+    {
+      ui->mainTabWidget->removeTab(0);
+      ui->mainTabWidget->insertTab(0, joint_page_, "Joint Details");
+    }
+  }
+  else
+  {
+    if (ui->mainTabWidget->count() != 1)
+    {
+      ui->mainTabWidget->removeTab(0);
+    }
+  }
+  ui->mainTabWidget->setCurrentIndex(0);
+}
