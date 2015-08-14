@@ -1,6 +1,11 @@
 #include "industrial_robot_builder.h"
 #include "ui_industrial_robot_builder.h"
 #include <sstream>
+#include <eigen3/Eigen/Eigen>
+#include "qtpropertymanager.h"
+#include "qteditorfactory.h"
+#include "qttreepropertybrowser.h"
+
 
 IndustrialRobotBuilder::IndustrialRobotBuilder(QWidget *parent) :
   QMainWindow(parent),
@@ -25,8 +30,14 @@ IndustrialRobotBuilder::IndustrialRobotBuilder(QWidget *parent) :
   joints_->setText(0,"Chain");
   root_->addChild(joints_);
 
-  addLink();
-  addLink();
+  model_ = urdf::parseURDFFile("/home/larmstrong/catkin_iiwa_ws/src/kuka_experimental/kuka_lbr_iiwa_support/urdf/lbr_iiwa_14_r820.urdf");
+
+
+  property_editor_ = new QtTreePropertyBrowser();
+  QVBoxLayout *vlayout = new QVBoxLayout(ui->propertyBrowserContainer);
+  vlayout->setMargin(0);
+  vlayout->addWidget(property_editor_);
+
 }
 
 IndustrialRobotBuilder::~IndustrialRobotBuilder()

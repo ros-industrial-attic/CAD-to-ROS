@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = industrial_robot_builder
 TEMPLATE = app
 
+include(qtpropertybrowser/qtpropertybrowser.pri)
 
 SOURCES += main.cpp\
         industrial_robot_builder.cpp
@@ -18,3 +19,8 @@ SOURCES += main.cpp\
 HEADERS  += industrial_robot_builder.h
 
 FORMS    += industrial_robot_builder.ui
+
+LIBS += -lurdfdom_model
+
+DISTFILES += \
+    config.pri

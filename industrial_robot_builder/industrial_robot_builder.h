@@ -5,6 +5,7 @@
 #include <QtCore>
 #include <QtGui>
 #include <QTreeWidgetItem>
+#include <urdf_parser/urdf_parser.h>
 
 namespace Ui {
 class IndustrialRobotBuilder;
@@ -40,6 +41,10 @@ private:
   QList<QString> joint_names;
   QWidget *link_page_;
   QWidget *joint_page_;
+  boost::shared_ptr<urdf::ModelInterface> model_;
+
+
+  class QtTreePropertyBrowser *property_editor_;
 };
 
 #endif // INDUSTRIAL_ROBOT_BUILDER_H
