@@ -31,14 +31,18 @@ namespace urdf_editor
       return QString("textVisible");
     case urdf_editor::EnumNames:
       return QString("enumNames");
+    default:
+      return QString("");
     }
   }
 
-  void Common::addOriginProperty(QtVariantPropertyManager *manager, QtProperty *top_item)
+  void Common::addOriginProperty(QtVariantPropertyManager *manager, QtProperty *top_item, urdf::Pose &orgin)
   {
     QtVariantProperty *item;
     QtVariantProperty *sub_item;
-    QList<QtProperty *> sub_items;
+    double r, p, y;
+
+    orgin.rotation.getRPY(r, p, y);
 
     QtProperty *origin = manager->addProperty(QtVariantPropertyManager::groupTypeId(), QTranslator::tr("Origin (optional)"));
     top_item->addSubProperty(origin);
@@ -46,12 +50,15 @@ namespace urdf_editor
     // Create position properties
     item = manager->addProperty(QtVariantPropertyManager::groupTypeId(), QTranslator::tr("Position (m)"));
     sub_item = manager->addProperty(QVariant::Double, QTranslator::tr("X"));
+    sub_item->setValue(orgin.position.x);
     sub_item->setAttribute(attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     sub_item = manager->addProperty(QVariant::Double, QTranslator::tr("Y"));
+    sub_item->setValue(orgin.position.y);
     sub_item->setAttribute(attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     sub_item = manager->addProperty(QVariant::Double, QTranslator::tr("Z"));
+    sub_item->setValue(orgin.position.z);
     sub_item->setAttribute(attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     origin->addSubProperty(item);
@@ -59,15 +66,17 @@ namespace urdf_editor
     // Create orientation properties
     item = manager->addProperty(QtVariantPropertyManager::groupTypeId(), QTranslator::tr("Orientation (rad)"));
     sub_item = manager->addProperty(QVariant::Double, QTranslator::tr("Roll"));
+    sub_item->setValue(r);
     sub_item->setAttribute(attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     sub_item = manager->addProperty(QVariant::Double, QTranslator::tr("Pitch"));
+    sub_item->setValue(p);
     sub_item->setAttribute(attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     sub_item = manager->addProperty(QVariant::Double, QTranslator::tr("Yaw"));
+    sub_item->setValue(y);
     sub_item->setAttribute(attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     origin->addSubProperty(item);
   }
-
 }

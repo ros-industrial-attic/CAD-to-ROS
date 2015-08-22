@@ -2,6 +2,7 @@
 #define COMMON_H
 #include <QtCore>
 #include "include/urdf_editor/qtpropertybrowser/qtvariantproperty.h"
+#include <urdf_model/joint.h>
 
 namespace urdf_editor
 {
@@ -10,8 +11,9 @@ namespace urdf_editor
   {
   public:
     static QString attributeStr(int enumValue);
-    static void addOriginProperty(QtVariantPropertyManager *manager, QtProperty *top_item);
+    static void addOriginProperty(QtVariantPropertyManager *manager, QtProperty *top_item, urdf::Pose &orgin);
   };
+
 }
 typedef urdf_editor::Attributes Attributes;
 #endif // COMMON_H

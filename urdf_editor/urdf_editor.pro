@@ -16,15 +16,17 @@ include(qtpropertybrowser.pri)
 SOURCES += \
     src/main.cpp \
     src/urdf_editor.cpp \
-    src/joint_tree_property.cpp \
     src/common.cpp \
-    src/link_tree_property.cpp
+    src/joint_property.cpp \
+    src/link_property.cpp \
+    src/urdf_property.cpp
 
 HEADERS  += \
     include/urdf_editor/urdf_editor.h \
-    include/urdf_editor/joint_tree_property.h \
     include/urdf_editor/common.h \
-    include/urdf_editor/link_tree_property.h
+    include/urdf_editor/link_property.h \
+    include/urdf_editor/joint_property.h \
+    include/urdf_editor/urdf_property.h
 
 FORMS    += ui/industrial_robot_builder.ui
 
