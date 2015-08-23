@@ -8,7 +8,7 @@ URDFEditor::URDFEditor(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  QString file_path = "/home/larmstrong/catkin_iiwa_ws/src/kuka_experimental/kuka_lbr_iiwa_support/urdf/lbr_iiwa_14_r820.urdf";
+  QString file_path = "/home/larmstrong/catkin_abb_ws/src/abb/abb_irb2400_support/urdf/irb2400.urdf";
 
   urdf_tree_.reset(new urdf_editor::URDFProperty(ui->robotTreeWidget, ui->propertyBrowserContainer));
   urdf_tree_->loadURDF(file_path);

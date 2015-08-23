@@ -24,7 +24,7 @@ namespace urdf_editor
     void originValueChanged(QtProperty *property, const QVariant &val);
 
   private:
-    boost::shared_ptr<urdf::Pose> origin_;
+    urdf::Pose &origin_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
@@ -46,7 +46,7 @@ namespace urdf_editor
     void jointAxisValueChanged(QtProperty *property, const QVariant &val);
 
   private:
-    boost::shared_ptr<urdf::Vector3> axis_;
+    urdf::Vector3 &axis_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;

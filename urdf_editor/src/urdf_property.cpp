@@ -214,6 +214,10 @@ namespace urdf_editor
     {
       ctree_to_joint_property_[item]->loadProperty(property_editor_);
     }
+    else
+    {
+      property_editor_->clear();
+    }
   }
 
   void URDFProperty::on_propertyWidget_customContextMenuRequested(const QPoint &pos)

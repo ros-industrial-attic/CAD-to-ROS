@@ -3,7 +3,7 @@
 namespace urdf_editor
 {
   //Origin Property
-  OriginProperty::OriginProperty(urdf::Pose &origin): origin_(&origin), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  OriginProperty::OriginProperty(urdf::Pose &origin): origin_(origin), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     QtVariantProperty *item;
     QtVariantProperty *sub_item;
@@ -12,22 +12,22 @@ namespace urdf_editor
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
               this, SLOT(originValueChanged(QtProperty *, const QVariant &)));
 
-    origin_->rotation.getRPY(r, p, y);
+    origin_.rotation.getRPY(r, p, y);
 
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), QTranslator::tr("Origin"));
 
     // Create position properties
     item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), QTranslator::tr("Position (m)"));
     sub_item = manager_->addProperty(QVariant::Double, QTranslator::tr("X"));
-    sub_item->setValue(origin_->position.x);
+    sub_item->setValue(origin_.position.x);
     sub_item->setAttribute(Common::attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     sub_item = manager_->addProperty(QVariant::Double, QTranslator::tr("Y"));
-    sub_item->setValue(origin_->position.y);
+    sub_item->setValue(origin_.position.y);
     sub_item->setAttribute(Common::attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     sub_item = manager_->addProperty(QVariant::Double, QTranslator::tr("Z"));
-    sub_item->setValue(origin_->position.z);
+    sub_item->setValue(origin_.position.z);
     sub_item->setAttribute(Common::attributeStr(Decimals), 6);
     item->addSubProperty(sub_item);
     top_item_->addSubProperty(item);
@@ -68,19 +68,19 @@ namespace urdf_editor
 
     if (name == "X")
     {
-      origin_->position.x = val.toDouble();
+      origin_.position.x = val.toDouble();
     }
     else if (name == "Y")
     {
-      origin_->position.y = val.toDouble();
+      origin_.position.y = val.toDouble();
     }
     else if (name == "Z")
     {
-      origin_->position.z = val.toDouble();
+      origin_.position.z = val.toDouble();
     }
     else if (name == "Roll" || name == "Pitch" || name == "Yaw")
     {
-      origin_->rotation.getRPY(r, p, y);
+      origin_.rotation.getRPY(r, p, y);
 
       if (name == "Roll")
         r = val.toDouble();
@@ -89,12 +89,12 @@ namespace urdf_editor
       else if (name == "Yaw")
         y = val.toDouble();
 
-      origin_->rotation.setFromRPY(r, p, y);
+      origin_.rotation.setFromRPY(r, p, y);
     }
   }
 
   //Joint Axis Property
-  JointAxisProperty::JointAxisProperty(urdf::Vector3 &axis): axis_(&axis), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  JointAxisProperty::JointAxisProperty(urdf::Vector3 &axis): axis_(axis), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     QtVariantProperty *item;
 
@@ -103,15 +103,15 @@ namespace urdf_editor
 
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Axis"));
     item = manager_->addProperty(QVariant::Double, tr("X"));
-    item->setValue(axis_->x);
+    item->setValue(axis_.x);
     item->setAttribute(Common::attributeStr(Decimals), 6);
     top_item_->addSubProperty(item);
     item = manager_->addProperty(QVariant::Double, tr("Y"));
-    item->setValue(axis_->y);
+    item->setValue(axis_.y);
     item->setAttribute(Common::attributeStr(Decimals), 6);
     top_item_->addSubProperty(item);
     item = manager_->addProperty(QVariant::Double, tr("Z"));
-    item->setValue(axis_->z);
+    item->setValue(axis_.z);
     item->setAttribute(Common::attributeStr(Decimals), 6);
     top_item_->addSubProperty(item);
 
@@ -132,15 +132,15 @@ namespace urdf_editor
   {
     if (property->propertyName() == "X")
     {
-      axis_->x = val.toDouble();
+      axis_.x = val.toDouble();
     }
     else if (property->propertyName() == "Y")
     {
-      axis_->y = val.toDouble();
+      axis_.y = val.toDouble();
     }
     else if (property->propertyName() == "Z")
     {
-      axis_->z = val.toDouble();
+      axis_.z = val.toDouble();
     }
   }
 
