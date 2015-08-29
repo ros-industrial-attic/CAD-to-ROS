@@ -27,6 +27,10 @@ namespace urdf_editor
 
     void on_propertyWidget_customContextMenuRequested(const QPoint &pos);
 
+    void on_propertyWidget_linkNameChanged(LinkProperty *property, const QVariant &val);
+
+    void on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val);
+
   private:
     bool buildTree();
 
@@ -45,7 +49,9 @@ namespace urdf_editor
     boost::shared_ptr<urdf::ModelInterface> model_;
     QMap<boost::shared_ptr<urdf::Link>, QTreeWidgetItem *> joint_child_to_ctree_;
     QMap<QTreeWidgetItem *, JointPropertyPtr> ctree_to_joint_property_;
+    QMap<JointProperty *, QTreeWidgetItem *> joint_property_to_ctree_;
     QMap<QTreeWidgetItem *, LinkPropertyPtr> ltree_to_link_property_;
+    QMap<LinkProperty *, QTreeWidgetItem *> link_property_to_ltree_;
 
     QStringList link_names_, joint_names_;
     QTreeWidgetItem *root_;

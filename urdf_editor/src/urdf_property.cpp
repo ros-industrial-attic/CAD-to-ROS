@@ -102,7 +102,10 @@ namespace urdf_editor
     root_->addChild(item);
 
     LinkPropertyPtr tree_link(new LinkProperty(link));
+    QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
+              this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
     ltree_to_link_property_[item] = tree_link;
+    link_property_to_ltree_[tree_link.get()] = item;
 
     link_names_.append(QString::fromStdString(link->name));
   }
@@ -127,8 +130,11 @@ namespace urdf_editor
 
     joint_child_to_ctree_[model_->links_.find(joint->child_link_name)->second] = item;
 
-    JointPropertyPtr tree_joint(new JointProperty(joint));
+    JointPropertyPtr tree_joint(new JointProperty(joint, link_names_, joint_names_));
+    QObject::connect(tree_joint.get(), SIGNAL(jointNameChanged(JointProperty *, const QVariant &)),
+              this, SLOT(on_propertyWidget_jointNameChanged(JointProperty*,QVariant)));
     ctree_to_joint_property_[item] = tree_joint;
+    joint_property_to_ctree_[tree_joint.get()] = item;
 
     joint_names_.append(name);
   }
@@ -212,6 +218,7 @@ namespace urdf_editor
     }
     else if (isJoint(item))
     {
+      //need to pass a list of available child links
       ctree_to_joint_property_[item]->loadProperty(property_editor_);
     }
     else
@@ -223,6 +230,22 @@ namespace urdf_editor
   void URDFProperty::on_propertyWidget_customContextMenuRequested(const QPoint &pos)
   {
     qDebug() << "property custom menu";
+  }
+
+  void URDFProperty::on_propertyWidget_linkNameChanged(LinkProperty *property, const QVariant &val)
+  {
+    QString orig_name = link_property_to_ltree_[property]->text(0);
+    int idx = link_names_.indexOf(orig_name);
+    link_names_.replace(idx, val.toString());
+    link_property_to_ltree_[property]->setText(0, val.toString());
+  }
+
+  void URDFProperty::on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val)
+  {
+    QString orig_name = joint_property_to_ctree_[property]->text(0);
+    int idx = joint_names_.indexOf(orig_name);
+    joint_names_.replace(idx, val.toString());
+    joint_property_to_ctree_[property]->setText(0, val.toString());
   }
 
 }

@@ -18,6 +18,8 @@ namespace urdf_editor
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
+    void loadData();
+
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
@@ -28,6 +30,7 @@ namespace urdf_editor
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
+    bool loading_;
 
   };
 
@@ -40,6 +43,8 @@ namespace urdf_editor
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
+    void loadData();
+
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
@@ -50,6 +55,7 @@ namespace urdf_editor
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
+    bool loading_;
 
   };
 
@@ -62,6 +68,8 @@ namespace urdf_editor
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
+    void loadData();
+
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
@@ -72,6 +80,7 @@ namespace urdf_editor
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
+    bool loading_;
 
   };
 
@@ -79,10 +88,12 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    JointMimicProperty(boost::shared_ptr<urdf::JointMimic> mimic);
+    JointMimicProperty(boost::shared_ptr<urdf::JointMimic> mimic, QStringList &joint_names);
     ~JointMimicProperty();
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+
+    void loadData();
 
     QtProperty *getTopItem() { return top_item_; }
 
@@ -94,6 +105,8 @@ namespace urdf_editor
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
+    bool loading_;
+    QStringList &joint_names_;
 
   };
 
@@ -106,6 +119,8 @@ namespace urdf_editor
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
+    void loadData();
+
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
@@ -116,6 +131,7 @@ namespace urdf_editor
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
+    bool loading_;
 
   };
 
@@ -128,6 +144,8 @@ namespace urdf_editor
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
+    void loadData();
+
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
@@ -138,6 +156,7 @@ namespace urdf_editor
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
+    bool loading_;
 
   };
 
@@ -150,6 +169,8 @@ namespace urdf_editor
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
+    void loadData();
+
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
@@ -160,6 +181,7 @@ namespace urdf_editor
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
+    bool loading_;
 
   };
 
@@ -168,18 +190,26 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    JointProperty(boost::shared_ptr<urdf::Joint> joint);
+    JointProperty(boost::shared_ptr<urdf::Joint> joint, QStringList &link_names, QStringList &joint_names);
     ~JointProperty();
 
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
+    void loadData();
+
   private slots:
     void jointValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void jointNameChanged(JointProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::Joint> joint_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
+    bool loading_;
+    QStringList &link_names_;
+    QStringList &joint_names_;
     boost::shared_ptr<JointLimitsProperty> limits_property_;
     boost::shared_ptr<JointDynamicsProperty> dynamics_property_;
     boost::shared_ptr<JointCalibrationProperty> calibration_property_;
