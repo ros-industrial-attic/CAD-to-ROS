@@ -1,4 +1,4 @@
-#include "include/urdf_editor/common.h"
+#include "urdf_editor/common.h"
 #include <QTranslator>
 
 namespace urdf_editor

@@ -39,8 +39,8 @@
 ****************************************************************************/
 
 
-#include "include/urdf_editor/qtpropertybrowser/qtpropertymanager.h"
-#include "include/urdf_editor/qtpropertybrowser/qtpropertybrowserutils_p.h"
+#include "urdf_editor/qtpropertybrowser/qtpropertymanager.h"
+#include "urdf_editor/qtpropertybrowser/qtpropertybrowserutils_p.h"
 #include <QDateTime>
 #include <QLocale>
 #include <QMap>

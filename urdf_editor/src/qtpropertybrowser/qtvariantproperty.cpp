@@ -39,9 +39,9 @@
 ****************************************************************************/
 
 
-#include "include/urdf_editor/qtpropertybrowser/qtvariantproperty.h"
-#include "include/urdf_editor/qtpropertybrowser/qtpropertymanager.h"
-#include "include/urdf_editor/qtpropertybrowser/qteditorfactory.h"
+#include "qtvariantproperty.h"
+#include "qtpropertymanager.h"
+#include "qteditorfactory.h"
 #include <QVariant>
 #include <QIcon>
 #include <QDate>

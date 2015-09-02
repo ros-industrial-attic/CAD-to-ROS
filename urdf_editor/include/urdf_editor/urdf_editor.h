@@ -4,18 +4,28 @@
 #include <QMainWindow>
 #include <QtCore>
 #include <QtGui>
-#include "include/urdf_editor/qtpropertybrowser/qtvariantproperty.h"
-#include "include/urdf_editor/qtpropertybrowser/qtpropertymanager.h"
-#include "include/urdf_editor/qtpropertybrowser/qteditorfactory.h"
-#include "include/urdf_editor/qtpropertybrowser/qttreepropertybrowser.h"
-#include "include/urdf_editor/joint_property.h"
-#include "include/urdf_editor/link_property.h"
-#include "include/urdf_editor/urdf_property.h"
+#include <QObject>
+#include "urdf_editor/qtpropertybrowser/qtvariantproperty.h"
+#include "urdf_editor/qtpropertybrowser/qtpropertymanager.h"
+#include "urdf_editor/qtpropertybrowser/qteditorfactory.h"
+#include "urdf_editor/qtpropertybrowser/qttreepropertybrowser.h"
+#include "urdf_editor/joint_property.h"
+#include "urdf_editor/link_property.h"
+#include "urdf_editor/urdf_property.h"
 
-namespace Ui {
 
+//#include "my_rviz.h"
 
+namespace Ui
+{
 class URDFEditor;
+}
+
+namespace rviz
+{
+class Display;
+class RenderPanel;
+class VisualizationManager;
 }
 
 class URDFEditor : public QMainWindow
@@ -32,6 +42,9 @@ private:
   QList<QString> joint_names;
 
   urdf_editor::URDFPropertyPtr urdf_tree_;
+  rviz::VisualizationManager *rviz_manager_;
+  rviz::RenderPanel *rviz_panel_;
+  //urdf_editor::MyRviz *rviz_;
 };
 
 #endif // URDF_EDITOR_H

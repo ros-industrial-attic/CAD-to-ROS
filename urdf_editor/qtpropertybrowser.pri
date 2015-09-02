@@ -21,8 +21,7 @@ qtpropertybrowser-uselib:!qtpropertybrowser-buildlib {
             $$PWD/include/urdf_editor/qtpropertybrowser/qtvariantproperty.h \
             $$PWD/include/urdf_editor/qtpropertybrowser/qttreepropertybrowser.h \
             $$PWD/include/urdf_editor/qtpropertybrowser/qtbuttonpropertybrowser.h \
-            $$PWD/include/urdf_editor/qtpropertybrowser/qtgroupboxpropertybrowser.h \
-            $$PWD/include/urdf_editor/qtpropertybrowser/qtpropertybrowserutils_p.h
+            $$PWD/include/urdf_editor/qtpropertybrowser/qtgroupboxpropertybrowser.h
     RESOURCES += $$PWD/include/urdf_editor/qtpropertybrowser/qtpropertybrowser.qrc
 }
 
@@ -30,3 +29,6 @@ win32 {
     contains(TEMPLATE, lib):contains(CONFIG, shared):DEFINES += QT_QTPROPERTYBROWSER_EXPORT
     else:qtpropertybrowser-uselib:DEFINES += QT_QTPROPERTYBROWSER_IMPORT
 }
+
+HEADERS += \
+    $$PWD/include/urdf_editor/qtpropertybrowser/qtpropertybrowserutils_p.h

@@ -13,6 +13,8 @@ TEMPLATE = app
 
 include(qtpropertybrowser.pri)
 
+INCLUDEPATH += /usr/include/OGRE
+
 SOURCES += \
     src/main.cpp \
     src/urdf_editor.cpp \
@@ -20,6 +22,7 @@ SOURCES += \
     src/joint_property.cpp \
     src/link_property.cpp \
     src/urdf_property.cpp
+    #my_rviz.cpp
 
 HEADERS  += \
     include/urdf_editor/urdf_editor.h \
@@ -27,10 +30,14 @@ HEADERS  += \
     include/urdf_editor/link_property.h \
     include/urdf_editor/joint_property.h \
     include/urdf_editor/urdf_property.h
+    #my_rviz.h
 
 FORMS    += ui/industrial_robot_builder.ui
 
 LIBS += -lurdfdom_model
+LIBS += -lboost_system
+LIBS += -L/opt/ros/indigo/lib -lrviz
+LIBS += -L/opt/ros/indigo/lib -lroscpp
 
 DISTFILES += \
     config.pri

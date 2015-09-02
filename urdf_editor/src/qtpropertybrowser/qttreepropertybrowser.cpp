@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 
-#include "include/urdf_editor/qtpropertybrowser/qttreepropertybrowser.h"
+#include "qttreepropertybrowser.h"
 #include <QSet>
 #include <QIcon>
 #include <QTreeWidget>

@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 
-#include "include/urdf_editor/qtpropertybrowser/qtgroupboxpropertybrowser.h"
+#include "urdf_editor/qtpropertybrowser/qtgroupboxpropertybrowser.h"
 #include <QSet>
 #include <QGridLayout>
 #include <QLabel>
@@ -531,4 +531,4 @@ void QtGroupBoxPropertyBrowser::itemChanged(QtBrowserItem *item)
 QT_END_NAMESPACE
 #endif
 
-#include "moc_qtgroupboxpropertybrowser.cpp"
+#include "urdf_editor/qtpropertybrowser/moc_qtgroupboxpropertybrowser.cpp"

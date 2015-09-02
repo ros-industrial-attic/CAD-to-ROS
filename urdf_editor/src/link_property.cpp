@@ -1,4 +1,4 @@
-#include "include/urdf_editor/link_property.h"
+#include "urdf_editor/link_property.h"
 
 namespace urdf_editor
 {

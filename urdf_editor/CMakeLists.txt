@@ -1,0 +1,174 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(urdf_builder)
+find_package(catkin REQUIRED COMPONENTS rviz roscpp)
+
+find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+include(${QT_USE_FILE})
+
+find_package(urdfdom REQUIRED)
+
+set(qtpropertyeditor_SRCS
+      src/qtpropertybrowser/qtpropertybrowser.cpp
+      src/qtpropertybrowser/qtpropertymanager.cpp
+      src/qtpropertybrowser/qteditorfactory.cpp
+      src/qtpropertybrowser/qtvariantproperty.cpp
+      src/qtpropertybrowser/qttreepropertybrowser.cpp
+      src/qtpropertybrowser/qtbuttonpropertybrowser.cpp
+      src/qtpropertybrowser/qtgroupboxpropertybrowser.cpp
+      src/qtpropertybrowser/qtpropertybrowserutils.cpp
+)
+
+set(qtpropertyeditor_INCLUDE_DIRECTORIES
+      include/urdf_editor/qtpropertybrowser
+      src/qtpropertybrowser
+      ${CMAKE_CURRENT_BINARY_DIR}
+      ${CMAKE_CURRENT_BINARY_DIR}/include/urdf_editor/qtpropertybrowser
+      ${QT_INCLUDE_DIR}
+)
+
+qt4_generate_moc(
+  include/urdf_editor/qtpropertybrowser/qtpropertybrowser.h
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowser.cpp
+)
+qt4_generate_moc(
+  include/urdf_editor/qtpropertybrowser/qtpropertymanager.h
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertymanager.cpp
+)
+qt4_generate_moc(
+  include/urdf_editor/qtpropertybrowser/qteditorfactory.h
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qteditorfactory.cpp
+)
+qt4_generate_moc(
+  include/urdf_editor/qtpropertybrowser/qtvariantproperty.h
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtvariantproperty.cpp
+)
+qt4_generate_moc(
+  include/urdf_editor/qtpropertybrowser/qttreepropertybrowser.h
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qttreepropertybrowser.cpp
+)
+qt4_generate_moc(
+  include/urdf_editor/qtpropertybrowser/qtbuttonpropertybrowser.h
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtbuttonpropertybrowser.cpp
+)
+qt4_generate_moc(
+  include/urdf_editor/qtpropertybrowser/qtgroupboxpropertybrowser.h
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtgroupboxpropertybrowser.cpp
+)
+qt4_generate_moc(
+  src/urdf_editor/qtpropertybrowser/qtpropertymanager.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertymanager.moc
+)
+qt4_generate_moc(
+  src/urdf_editor/qtpropertybrowser/qteditorfactory.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/qteditorfactory.moc
+)
+qt4_generate_moc(
+  src/urdf_editor/qtpropertybrowser/qttreepropertybrowser.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/qttreepropertybrowser.moc
+)
+
+set(
+  qtpropertyeditor_HEADERS_ONLY_MOC
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowser.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertymanager.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qteditorfactory.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtvariantproperty.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qttreepropertybrowser.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtbuttonpropertybrowser.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtgroupboxpropertybrowser.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertymanager.moc
+  ${CMAKE_CURRENT_BINARY_DIR}/qteditorfactory.moc
+  ${CMAKE_CURRENT_BINARY_DIR}/qttreepropertybrowser.moc
+)
+
+set_source_files_properties(
+  ${qtpropertyeditor_HEADERS_ONLY_MOC}
+  PROPERTIES
+    HEADER_FILE_ONLY true
+)
+
+qt4_generate_moc(
+  include/urdf_editor/qtpropertybrowser/qtpropertybrowserutils_p.h
+  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowserutils_p.cpp
+)
+
+set(qtpropertyeditor_HEADERS_MOC
+      ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowserutils_p.cpp
+)
+
+set(qtpropertyeditor_MOC
+      ${qtpropertyeditor_HEADERS_MOC}
+      ${qtpropertyeditor_HEADERS_ONLY_MOC}
+)
+
+qt4_add_resources(qtpropertyeditor_RESOURCES
+                    include/urdf_editor/qtpropertybrowser/qtpropertybrowser.qrc
+)
+
+
+include_directories(${qtpropertyeditor_INCLUDE_DIRECTORIES})
+
+add_library(QtPropertyBrowser
+              ${qtpropertyeditor_MOC}
+              ${qtpropertyeditor_SRCS}
+              ${qtpropertyeditor_RESOURCES})
+
+target_link_libraries(QtPropertyBrowser
+                        ${QT_LIBRARIES}
+                        ${QT_QTCORE_LIBRARY}
+                        ${QT_QTGUI_LIBRARY})
+
+set(editor_SRCS
+      src/main.cpp
+      src/urdf_editor.cpp
+      src/common.cpp
+      src/joint_property.cpp
+      src/link_property.cpp
+      src/urdf_property.cpp
+)
+
+set(editor_HDRS
+      include/urdf_editor/urdf_editor.h
+      include/urdf_editor/joint_property.h
+      include/urdf_editor/link_property.h
+      include/urdf_editor/urdf_property.h
+)
+
+set(editor_UIS
+      industrial_robot_builder.ui
+)
+
+set(editor_INCLUDE_DIRECTORIES
+      include
+      ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+catkin_package(
+  INCLUDE_DIRS ${qtpropertyeditor_INCLUDE_DIRECTORIES} ${editor_INCLUDE_DIRECTORIES}
+  LIBRARIES QtPropertyBrowser
+  CATKIN_DEPENDS roscpp rviz
+  DEPENDS urdfdom
+)
+
+qt4_wrap_cpp(EDITOR_MOCS ${editor_HDRS})
+qt4_wrap_ui(EDITOR_UIS_H ${editor_UIS})
+
+include_directories(${editor_INCLUDE_DIRECTORIES}
+                    ${catkin_INCLUDE_DIRS}
+                    ${urdfdom_INCLUDE_DIRS})
+
+add_executable(urdf_builder
+                  ${editor_UIS_H}
+                  ${editor_MOCS}
+                  ${editor_SRCS})
+
+target_link_libraries(urdf_builder
+                        QtPropertyBrowser
+                        ${catkin_LIBRARIES}
+                        ${urdfdom_LIBRARIES}
+                        ${QT_LIBRARIES}
+                        ${QT_QTCORE_LIBRARY}
+                        ${QT_QTGUI_LIBRARY})
+
+## Install
+#install(TARGETS urdf_builder DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
