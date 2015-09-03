@@ -1,4 +1,4 @@
-#include "include/urdf_editor/joint_property.h"
+#include "urdf_editor/joint_property.h"
 
 namespace urdf_editor
 {

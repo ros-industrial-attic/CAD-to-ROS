@@ -2,9 +2,9 @@
 #define JOINT_PROPERTY
 #include <QtCore>
 #include <boost/shared_container_iterator.hpp>
-#include <include/urdf_editor/qtpropertybrowser/qttreepropertybrowser.h>
-#include "include/urdf_editor/qtpropertybrowser/qtvariantproperty.h"
-#include "include/urdf_editor/common.h"
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+#include "urdf_editor/common.h"
 #include <urdf_model/joint.h>
 
 namespace urdf_editor

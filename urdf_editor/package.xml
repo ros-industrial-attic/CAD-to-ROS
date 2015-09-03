@@ -1,0 +1,22 @@
+<package>
+  <name>urdf_builder</name>
+  <version>0.0.1</version>
+  <description>
+     This is an editor for creating and modifying urdf files.
+  </description>
+  <maintainer email="levi.armstrong@swri.org">Levi Armstrong</maintainer>
+  <license>BSD</license>
+
+  <url></url>
+  <author>Levi Armstrong</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>rviz</build_depend>
+  <build_depend>qt_property_browser</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>rviz</run_depend>
+  <run_depend>qt_property_browser</run_depend>
+</package>

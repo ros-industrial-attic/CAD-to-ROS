@@ -1,4 +1,4 @@
-#include "include/urdf_editor/urdf_property.h"
+#include "urdf_editor/urdf_property.h"
 #include <QVBoxLayout>
 
 namespace urdf_editor

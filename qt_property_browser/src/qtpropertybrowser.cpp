@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 
-#include "include/urdf_editor/qtpropertybrowser/qtpropertybrowser.h"
+#include "qtpropertybrowser.h"
 #include <QSet>
 #include <QMap>
 #include <QIcon>

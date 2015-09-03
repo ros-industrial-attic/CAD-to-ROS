@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 
-#include "include/urdf_editor/qtpropertybrowser/qtpropertybrowserutils_p.h"
+#include "qtpropertybrowserutils_p.h"
 #include <QApplication>
 #include <QPainter>
 #include <QHBoxLayout>
