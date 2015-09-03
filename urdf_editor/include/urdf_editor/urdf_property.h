@@ -7,7 +7,7 @@
 #include <urdf_parser/urdf_parser.h>
 #include "urdf_editor/joint_property.h"
 #include "urdf_editor/link_property.h"
-#include "urdf_editor/qtpropertybrowser/qttreepropertybrowser.h"
+#include <qttreepropertybrowser.h>
 
 namespace urdf_editor
 {

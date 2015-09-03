@@ -14,7 +14,9 @@
 
   <build_depend>roscpp</build_depend>
   <build_depend>rviz</build_depend>
+  <build_depend>qt_property_browser</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>rviz</run_depend>
+  <run_depend>qt_property_browser</run_depend>
 </package>

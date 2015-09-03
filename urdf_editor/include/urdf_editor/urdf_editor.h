@@ -5,10 +5,11 @@
 #include <QtCore>
 #include <QtGui>
 #include <QObject>
-#include "urdf_editor/qtpropertybrowser/qtvariantproperty.h"
-#include "urdf_editor/qtpropertybrowser/qtpropertymanager.h"
-#include "urdf_editor/qtpropertybrowser/qteditorfactory.h"
-#include "urdf_editor/qtpropertybrowser/qttreepropertybrowser.h"
+#include <qtvariantproperty.h>
+#include <qtpropertymanager.h>
+#include <qteditorfactory.h>
+#include <qteditorfactory.h>
+#include <qttreepropertybrowser.h>
 #include "urdf_editor/joint_property.h"
 #include "urdf_editor/link_property.h"
 #include "urdf_editor/urdf_property.h"

@@ -2,8 +2,8 @@
 #define LINK_PROPERTY_H
 #include <QtCore>
 #include <boost/shared_ptr.hpp>
-#include "urdf_editor/qtpropertybrowser/qttreepropertybrowser.h"
-#include "urdf_editor/qtpropertybrowser/qtvariantproperty.h"
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
 #include "urdf_editor/common.h"
 #include "urdf_editor/joint_property.h"
 #include <urdf_model/link.h>

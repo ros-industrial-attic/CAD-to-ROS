@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 #include <QtCore>
-#include "urdf_editor/qtpropertybrowser/qtvariantproperty.h"
+#include <qtvariantproperty.h>
 #include <urdf_model/joint.h>
 
 namespace urdf_editor
