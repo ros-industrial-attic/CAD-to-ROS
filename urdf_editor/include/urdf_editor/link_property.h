@@ -24,7 +24,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void linkGeometryValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::Geometry> geometry_;
@@ -48,7 +51,11 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void linkCollisionValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+    void onChildValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::Collision> collision_;
@@ -75,7 +82,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void linkNewMaterialValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::Material> material_;
@@ -100,7 +110,11 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void linkVisualValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+    void onChildValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::Visual> visual_;
@@ -128,7 +142,11 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void linkInertialValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+    void onChildValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::Inertial> inertial_;
@@ -152,10 +170,12 @@ namespace urdf_editor
     void loadData();
 
   private slots:
-    void linkValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+    void onChildValueChanged(QtProperty *property, const QVariant &val);
 
   signals:
     void linkNameChanged(LinkProperty *property, const QVariant &val);
+    void valueChanged();
 
   private:
     boost::shared_ptr<urdf::Link> link_;

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(urdf_builder)
-find_package(catkin REQUIRED COMPONENTS rviz roscpp qt_property_browser)
+find_package(catkin REQUIRED COMPONENTS rviz roscpp qt_property_browser moveit_ros_visualization)
 
 find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
@@ -14,6 +14,7 @@ set(editor_SRCS
       src/joint_property.cpp
       src/link_property.cpp
       src/urdf_property.cpp
+      src/my_rviz.cpp
 )
 
 set(editor_HDRS
@@ -21,6 +22,7 @@ set(editor_HDRS
       include/urdf_editor/joint_property.h
       include/urdf_editor/link_property.h
       include/urdf_editor/urdf_property.h
+      include/urdf_editor/my_rviz.h
 )
 
 set(editor_UIS
@@ -44,17 +46,17 @@ qt4_wrap_ui(editor_UIS_H ${editor_UIS})
 
 include_directories(${editor_INCLUDE_DIRECTORIES} ${catkin_INCLUDE_DIRS} ${QT_INCLUDE_DIR} ${urdfdom_INCLUDE_DIR})
 
-add_executable(urdf_builder
+add_executable(${PROJECT_NAME}
                   ${editor_UIS_H}
                   ${editor_MOCS}
                   ${editor_SRCS})
 
-target_link_libraries(urdf_builder
-                        ${catkin_LIBRARIES}
-                        ${urdfdom_LIBRARIES}
-                        ${QT_LIBRARIES}
-                        ${QT_QTCORE_LIBRARY}
-                        ${QT_QTGUI_LIBRARY})
+target_link_libraries(${PROJECT_NAME}
+                          ${catkin_LIBRARIES}
+                          ${urdfdom_LIBRARIES}
+                          ${QT_LIBRARIES}
+                          ${QT_QTCORE_LIBRARY}
+                          ${QT_QTGUI_LIBRARY})
 
 ## Install
-#install(TARGETS urdf_builder DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS ${PROJECT_NAME} DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

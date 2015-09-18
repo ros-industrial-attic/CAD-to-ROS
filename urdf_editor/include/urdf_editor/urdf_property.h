@@ -8,6 +8,7 @@
 #include "urdf_editor/joint_property.h"
 #include "urdf_editor/link_property.h"
 #include <qttreepropertybrowser.h>
+#include "urdf_editor/my_rviz.h"
 
 namespace urdf_editor
 {
@@ -15,7 +16,7 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    URDFProperty(QTreeWidget *tree_widget, QWidget *browser_parent);
+    URDFProperty(QTreeWidget *tree_widget, QWidget *browser_parent, QWidget *rviz_parent);
     ~URDFProperty();
 
     bool loadURDF(QString file_path);
@@ -31,6 +32,8 @@ namespace urdf_editor
 
     void on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val);
 
+    void on_propertyWidget_valueChanged();
+
   private:
     bool buildTree();
 
@@ -44,8 +47,6 @@ namespace urdf_editor
     bool isJoint(QTreeWidgetItem *item);
 
     boost::shared_ptr<QtTreePropertyBrowser> property_editor_;
-    boost::shared_ptr<QtVariantEditorFactory> variant_factory_; //This should be removed after link_property is updated like joint_propery
-
     boost::shared_ptr<urdf::ModelInterface> model_;
     QMap<boost::shared_ptr<urdf::Link>, QTreeWidgetItem *> joint_child_to_ctree_;
     QMap<QTreeWidgetItem *, JointPropertyPtr> ctree_to_joint_property_;
@@ -57,8 +58,9 @@ namespace urdf_editor
     QTreeWidgetItem *root_;
     QTreeWidgetItem *link_root_;
     QTreeWidgetItem *joint_root_;
-    boost::shared_ptr<QTreeWidget> tree_widget_;
-    boost::shared_ptr<QWidget> browser_parent_;
+    QTreeWidget *tree_widget_;
+    QWidget *browser_parent_;
+    urdf_editor::MyRviz *rviz_widget_;
 
   };
   typedef boost::shared_ptr<URDFProperty> URDFPropertyPtr;

@@ -13,20 +13,11 @@
 #include "urdf_editor/joint_property.h"
 #include "urdf_editor/link_property.h"
 #include "urdf_editor/urdf_property.h"
-
-
-//#include "my_rviz.h"
+#include "my_rviz.h"
 
 namespace Ui
 {
 class URDFEditor;
-}
-
-namespace rviz
-{
-class Display;
-class RenderPanel;
-class VisualizationManager;
 }
 
 class URDFEditor : public QMainWindow
@@ -43,9 +34,6 @@ private:
   QList<QString> joint_names;
 
   urdf_editor::URDFPropertyPtr urdf_tree_;
-  rviz::VisualizationManager *rviz_manager_;
-  rviz::RenderPanel *rviz_panel_;
-  //urdf_editor::MyRviz *rviz_;
 };
 
 #endif // URDF_EDITOR_H

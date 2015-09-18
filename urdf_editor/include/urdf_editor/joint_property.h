@@ -23,7 +23,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void originValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     urdf::Pose &origin_;
@@ -48,7 +51,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void jointAxisValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     urdf::Vector3 &axis_;
@@ -73,7 +79,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void jointSafetyValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::JointSafety> safety_;
@@ -98,7 +107,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void jointMimicValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::JointMimic> mimic_;
@@ -124,7 +136,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void jointCalibrationValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::JointCalibration> calibration_;
@@ -149,7 +164,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void jointDynamicsValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::JointDynamics> dynamics_;
@@ -174,7 +192,10 @@ namespace urdf_editor
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
-    void jointLimitsValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+
+  signals:
+    void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
     boost::shared_ptr<urdf::JointLimits> limits_;
@@ -198,10 +219,12 @@ namespace urdf_editor
     void loadData();
 
   private slots:
-    void jointValueChanged(QtProperty *property, const QVariant &val);
+    void onValueChanged(QtProperty *property, const QVariant &val);
+    void onChildValueChanged(QtProperty *property, const QVariant &val);
 
   signals:
     void jointNameChanged(JointProperty *property, const QVariant &val);
+    void valueChanged();
 
   private:
     boost::shared_ptr<urdf::Joint> joint_;

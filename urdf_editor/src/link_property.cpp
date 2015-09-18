@@ -10,7 +10,7 @@ namespace urdf_editor
     QtVariantProperty *sub_item;
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-              this, SLOT(linkGeometryValueChanged(QtProperty *, const QVariant &)));
+              this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
     //{SPHERE, BOX, CYLINDER, MESH}
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Geometry"));
     item = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
@@ -131,7 +131,7 @@ namespace urdf_editor
     property_editor->setFactoryForManager(manager_, factory_);
   }
 
-  void LinkGeometryProperty::linkGeometryValueChanged(QtProperty *property, const QVariant &val)
+  void LinkGeometryProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
@@ -195,6 +195,8 @@ namespace urdf_editor
           mesh->scale.z = val.toDouble();
       }
     }
+
+    emit LinkGeometryProperty::valueChanged(property, val);
   }
 
   // Link Collision Property
@@ -206,7 +208,7 @@ namespace urdf_editor
     urdf::Pose origin;
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-              this, SLOT(linkCollisionValueChanged(QtProperty *, const QVariant &)));
+              this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
 
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Collision"));
     item = manager_->addProperty(QVariant::String, tr("Name"));
@@ -223,12 +225,18 @@ namespace urdf_editor
     if (p_norm > 0.0 || r_norm > 0.0)
     {
       origin_property_.reset(new OriginProperty(collision_->origin));
+      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(origin_property_->getTopItem());
     }
 
     if (collision_->geometry)
     {
       geometry_property_.reset(new LinkGeometryProperty(collision_->geometry));
+      QObject::connect(geometry_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(geometry_property_->getTopItem());
     }
 
@@ -276,7 +284,7 @@ namespace urdf_editor
 
   }
 
-  void LinkCollisionProperty::linkCollisionValueChanged(QtProperty *property, const QVariant &val)
+  void LinkCollisionProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
@@ -285,6 +293,15 @@ namespace urdf_editor
     if (name == "Name")
       collision_->group_name = val.toString().toStdString();
 
+    emit LinkCollisionProperty::valueChanged(property, val);
+  }
+
+  void LinkCollisionProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit LinkCollisionProperty::valueChanged(property, val);
   }
 
   // Link Material Property
@@ -294,7 +311,7 @@ namespace urdf_editor
     QtVariantProperty *item;
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-              this, SLOT(linkNewMaterialValueChanged(QtProperty *, const QVariant &)));
+              this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
 
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Material"));
 
@@ -342,7 +359,7 @@ namespace urdf_editor
     property_editor->setFactoryForManager(manager_, factory_);
   }
 
-  void LinkNewMaterialProperty::linkNewMaterialValueChanged(QtProperty *property, const QVariant &val)
+  void LinkNewMaterialProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
@@ -360,6 +377,8 @@ namespace urdf_editor
       material_->color.a = val.toDouble()/255.0;
     else if (name == "Texture")
       material_->texture_filename = val.toString().toStdString();
+
+    emit LinkNewMaterialProperty::valueChanged(property, val);
   }
 
   // Link Visual Property
@@ -371,7 +390,7 @@ namespace urdf_editor
     urdf::Pose origin;
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-              this, SLOT(linkVisualValueChanged(QtProperty *, const QVariant &)));
+              this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
 
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Visual"));
     item = manager_->addProperty(QVariant::String, tr("Name"));
@@ -387,18 +406,27 @@ namespace urdf_editor
     if (p_norm > 0.0 || r_norm > 0.0)
     {
       origin_property_.reset(new OriginProperty(visual_->origin));
+      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(origin_property_->getTopItem());
     }
 
     if (visual_->material)
     {
       new_material_property_.reset(new LinkNewMaterialProperty(visual_->material));
+      QObject::connect(new_material_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(new_material_property_->getTopItem());
     }
 
     if (visual_->geometry)
     {
       geometry_property_.reset(new LinkGeometryProperty(visual_->geometry));
+      QObject::connect(geometry_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(geometry_property_->getTopItem());
     }
     else
@@ -454,7 +482,7 @@ namespace urdf_editor
 
   }
 
-  void LinkVisualProperty::linkVisualValueChanged(QtProperty *property, const QVariant &val)
+  void LinkVisualProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
@@ -463,6 +491,15 @@ namespace urdf_editor
     if (name == "Name")
       visual_->group_name = val.toString().toStdString();
 
+    emit LinkVisualProperty::valueChanged(property, val);
+  }
+
+  void LinkVisualProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit LinkVisualProperty::valueChanged(property, val);
   }
 
   // Link Inertial Property
@@ -475,7 +512,7 @@ namespace urdf_editor
     urdf::Pose origin;
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-              this, SLOT(linkInertialValueChanged(QtProperty *, const QVariant &)));
+              this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
 
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Inertial"));
 
@@ -508,6 +545,9 @@ namespace urdf_editor
     if (p_norm > 0.0 || r_norm > 0.0)
     {
       origin_property_.reset(new OriginProperty(inertial_->origin));
+      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(origin_property_->getTopItem());
     }
     loading_ = false;
@@ -558,7 +598,7 @@ namespace urdf_editor
       origin_property_->loadFactoryForManager(property_editor);
   }
 
-  void LinkInertialProperty::linkInertialValueChanged(QtProperty *property, const QVariant &val)
+  void LinkInertialProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
@@ -578,6 +618,16 @@ namespace urdf_editor
       inertial_->ixz = val.toDouble();
     else if (name == "Iyz")
       inertial_->iyz = val.toDouble();
+
+    emit LinkInertialProperty::valueChanged(property, val);
+  }
+
+  void LinkInertialProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit LinkInertialProperty::valueChanged(property, val);
   }
 
   // Link Property
@@ -585,20 +635,32 @@ namespace urdf_editor
   {
     loading_ = true;
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-              this, SLOT(linkValueChanged(QtProperty *, const QVariant &)));
+              this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
 
     //top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Link Properties"));
 
     name_item_ = manager_->addProperty(QVariant::String, tr("Name"));
 
     if (link_->inertial)
+    {
       inertial_property_.reset(new LinkInertialProperty(link_->inertial));
+      QObject::connect(inertial_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+    }
 
     if (link_->visual)
+    {
       visual_property_.reset(new LinkVisualProperty(link_->visual));
+      QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+    }
 
     if (link_->collision)
+    {
       collision_property_.reset(new LinkCollisionProperty(link_->collision));
+      QObject::connect(collision_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+    }
 
     loading_ = true;
   }
@@ -652,7 +714,7 @@ namespace urdf_editor
     }
   }
 
-  void LinkProperty::linkValueChanged(QtProperty *property, const QVariant &val)
+  void LinkProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
@@ -676,6 +738,15 @@ namespace urdf_editor
 
       emit LinkProperty::linkNameChanged(this, val);
     }
+    emit LinkProperty::valueChanged();
+  }
+
+  void LinkProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit LinkProperty::valueChanged();
   }
 }
 

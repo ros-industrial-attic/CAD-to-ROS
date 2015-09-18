@@ -3,12 +3,12 @@
 
 namespace urdf_editor
 {
-  URDFProperty::URDFProperty(QTreeWidget *tree_widget, QWidget *browser_parent)
+  URDFProperty::URDFProperty(QTreeWidget *tree_widget, QWidget *browser_parent, QWidget *rviz_parent)
   {
-    tree_widget_.reset(tree_widget);
-    browser_parent_.reset(browser_parent);
+    tree_widget_ = tree_widget;
+    browser_parent_ = browser_parent;
 
-    root_ = new QTreeWidgetItem(tree_widget_.get());
+    root_ = new QTreeWidgetItem(tree_widget_);
     root_->setText(0, "RobotModel");
     tree_widget_->addTopLevelItem(root_);
 
@@ -20,17 +20,17 @@ namespace urdf_editor
     joint_root_->setText(0,"Chain");
     root_->addChild(joint_root_);
 
-    variant_factory_.reset(new QtVariantEditorFactory());
-
     property_editor_.reset(new QtTreePropertyBrowser());
     property_editor_->setContextMenuPolicy(Qt::CustomContextMenu);
     property_editor_->setPropertiesWithoutValueMarked(false);
     property_editor_->setRootIsDecorated(true);
     property_editor_->setResizeMode(QtTreePropertyBrowser::ResizeToContents);
 
-    QVBoxLayout *vlayout = new QVBoxLayout(browser_parent_.get());
+    QVBoxLayout *vlayout = new QVBoxLayout(browser_parent_);
     vlayout->setMargin(0);
     vlayout->addWidget(property_editor_.get());
+
+    rviz_widget_ = new urdf_editor::MyRviz(rviz_parent);
 
     connect(tree_widget, SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_treeWidget_customContextMenuRequested(QPoint)));
@@ -40,6 +40,7 @@ namespace urdf_editor
 
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
+
   }
 
   URDFProperty::~URDFProperty()
@@ -51,11 +52,18 @@ namespace urdf_editor
     model_ = urdf::parseURDFFile(file_path.toStdString());
     if (model_)
       if (buildTree())
+      {
+        rviz_widget_->loadRobot(model_);
         return true;
+      }
       else
+      {
         return false;
+      }
     else
+    {
       return false;
+    }
   }
 
   bool URDFProperty::buildTree()
@@ -104,6 +112,9 @@ namespace urdf_editor
     LinkPropertyPtr tree_link(new LinkProperty(link));
     QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
+    QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
+              this, SLOT(on_propertyWidget_valueChanged()));
+
     ltree_to_link_property_[item] = tree_link;
     link_property_to_ltree_[tree_link.get()] = item;
 
@@ -133,6 +144,9 @@ namespace urdf_editor
     JointPropertyPtr tree_joint(new JointProperty(joint, link_names_, joint_names_));
     QObject::connect(tree_joint.get(), SIGNAL(jointNameChanged(JointProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_jointNameChanged(JointProperty*,QVariant)));
+    QObject::connect(tree_joint.get(), SIGNAL(valueChanged()),
+              this, SLOT(on_propertyWidget_valueChanged()));
+
     ctree_to_joint_property_[item] = tree_joint;
     joint_property_to_ctree_[tree_joint.get()] = item;
 
@@ -174,7 +188,7 @@ namespace urdf_editor
 
       QTreeWidgetItem *sel = tree_widget_->selectedItems()[0];
 
-      QMenu *menu = new QMenu(tree_widget_.get());
+      QMenu *menu = new QMenu(tree_widget_);
       menu->addAction("Add");
       menu->addAction("Remove");
       QAction *selected_item = menu->exec(tree_widget_->mapToGlobal(pos));
@@ -246,6 +260,11 @@ namespace urdf_editor
     int idx = joint_names_.indexOf(orig_name);
     joint_names_.replace(idx, val.toString());
     joint_property_to_ctree_[property]->setText(0, val.toString());
+  }
+
+  void URDFProperty::on_propertyWidget_valueChanged()
+  {
+    rviz_widget_->loadRobot(model_);
   }
 
 }

@@ -1,9 +1,23 @@
 #ifndef MYRVIZ_H
 #define MYRVIZ_H
 
-#include "rviz/visualization_manager.h"
-#include "rviz/render_panel.h"
-#include "rviz/display.h"
+#include <rviz/visualization_manager.h>
+#include <rviz/render_panel.h>
+#include <rviz/display.h>
+#include <moveit/robot_state_rviz_plugin/robot_state_display.h>
+#include <urdf/model.h>
+
+namespace rviz
+{
+class Display;
+class RenderPanel;
+class VisualizationManager;
+}
+
+namespace moveit_rviz_plugin
+{
+class RobotStateDisplay;
+}
 
 namespace urdf_editor
 {
@@ -15,10 +29,13 @@ namespace urdf_editor
     MyRviz(QWidget *parent = 0);
     virtual ~MyRviz();
 
+    bool loadRobot(boost::shared_ptr<urdf::ModelInterface> robot_model);
+
   private:
     rviz::VisualizationManager *manager_;
     rviz::RenderPanel *render_panel_;
-    rviz::Display *display_;
+    moveit_rviz_plugin::RobotStateDisplay *robot_display_;
+    rviz::Display *grid_display_;
   };
 
 }
