@@ -3,6 +3,7 @@
 #include "rviz/visualization_manager.h"
 #include "rviz/render_panel.h"
 #include <sstream>
+#include <QFileDialog>
 
 URDFEditor::URDFEditor(QWidget *parent) :
   QMainWindow(parent),
@@ -10,7 +11,7 @@ URDFEditor::URDFEditor(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  QString file_path = "/home/larmstrong/catkin_abb_ws/src/abb/abb_irb2400_support/urdf/irb2400.urdf";
+  QString file_path = QFileDialog::getOpenFileName(this,tr("Open ROS URDF File"),"",tr("URDF Files (*.urdf)"));
 
   urdf_tree_.reset(new urdf_editor::URDFProperty(ui->robotTreeWidget, ui->propertyBrowserContainer, ui->mainTabWidget->currentWidget()));
   urdf_tree_->loadURDF(file_path);
