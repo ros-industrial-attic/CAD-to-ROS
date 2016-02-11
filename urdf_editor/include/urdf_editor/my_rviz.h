@@ -31,6 +31,8 @@ namespace urdf_editor
 
     bool loadRobot(boost::shared_ptr<urdf::ModelInterface> robot_model);
 
+    bool clear();
+
   private:
     rviz::VisualizationManager *manager_;
     rviz::RenderPanel *render_panel_;

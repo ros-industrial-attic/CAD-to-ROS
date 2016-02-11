@@ -7,6 +7,7 @@ namespace urdf_editor
   {
     tree_widget_ = tree_widget;
     browser_parent_ = browser_parent;
+    model_.reset(new urdf::ModelInterface);
 
     root_ = new QTreeWidgetItem(tree_widget_);
     root_->setText(0, "RobotModel");
@@ -47,6 +48,32 @@ namespace urdf_editor
   {
   }
 
+  bool URDFProperty::clear()
+  {
+    // Clear Links from tree
+    while (link_root_->childCount() > 0)
+    {
+      link_root_->removeChild(link_root_->child(0));
+    }
+
+    // Clear Joints from tree
+    while (joint_root_->childCount() > 0)
+    {
+      joint_root_->removeChild(joint_root_->child(0));
+    }
+
+    rviz_widget_->clear();
+    model_->clear();
+    property_editor_->clear();
+    joint_child_to_ctree_.clear();
+    ctree_to_joint_property_.clear();
+    joint_property_to_ctree_.clear();
+    ltree_to_link_property_.clear();
+    link_property_to_ltree_.clear();
+    link_names_.clear();
+    joint_names_.clear();
+  }
+
   bool URDFProperty::loadURDF(QString file_path)
   {
     model_ = urdf::parseURDFFile(file_path.toStdString());
@@ -64,6 +91,14 @@ namespace urdf_editor
     {
       return false;
     }
+  }
+
+  bool URDFProperty::saveURDF(QString file_path)
+  {
+    TiXmlDocument* doc = urdf::exportURDF(model_);
+    TiXmlDeclaration decl("1.0", "", "");
+    doc->InsertBeforeChild(doc->RootElement(), decl);
+    doc->SaveFile(file_path.toStdString());
   }
 
   bool URDFProperty::buildTree()

@@ -11,10 +11,9 @@ URDFEditor::URDFEditor(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  QString file_path = QFileDialog::getOpenFileName(this,tr("Open ROS URDF File"),"",tr("URDF Files (*.urdf)"));
+  ui->action_Save->setDisabled(true);
 
   urdf_tree_.reset(new urdf_editor::URDFProperty(ui->robotTreeWidget, ui->propertyBrowserContainer, ui->mainTabWidget->currentWidget()));
-  urdf_tree_->loadURDF(file_path);
 }
 
 URDFEditor::~URDFEditor()
@@ -22,4 +21,37 @@ URDFEditor::~URDFEditor()
   delete ui;
 }
 
+void URDFEditor::on_action_Open_triggered()
+{
+  QString file_path = QFileDialog::getOpenFileName(this, tr("Open ROS URDF File"), QFileInfo(file_path_).dir().absolutePath(), tr("URDF Files (*.urdf)"));
+  if (!file_path.isEmpty())
+  {
+    file_path_ = file_path;
+    urdf_tree_->clear();
+    urdf_tree_->loadURDF(file_path);
+    ui->action_Save->setDisabled(false);
+  }
+}
 
+void URDFEditor::on_action_Save_triggered()
+{
+  urdf_tree_->saveURDF(file_path_);
+}
+
+void URDFEditor::on_actionSave_As_triggered()
+{
+  QString file_path = QFileDialog::getSaveFileName(this, tr("Save As ROS URDF File"), QFileInfo(file_path_).dir().absolutePath(), tr("URDF Files (*.urdf)"));
+  if (!file_path.isEmpty())
+  {
+    file_path_ = file_path;
+    urdf_tree_->saveURDF(file_path);
+    ui->action_Save->setDisabled(false);
+  }
+}
+
+void URDFEditor::on_action_New_triggered()
+{
+    file_path_.clear();
+    urdf_tree_->clear();
+    ui->action_Save->setDisabled(true);
+}

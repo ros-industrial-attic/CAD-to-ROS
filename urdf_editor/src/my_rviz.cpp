@@ -47,4 +47,13 @@ namespace urdf_editor
     robot_display_->setEnabled(true);
   }
 
+  bool MyRviz::clear()
+  {
+    robot_display_->setEnabled(false);
+    ros::NodeHandle nh("~");
+    nh.setParam("/ros_workbench", "");
+    robot_display_->reset();
+    robot_display_->setEnabled(true);
+  }
+
 }
