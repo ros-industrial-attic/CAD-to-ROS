@@ -17,7 +17,7 @@ namespace urdf_editor
     LinkGeometryProperty(boost::shared_ptr<urdf::Geometry> geometry);
     ~LinkGeometryProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -44,7 +44,7 @@ namespace urdf_editor
     LinkCollisionProperty(boost::shared_ptr<urdf::Collision> collision);
     ~LinkCollisionProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -75,7 +75,7 @@ namespace urdf_editor
     LinkNewMaterialProperty(boost::shared_ptr<urdf::Material> material);
     ~LinkNewMaterialProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -103,7 +103,7 @@ namespace urdf_editor
     LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual);
     ~LinkVisualProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -135,9 +135,13 @@ namespace urdf_editor
     LinkInertialProperty(boost::shared_ptr<urdf::Inertial> inertial);
     ~LinkInertialProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
+
+    bool hasOriginProperty();
+
+    void createOriginProperty();
 
     QtProperty *getTopItem() { return top_item_; }
 
@@ -157,6 +161,7 @@ namespace urdf_editor
     boost::shared_ptr<OriginProperty> origin_property_;
 
   };
+  typedef boost::shared_ptr<LinkInertialProperty> LinkInertialPropertyPtr;
 
   class LinkProperty : public QObject
   {
@@ -168,6 +173,11 @@ namespace urdf_editor
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
     void loadData();
+
+    bool hasInertialProperty();
+    void createInertialProperty();
+    LinkInertialPropertyPtr getInertialProperty();
+
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);

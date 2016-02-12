@@ -126,7 +126,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void LinkGeometryProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void LinkGeometryProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }
@@ -273,7 +273,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void LinkCollisionProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void LinkCollisionProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
     if (origin_property_)
@@ -354,7 +354,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void LinkNewMaterialProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void LinkNewMaterialProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }
@@ -468,7 +468,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void LinkVisualProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void LinkVisualProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
     if (origin_property_)
@@ -591,7 +591,21 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void LinkInertialProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  bool LinkInertialProperty::hasOriginProperty()
+  {
+    return (origin_property_ != NULL);
+  }
+
+  void LinkInertialProperty::createOriginProperty()
+  {
+    if (!origin_property_)
+    {
+      origin_property_.reset(new OriginProperty(inertial_->origin));
+      top_item_->addSubProperty(origin_property_->getTopItem());
+    }
+  }
+
+  void LinkInertialProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
     if (origin_property_)
@@ -712,6 +726,25 @@ namespace urdf_editor
       collision_property_->loadFactoryForManager(property_editor);
       property_editor->addProperty(collision_property_->getTopItem());
     }
+  }
+
+  bool LinkProperty::hasInertialProperty()
+  {
+    return (inertial_property_ != NULL);
+  }
+
+  void LinkProperty::createInertialProperty()
+  {
+    if(!link_->inertial)
+    {
+      link_->inertial.reset(new urdf::Inertial());
+      inertial_property_.reset(new LinkInertialProperty(link_->inertial));
+    }
+  }
+
+  LinkInertialPropertyPtr LinkProperty::getInertialProperty()
+  {
+    return inertial_property_;
   }
 
   void LinkProperty::onValueChanged(QtProperty *property, const QVariant &val)
