@@ -22,7 +22,7 @@ namespace urdf_editor
 
     robot_display_ = new moveit_rviz_plugin::RobotStateDisplay();
     robot_display_->setName("RobotModel");
-    robot_display_->subProp("Robot Description")->setValue("/ros_workbench");
+    robot_display_->subProp("Robot Description")->setValue("ros_workbench");
     manager_->addDisplay(robot_display_, false);
 
     grid_display_ = manager_->createDisplay("rviz/Grid", "MyGrid", true);
@@ -42,7 +42,7 @@ namespace urdf_editor
     TiXmlDocument *robot_document = urdf::exportURDF(robot_model);
     TiXmlPrinter printer;
     robot_document->Accept(&printer);
-    nh.setParam("/ros_workbench", printer.CStr());
+    nh.setParam("ros_workbench", printer.CStr());
     robot_display_->reset();
     robot_display_->setEnabled(true);
   }
@@ -51,7 +51,7 @@ namespace urdf_editor
   {
     robot_display_->setEnabled(false);
     ros::NodeHandle nh("~");
-    nh.setParam("/ros_workbench", "");
+    nh.setParam("ros_workbench", "");
     robot_display_->reset();
     robot_display_->setEnabled(true);
   }
