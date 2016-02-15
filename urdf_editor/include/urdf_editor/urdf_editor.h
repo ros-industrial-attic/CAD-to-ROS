@@ -37,6 +37,8 @@ private slots:
 
   void on_action_New_triggered();
 
+  void on_actionE_xit_triggered();
+
 private:
   Ui::URDFEditor *ui;
   QList<QString> link_names;

@@ -55,3 +55,8 @@ void URDFEditor::on_action_New_triggered()
     urdf_tree_->clear();
     ui->action_Save->setDisabled(true);
 }
+
+void URDFEditor::on_actionE_xit_triggered()
+{
+    QApplication::quit();
+}
