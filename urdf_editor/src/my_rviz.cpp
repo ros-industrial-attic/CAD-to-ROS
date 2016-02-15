@@ -5,7 +5,7 @@
 namespace urdf_editor
 {
 
-  MyRviz::MyRviz(QWidget *parent): QWidget(parent)
+  MyRviz::MyRviz(QWidget *parent): QWidget(parent), nh_("~")
   {
     // Construct and layout render panel
     render_panel_ = new rviz::RenderPanel();
@@ -38,11 +38,10 @@ namespace urdf_editor
   bool MyRviz::loadRobot(boost::shared_ptr<urdf::ModelInterface> robot_model)
   {
     robot_display_->setEnabled(false);
-    ros::NodeHandle nh("~");
     TiXmlDocument *robot_document = urdf::exportURDF(robot_model);
     TiXmlPrinter printer;
     robot_document->Accept(&printer);
-    nh.setParam("ros_workbench", printer.CStr());
+    nh_.setParam("ros_workbench", printer.CStr());
     robot_display_->reset();
     robot_display_->setEnabled(true);
   }
@@ -50,8 +49,7 @@ namespace urdf_editor
   bool MyRviz::clear()
   {
     robot_display_->setEnabled(false);
-    ros::NodeHandle nh("~");
-    nh.setParam("ros_workbench", "");
+    nh_.setParam("ros_workbench", "");
     robot_display_->reset();
     robot_display_->setEnabled(true);
   }
