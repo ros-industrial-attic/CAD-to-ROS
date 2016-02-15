@@ -7,7 +7,7 @@ namespace urdf_editor
   {
     tree_widget_ = tree_widget;
     browser_parent_ = browser_parent;
-    model_.reset(new urdf::ModelInterface);
+    model_.reset(new urdf::ModelInterface());
 
     root_ = new QTreeWidgetItem(tree_widget_);
     root_->setText(0, "RobotModel");
