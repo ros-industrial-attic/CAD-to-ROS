@@ -49,7 +49,7 @@ namespace urdf_editor
   bool MyRviz::clear()
   {
     robot_display_->setEnabled(false);
-    nh_.setParam("ros_workbench", "");
+    nh_.deleteParam("ros_workbench");
     robot_display_->reset();
     robot_display_->setEnabled(true);
   }
