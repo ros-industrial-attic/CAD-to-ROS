@@ -21,6 +21,10 @@ namespace urdf_editor
 
     bool loadURDF(QString file_path);
 
+    bool saveURDF(QString file_path);
+
+    bool clear();
+
   private slots:
     void on_treeWidget_customContextMenuRequested(const QPoint &pos);
 

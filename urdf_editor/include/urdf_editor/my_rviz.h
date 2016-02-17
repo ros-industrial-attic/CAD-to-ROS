@@ -31,11 +31,14 @@ namespace urdf_editor
 
     bool loadRobot(boost::shared_ptr<urdf::ModelInterface> robot_model);
 
+    bool clear();
+
   private:
     rviz::VisualizationManager *manager_;
     rviz::RenderPanel *render_panel_;
     moveit_rviz_plugin::RobotStateDisplay *robot_display_;
     rviz::Display *grid_display_;
+    ros::NodeHandle nh_;
   };
 
 }
