@@ -16,7 +16,7 @@ namespace urdf_editor
     OriginProperty(urdf::Pose &origin);
     ~OriginProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -44,7 +44,7 @@ namespace urdf_editor
     JointAxisProperty(urdf::Vector3 &axis);
     ~JointAxisProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -72,7 +72,7 @@ namespace urdf_editor
     JointSafetyProperty(boost::shared_ptr<urdf::JointSafety> safety);
     ~JointSafetyProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -100,7 +100,7 @@ namespace urdf_editor
     JointMimicProperty(boost::shared_ptr<urdf::JointMimic> mimic, QStringList &joint_names);
     ~JointMimicProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -129,7 +129,7 @@ namespace urdf_editor
     JointCalibrationProperty(boost::shared_ptr<urdf::JointCalibration> calibration);
     ~JointCalibrationProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -157,7 +157,7 @@ namespace urdf_editor
     JointDynamicsProperty(boost::shared_ptr<urdf::JointDynamics> dynamics);
     ~JointDynamicsProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 
@@ -185,7 +185,7 @@ namespace urdf_editor
     JointLimitsProperty(boost::shared_ptr<urdf::JointLimits> limits);
     ~JointLimitsProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
+    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
     void loadData();
 

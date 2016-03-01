@@ -89,7 +89,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void OriginProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void OriginProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }
@@ -174,7 +174,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointAxisProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void JointAxisProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }
@@ -249,7 +249,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointSafetyProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void JointSafetyProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }
@@ -324,7 +324,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointMimicProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void JointMimicProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }
@@ -391,7 +391,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointCalibrationProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void JointCalibrationProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }
@@ -456,7 +456,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointDynamicsProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void JointDynamicsProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }
@@ -534,7 +534,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointLimitsProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  void JointLimitsProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }

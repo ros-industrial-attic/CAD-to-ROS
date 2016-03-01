@@ -1,6 +1,12 @@
 #include "urdf_editor/urdf_property.h"
 #include <QVBoxLayout>
 
+const QString PROPERTY_NAME_TEXT = "Name";
+const QString PROPERTY_COLLISION_TEXT = "Collision";
+const QString PROPERTY_VISUAL_TEXT = "Visual";
+const QString PROPERTY_INERTIAL_TEXT = "Inertial";
+const QString PROPERTY_ORIGIN_TEXT = "Origin";
+
 namespace urdf_editor
 {
   URDFProperty::URDFProperty(QTreeWidget *tree_widget, QWidget *browser_parent, QWidget *rviz_parent)
@@ -278,7 +284,95 @@ namespace urdf_editor
 
   void URDFProperty::on_propertyWidget_customContextMenuRequested(const QPoint &pos)
   {
-    qDebug() << "property custom menu";
+    QtBrowserItem *selb = property_editor_->currentItem();
+    QTreeWidgetItem *selt = tree_widget_->selectedItems()[0];
+
+    // don't show this menu for joints
+    if (!selb || isJoint(selt))
+      return;
+
+    if (!ltree_to_link_property_.contains(selt))
+    {
+      qDebug() << QString("The member ltree_to_link_property_ does not contain the link %1").arg(selt->text(0));
+      return;
+    }
+
+    LinkPropertyPtr activeLink = ltree_to_link_property_[selt];
+    QMenu menu(property_editor_.get());
+
+    // user right-clicked a 'Name' property entry: show 'Inertial', 'Visual'
+    // and 'Collision' options
+    if (selb->property()->propertyName() == PROPERTY_NAME_TEXT && !selb->parent())
+    {
+      QAction *inertial_action = menu.addAction(PROPERTY_INERTIAL_TEXT);
+      QAction *visual_action = menu.addAction(PROPERTY_VISUAL_TEXT);
+      QAction *collision_action = menu.addAction(PROPERTY_COLLISION_TEXT);
+
+      // if this link already has an 'inertial' element, don't allow user to
+      // add another
+      if (activeLink->hasInertialProperty())
+      {
+        inertial_action->setDisabled(true);
+      }
+
+      QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+      // don't do anything if user didn't select something
+      if (selected_item == NULL)
+        return;
+
+      if (selected_item == inertial_action)
+      {
+        activeLink->createInertialProperty();
+        activeLink->loadProperty(property_editor_);
+      }
+      else if (selected_item == visual_action)
+      {
+        // Need to implement
+      }
+      else if (selected_item == collision_action)
+      {
+        // Need to implement
+      }
+      else
+      {
+        // should never happen
+        qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+        assert (1==0);
+      }
+    }
+
+    // user right-clicked an 'Interial' property entry: show 'Origin' option
+    // only.
+    if (selb->property()->propertyName() == PROPERTY_INERTIAL_TEXT)
+    {
+      LinkInertialPropertyPtr activeInertia = activeLink->getInertialProperty();
+      QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
+
+      // if this link already has an 'origin' element, don't allow user to
+      // add another
+      if (activeInertia->hasOriginProperty())
+      {
+        origin->setDisabled(true);
+      }
+
+      QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+      // don't do anything if user didn't select something
+      if (selected_item == NULL)
+        return;
+
+      if (selected_item == origin)
+      {
+        activeInertia->createOriginProperty();
+        activeInertia->loadData();
+        activeLink->loadProperty(property_editor_);
+      }
+      else
+      {
+        // should never happen
+        qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+        assert (1==0);
+      }
+    }
   }
 
   void URDFProperty::on_propertyWidget_linkNameChanged(LinkProperty *property, const QVariant &val)
