@@ -6,6 +6,8 @@ const QString PROPERTY_COLLISION_TEXT = "Collision";
 const QString PROPERTY_VISUAL_TEXT = "Visual";
 const QString PROPERTY_INERTIAL_TEXT = "Inertial";
 const QString PROPERTY_ORIGIN_TEXT = "Origin";
+const QString PROPERTY_GEOMETRY_TEXT = "Geometry";
+const QString PROPERTY_MATERIAL_TEXT = "Material";
 
 namespace urdf_editor
 {
@@ -314,6 +316,21 @@ namespace urdf_editor
       {
         inertial_action->setDisabled(true);
       }
+      
+      // if this link already has a 'visual element, don't allow user to
+      // add another
+      if (activeLink->hasVisualProperty())
+      {
+        visual_action->setDisabled(true);
+      }
+      
+      // if this link already has a 'collision element, don't allow user to
+      // add another
+      if (activeLink->hasCollisionProperty())
+      {
+        collision_action->setDisabled(true);
+      }
+
 
       QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
       // don't do anything if user didn't select something
@@ -327,11 +344,13 @@ namespace urdf_editor
       }
       else if (selected_item == visual_action)
       {
-        // Need to implement
+        activeLink->createVisualProperty();
+        activeLink->loadProperty(property_editor_);
       }
       else if (selected_item == collision_action)
       {
-        // Need to implement
+        activeLink->createCollisionProperty();
+        activeLink->loadProperty(property_editor_);
       }
       else
       {
@@ -373,6 +392,106 @@ namespace urdf_editor
         assert (1==0);
       }
     }
+    //   user right-clicked on 'Visual' property entry: show  option
+    // only.
+    else if (selb->property()->propertyName() == PROPERTY_VISUAL_TEXT)
+    {
+      LinkVisualPropertyPtr activeVisual = activeLink->getVisualProperty();
+      QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
+      QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
+      QAction *material = menu.addAction(PROPERTY_MATERIAL_TEXT);
+      // if this link already has an 'origin' element, don't allow user to
+      // add another
+      if (activeVisual->hasOriginProperty())
+      {
+        origin->setDisabled(true);
+      }
+      if (activeVisual->hasGeometryProperty())
+      {
+        geometry->setDisabled(true);
+      }
+      if (activeVisual->hasMaterialProperty())
+      {
+        material->setDisabled(true);
+      }
+      
+
+      QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+      // don't do anything if user didn't select something
+      if (selected_item == NULL)
+        return;
+
+      if (selected_item == origin)
+      {
+        activeVisual->createOriginProperty();
+        activeVisual->loadData();
+        activeLink->loadProperty(property_editor_);
+      }
+      else if (selected_item == geometry)
+      {
+        activeVisual->createGeometryProperty();
+        activeVisual->loadData();
+        activeLink->loadProperty(property_editor_);
+      }
+      else if (selected_item == material)
+      {
+        activeVisual->createMaterialProperty();
+        activeVisual->loadData();
+        activeLink->loadProperty(property_editor_);
+      }
+      else
+      {
+        // should never happen
+        qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+        assert (1==0);
+      }
+    }
+       // user right-clicked on 'Collsion' property entry: show  option
+    // only.
+    else if (selb->property()->propertyName() == PROPERTY_COLLISION_TEXT)
+    {
+      LinkCollisionPropertyPtr activeCollision = activeLink->getCollisionProperty();
+      QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
+      QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
+      // if this link already has an 'origin' element, don't allow user to
+      // add another
+      if (activeCollision->hasOriginProperty())
+      {
+        origin->setDisabled(true);
+      }
+      
+      if (activeCollision->hasGeometryProperty())
+      {
+        geometry->setDisabled(true);
+      }
+      
+      
+
+      QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+      // don't do anything if user didn't select something
+      if (selected_item == NULL)
+        return;
+
+      if (selected_item == origin)
+      {
+        activeCollision->createOriginProperty();
+        activeCollision->loadData();
+        activeLink->loadProperty(property_editor_);
+      }
+       else if (selected_item == geometry)
+      {
+        activeCollision->createGeometryProperty();
+        activeCollision->loadData();
+        activeLink->loadProperty(property_editor_);
+      }
+      else
+      {
+        // should never happen
+        qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+        assert (1==0);
+      }
+    }
+    
   }
 
   void URDFProperty::on_propertyWidget_linkNameChanged(LinkProperty *property, const QVariant &val)
