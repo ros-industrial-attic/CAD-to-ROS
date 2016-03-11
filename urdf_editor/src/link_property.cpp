@@ -665,7 +665,15 @@ namespace urdf_editor
     loading_ = true;
     QtVariantProperty *item;
     QString name;
-    QList<QtProperty *> sub_items = top_item_->subProperties();
+
+    //Get Mass, since its the first one
+    item = static_cast<QtVariantProperty *>(top_item_->subProperties()[0]);
+    name = item->propertyName();
+      if (name == "Mass (kg)")
+        item->setValue(inertial_->mass);
+
+    //Remaining sub-properties are for Inertial values
+    QList<QtProperty *> sub_items = top_item_->subProperties()[1]->subProperties();
     for (int i = 0; i < sub_items.length(); ++i)
     {
       item = static_cast<QtVariantProperty *>(sub_items[i]);
