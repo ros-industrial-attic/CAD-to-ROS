@@ -638,6 +638,16 @@ namespace urdf_editor
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
 
+    tf_transformer_.updateLink(joint_->parent_link_name, joint_->child_link_name);
+    geometry_msgs::Vector3 vect;
+    vect.x = joint_->parent_to_joint_origin_transform.position.x;
+    vect.y = joint_->parent_to_joint_origin_transform.position.y;
+    vect.z = joint_->parent_to_joint_origin_transform.position.z;
+    tf_transformer_.updateLink(joint_->parent_link_name, vect);
+    geometry_msgs::Quaternion quat;
+    joint_->parent_to_joint_origin_transform.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
+    tf_transformer_.updateLink(joint_->parent_link_name, quat);
+
     loading_ = false;
   }
 

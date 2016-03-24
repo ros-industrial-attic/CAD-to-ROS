@@ -6,6 +6,7 @@
 #include <qtvariantproperty.h>
 #include "urdf_editor/common.h"
 #include <urdf_model/joint.h>
+#include <urdf_editor/urdf_transforms.h>
 
 namespace urdf_editor
 {
@@ -34,6 +35,7 @@ namespace urdf_editor
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
+
 
   };
 
@@ -244,6 +246,8 @@ namespace urdf_editor
     QtVariantProperty *type_item_;
     QtVariantProperty *parent_item_;
     QtVariantProperty *child_item_;
+
+    URDFTransformer tf_transformer_;
 
   };
   typedef boost::shared_ptr<JointProperty> JointPropertyPtr;

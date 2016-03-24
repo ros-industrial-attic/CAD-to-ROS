@@ -38,6 +38,7 @@ namespace urdf_editor
     rviz::RenderPanel *render_panel_;
     moveit_rviz_plugin::RobotStateDisplay *robot_display_;
     rviz::Display *grid_display_;
+    rviz::Display *tf_display_;
     ros::NodeHandle nh_;
   };
 
