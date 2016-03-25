@@ -497,6 +497,7 @@ namespace urdf_editor
     item->setValue(limits_->effort);
     item->setAttribute(Common::attributeStr(Minimum), 0.0);
     item->setAttribute(Common::attributeStr(Decimals), 6);
+    top_item_->addSubProperty(item);
     item = manager_->addProperty(QVariant::Double, tr("Velocity"));
     item->setValue(limits_->velocity);
     item->setAttribute(Common::attributeStr(Minimum), 0.0);
