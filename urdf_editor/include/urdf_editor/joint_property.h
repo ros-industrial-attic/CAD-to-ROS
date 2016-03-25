@@ -206,7 +206,28 @@ namespace urdf_editor
 
   };
 
-
+  /*! OriginProperty pointer */
+  typedef boost::shared_ptr<OriginProperty> OriginPropertyPtr;
+  
+  /*! JointAxisProperty pointer */
+  typedef boost::shared_ptr<JointAxisProperty> JointAxisPropertyPtr;
+  
+  /*! JointLimitsProperty pointer */
+  typedef boost::shared_ptr<JointLimitsProperty> JointLimitsPropertyPtr;
+  
+  /*! JointCalibrationProperty pointer */
+  typedef boost::shared_ptr<JointCalibrationProperty> JointCalibrationPropertyPtr;
+  
+  /*! JointDynamicsProperty pointer */
+  typedef boost::shared_ptr<JointDynamicsProperty> JointDynamicsPropertyPtr;
+  
+  /*! JointMimicProperty pointer */
+  typedef boost::shared_ptr<JointMimicProperty> JointMimicPropertyPtr;
+  
+  /*! JointSafetyProperty pointer */
+  typedef boost::shared_ptr<JointSafetyProperty> JointSafetyPropertyPtr;
+  
+  
   class JointProperty : public QObject
   {
     Q_OBJECT
@@ -217,6 +238,72 @@ namespace urdf_editor
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
     void loadData();
+    
+    /*! Check if has origin property */
+    bool hasOriginProperty();
+    
+    /*! Create origin property */
+    void createOriginProperty();
+   
+    /*! Get the Origin Property */
+    OriginPropertyPtr getOriginProperty();
+    
+    /*! Check if has axis property */
+    bool hasAxisProperty();
+    
+    /*! Create axis property */
+    void createAxisProperty();
+   
+    /*! Get the axis Property */
+    JointAxisPropertyPtr getAxisProperty();
+    
+    /*! Check if has limits property */
+    bool hasLimitsProperty();
+    
+    /*! Create limits property */
+    void createLimitsProperty();
+   
+    /*! Get the limits Property */
+    JointLimitsPropertyPtr getLimitsProperty();
+    
+    /*! Check if has calibration property */
+    bool hasCalibrationProperty();
+    
+    /*! Create calibration property */
+    void createCalibrationProperty();
+   
+    /*! Get the calibration Property */
+    JointCalibrationPropertyPtr getCalibrationProperty();
+    
+    /*! Check if has dyanmics property */
+    bool hasDynamicsProperty();
+    
+    /*! Create dynamics property */
+    void createDynamicsProperty();
+   
+    /*! Get the dynamics Property */
+    JointDynamicsPropertyPtr getDynamicsProperty();
+    
+    /*! Check if has mimic property */
+    bool hasMimicProperty();
+    
+    /*! Create mimic property */
+    void createMimicProperty();
+   
+    /*! Get the mimic Property */
+    JointMimicPropertyPtr getMimicProperty();
+    
+    /*! Check if has safety property */
+    bool hasSafetyProperty();
+    
+    /*! Create safety property */
+    void createSafetyProperty();
+   
+    /*! Get the safety Property */
+    JointSafetyPropertyPtr getSafetyProperty();
+    
+    
+    
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);

@@ -794,4 +794,233 @@ namespace urdf_editor
     emit JointProperty::valueChanged();
   }
 
+   /*!
+   *@brief Checks if the Joint has an origin property defined
+   * 
+   *@return returns true if origin property defined
+   */
+  bool JointProperty::hasOriginProperty()
+  {
+    return (origin_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the origin property
+   * 
+   */
+  void JointProperty::createOriginProperty()
+  {
+    if(! origin_property_)
+    {
+      origin_property_.reset(new OriginProperty(joint_->parent_to_joint_origin_transform));
+    }
+  }
+  
+   /*!
+   *@brief Get the origin property Object
+   * 
+   *@return OriginPropertyPtr
+   */
+  OriginPropertyPtr JointProperty::getOriginProperty()
+  {
+    return origin_property_;
+  }
+  
+   /*!
+   *@brief Checks if the Joint has an origin property defined
+   * 
+   *@return returns true if axis property defined
+   */
+  bool JointProperty::hasAxisProperty()
+  {
+    return (axis_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the axis property
+   * 
+   */
+  void JointProperty::createAxisProperty()
+  {
+    if(! axis_property_)
+    {
+      axis_property_.reset(new JointAxisProperty(joint_->axis));
+    }
+  }
+  
+   /*!
+   *@brief Get the axis property Object
+   * 
+   *@return JointAxisPropertyPtr
+   */
+  JointAxisPropertyPtr JointProperty::getAxisProperty()
+  {
+    return axis_property_;
+  }
+  
+   /*!
+   *@brief Checks if the Joint has a limits property defined
+   * 
+   *@return returns true if limits property defined
+   */
+  bool JointProperty::hasLimitsProperty()
+  {
+    return (limits_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the limits property
+   * 
+   */
+  void JointProperty::createLimitsProperty()
+  {
+    if(!joint_->limits)
+    {
+      joint_->limits.reset(new urdf::JointLimits());
+      limits_property_.reset(new JointLimitsProperty(joint_->limits));
+    }
+  }
+  
+   /*!
+   *@brief Get the limts property Object
+   * 
+   *@return JointLimitsPropertyPtr
+   */
+  JointLimitsPropertyPtr JointProperty::getLimitsProperty()
+  {
+    return limits_property_;
+  }
+  
+  /*!
+   *@brief Checks if the Joint has a calibration property defined
+   * 
+   *@return returns true if calibration property defined
+   */
+  bool JointProperty::hasCalibrationProperty()
+  {
+    return (calibration_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the calibration property
+   * 
+   */
+  void JointProperty::createCalibrationProperty()
+  {
+    if(!joint_->calibration)
+    {
+      joint_->calibration.reset(new urdf::JointCalibration());
+      calibration_property_.reset(new JointCalibrationProperty(joint_->calibration));
+    }
+  }
+  
+   /*!
+   *@brief Get the calibration property Object
+   * 
+   *@return JointCalibrationPropertyPtr
+   */
+  JointCalibrationPropertyPtr JointProperty::getCalibrationProperty()
+  {
+    return calibration_property_;
+  }
+  
+  /*!
+   *@brief Checks if the Joint has a dynamics property defined
+   * 
+   *@return returns true if dynamics property defined
+   */
+  bool JointProperty::hasDynamicsProperty()
+  {
+    return (dynamics_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the dynamics property
+   * 
+   */
+  void JointProperty::createDynamicsProperty()
+  {
+    if(!joint_->dynamics)
+    {
+      joint_->dynamics.reset(new urdf::JointDynamics());
+      dynamics_property_.reset(new JointDynamicsProperty(joint_->dynamics));
+    }
+  }
+  
+   /*!
+   *@brief Get the dynamics property Object
+   * 
+   *@return JointDynamicsPropertyPtr
+   */
+  JointDynamicsPropertyPtr JointProperty::getDynamicsProperty()
+  {
+    return dynamics_property_;
+  }
+  
+  /*!
+   *@brief Checks if the Joint has a mimic property defined
+   * 
+   *@return returns true if mimic property defined
+   */
+  bool JointProperty::hasMimicProperty()
+  {
+    return (mimic_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the mimic property
+   * 
+   */
+  void JointProperty::createMimicProperty()
+  {
+    if(!joint_->mimic)
+    {
+      joint_->mimic.reset(new urdf::JointMimic());
+      mimic_property_.reset(new JointMimicProperty(joint_->mimic, joint_names_));
+    }
+  }
+  
+   /*!
+   *@brief Get the mimic property Object
+   * 
+   *@return JointMimicPropertyPtr
+   */
+  JointMimicPropertyPtr JointProperty::getMimicProperty()
+  {
+    return mimic_property_;
+  }
+  
+   /*!
+   *@brief Checks if the Joint has a safety property defined
+   * 
+   *@return returns true if safety property defined
+   */
+  bool JointProperty::hasSafetyProperty()
+  { 
+    return (safety_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the safety property
+   * 
+   */
+  void JointProperty::createSafetyProperty()
+  {
+    if(!joint_->safety)
+    {
+      joint_->safety.reset(new urdf::JointSafety());
+      safety_property_.reset(new JointSafetyProperty(joint_->safety));
+    }
+  }
+  
+   /*!
+   *@brief Get the safety property Object
+   * 
+   *@return JointSafetyPropertyPtr
+   */
+  JointSafetyPropertyPtr JointProperty::getSafetyProperty()
+  {
+    return safety_property_;
+  }
+  
 }
