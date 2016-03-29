@@ -1,5 +1,6 @@
 #include "urdf_editor/urdf_property.h"
 #include <QVBoxLayout>
+#include <QMessageBox> // For dialog boxes
 
 const QString PROPERTY_NAME_TEXT = "Name";
 const QString PROPERTY_COLLISION_TEXT = "Collision";
@@ -104,7 +105,24 @@ namespace urdf_editor
     TiXmlDocument* doc = urdf::exportURDF(model_);
     TiXmlDeclaration decl("1.0", "", "");
     doc->InsertBeforeChild(doc->RootElement(), decl);
-    doc->SaveFile(file_path.toStdString());
+    bool savedCorrectly = false;
+    savedCorrectly = doc->SaveFile(file_path.toStdString());
+
+    QMessageBox msgBox;
+    if (savedCorrectly)
+    {
+        msgBox.setWindowTitle("Success!");
+        msgBox.setText("The file was saved.");
+        msgBox.exec();
+    }
+    else
+    {
+        msgBox.setWindowTitle("FAILURE!");
+        msgBox.setText("The file was NOT saved.");
+        msgBox.exec();
+    }
+
+    return true;
   }
 
   bool URDFProperty::buildTree()
