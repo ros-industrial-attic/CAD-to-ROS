@@ -226,6 +226,7 @@ namespace urdf_editor
 
   signals:
     void linkNameChanged(LinkProperty *property, const QVariant &val);
+    void linkVisibilityChanged(LinkProperty *property, const QVariant &val);
     void valueChanged();
 
   private:

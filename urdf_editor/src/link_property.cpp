@@ -1,4 +1,5 @@
 #include "urdf_editor/link_property.h"
+#include <qt4/QtCore/qvariant.h>
 
 namespace urdf_editor
 {
@@ -433,6 +434,10 @@ namespace urdf_editor
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Visual"));
    
     item = manager_->addProperty(QVariant::String, tr("Name"));
+    top_item_->addSubProperty(item);
+    
+    item = manager_->addProperty(QVariant::Bool, tr("Show in Editor"));
+    QObject::connect(
     top_item_->addSubProperty(item);
 
     
