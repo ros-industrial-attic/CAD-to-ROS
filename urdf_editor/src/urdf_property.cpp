@@ -107,13 +107,22 @@ namespace urdf_editor
     doc->InsertBeforeChild(doc->RootElement(), decl);
     bool savedCorrectly = false;
     savedCorrectly = doc->SaveFile(file_path.toStdString());
+
+    QMessageBox msgBox;
     if (savedCorrectly)
     {
-        QMessageBox* msgBox = new QMessageBox();
-        msgBox->setWindowTitle("Success!");
-        msgBox->setText("The file was saved.");
-        msgBox->show();
+        msgBox.setWindowTitle("Success!");
+        msgBox.setText("The file was saved.");
+        msgBox.exec();
     }
+    else
+    {
+        msgBox.setWindowTitle("FAILURE!");
+        msgBox.setText("The file was NOT saved.");
+        msgBox.exec();
+    }
+
+    return true;
   }
 
   bool URDFProperty::buildTree()
