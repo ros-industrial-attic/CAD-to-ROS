@@ -6,6 +6,14 @@ const QString PROPERTY_COLLISION_TEXT = "Collision";
 const QString PROPERTY_VISUAL_TEXT = "Visual";
 const QString PROPERTY_INERTIAL_TEXT = "Inertial";
 const QString PROPERTY_ORIGIN_TEXT = "Origin";
+const QString PROPERTY_GEOMETRY_TEXT = "Geometry";
+const QString PROPERTY_MATERIAL_TEXT = "Material";
+const QString PROPERTY_AXIS_TEXT = "Axis";
+const QString PROPERTY_CALIBRATION_TEXT = "Calibration";
+const QString PROPERTY_DYNAMICS_TEXT = "Dynamics";
+const QString PROPERTY_LIMIT_TEXT = "Limit";
+const QString PROPERTY_MIMIC_TEXT = "Mimic";
+const QString PROPERTY_SAFETY_TEXT = "Safety";
 
 namespace urdf_editor
 {
@@ -287,92 +295,335 @@ namespace urdf_editor
     QtBrowserItem *selb = property_editor_->currentItem();
     QTreeWidgetItem *selt = tree_widget_->selectedItems()[0];
 
-    // don't show this menu for joints
-    if (!selb || isJoint(selt))
+    
+    if (!selb)
       return;
 
-    if (!ltree_to_link_property_.contains(selt))
+    if (ctree_to_joint_property_.contains(selt))
     {
-      qDebug() << QString("The member ltree_to_link_property_ does not contain the link %1").arg(selt->text(0));
+       qDebug() << QString("The member ctree_to_joint_property_  contains the link %1").arg(selt->text(0));
+       
+       JointPropertyPtr activeJoint = ctree_to_joint_property_[selt];
+       QMenu menu(property_editor_.get());
+       
+       
+      // user right-clicked a 'Name' property entry: show 'Origin', Axis, Calibration, Dynamics, Limit, Mimic
+      // and 'Safety Controller' options
+      if (selb->property()->propertyName() == PROPERTY_NAME_TEXT && !selb->parent())
+      {
+        QAction *origin_action = menu.addAction(PROPERTY_ORIGIN_TEXT);
+        QAction *axis_action = menu.addAction(PROPERTY_AXIS_TEXT);
+        QAction *calibration_action = menu.addAction(PROPERTY_CALIBRATION_TEXT);  
+         calibration_action->setDisabled(true); //TODO: something wrong with underlying data structure, its crashing, once fixed enable
+        QAction *dynamics_action = menu.addAction(PROPERTY_DYNAMICS_TEXT);
+        QAction *limit_action = menu.addAction(PROPERTY_LIMIT_TEXT);
+        QAction *mimic_action = menu.addAction(PROPERTY_MIMIC_TEXT);
+        QAction *safety_action = menu.addAction(PROPERTY_SAFETY_TEXT);
+  
+        // if this joint already has an 'origin' element, don't allow user to
+        // add another
+        if (activeJoint->hasOriginProperty())
+        {
+          origin_action->setDisabled(true);
+        }
+        
+        // if this joint already has a 'axis element, don't allow user to
+        // add another
+        if (activeJoint->hasAxisProperty())
+        {
+          axis_action->setDisabled(true);
+        }
+        
+         // if this joint already has a 'limit element, don't allow user to
+        // add another
+        if (activeJoint->hasLimitsProperty())
+        {
+          limit_action->setDisabled(true);
+        }
+        
+        // if this joint already has a 'calibration element, don't allow user to
+        // add another
+        if (activeJoint->hasCalibrationProperty())
+        {
+          calibration_action->setDisabled(true);
+        }
+        
+         // if this joint already has a 'dynamics element, don't allow user to
+        // add another
+        if (activeJoint->hasDynamicsProperty())
+        {
+          dynamics_action->setDisabled(true);
+        }
+  
+        
+        
+         // if this joint already has a 'mimic element, don't allow user to
+        // add another
+        if (activeJoint->hasMimicProperty())
+        {
+          mimic_action->setDisabled(true);
+        }
+        
+         // if this joint already has a 'safety element, don't allow user to
+        // add another
+        if (activeJoint->hasSafetyProperty())
+        {
+          safety_action->setDisabled(true);
+        }
+        
+  
+        QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+        // don't do anything if user didn't select something
+        if (selected_item == NULL)
+          return;
+  
+        if (selected_item == origin_action)
+        {
+          activeJoint->createOriginProperty();
+          activeJoint->loadProperty(property_editor_);
+        }
+        else if (selected_item == axis_action)
+        {
+          activeJoint->createAxisProperty();
+          activeJoint->loadProperty(property_editor_);
+        }
+        else if (selected_item == limit_action)
+        {
+          activeJoint->createLimitsProperty();
+          activeJoint->loadProperty(property_editor_);
+        }
+        else if (selected_item == calibration_action)
+        {
+          qDebug() << QString("The calibration datastructure is crashing FIX"); //TODO fix
+          activeJoint->createCalibrationProperty();
+          activeJoint->loadProperty(property_editor_);
+        }
+        else if (selected_item == dynamics_action)
+        {
+          activeJoint->createDynamicsProperty();
+          activeJoint->loadProperty(property_editor_);
+        }
+         else if (selected_item == mimic_action)
+        {
+          activeJoint->createMimicProperty();
+          activeJoint->loadProperty(property_editor_);
+        }
+         else if (selected_item == safety_action)
+        {
+          activeJoint->createSafetyProperty();
+          activeJoint->loadProperty(property_editor_);
+        }
+        else
+        {
+          // should never happen
+          qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+          assert (1==0);
+        }
+      }
+       
       return;
-    }
-
-    LinkPropertyPtr activeLink = ltree_to_link_property_[selt];
-    QMenu menu(property_editor_.get());
-
-    // user right-clicked a 'Name' property entry: show 'Inertial', 'Visual'
-    // and 'Collision' options
-    if (selb->property()->propertyName() == PROPERTY_NAME_TEXT && !selb->parent())
+    }//joint
+    
+    if (ltree_to_link_property_.contains(selt))
     {
-      QAction *inertial_action = menu.addAction(PROPERTY_INERTIAL_TEXT);
-      QAction *visual_action = menu.addAction(PROPERTY_VISUAL_TEXT);
-      QAction *collision_action = menu.addAction(PROPERTY_COLLISION_TEXT);
+     
+     
+      LinkPropertyPtr activeLink = ltree_to_link_property_[selt];
+      QMenu menu(property_editor_.get());
+  
+      // user right-clicked a 'Name' property entry: show 'Inertial', 'Visual'
+      // and 'Collision' options
+      if (selb->property()->propertyName() == PROPERTY_NAME_TEXT && !selb->parent())
+      {
+        QAction *inertial_action = menu.addAction(PROPERTY_INERTIAL_TEXT);
+        QAction *visual_action = menu.addAction(PROPERTY_VISUAL_TEXT);
+        QAction *collision_action = menu.addAction(PROPERTY_COLLISION_TEXT);
+  
+        // if this link already has an 'inertial' element, don't allow user to
+        // add another
+        if (activeLink->hasInertialProperty())
+        {
+          inertial_action->setDisabled(true);
+        }
+        
+        // if this link already has a 'visual element, don't allow user to
+        // add another
+        if (activeLink->hasVisualProperty())
+        {
+          visual_action->setDisabled(true);
+        }
+        
+        // if this link already has a 'collision element, don't allow user to
+        // add another
+        if (activeLink->hasCollisionProperty())
+        {
+          collision_action->setDisabled(true);
+        }
+  
+  
+        QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+        // don't do anything if user didn't select something
+        if (selected_item == NULL)
+          return;
+  
+        if (selected_item == inertial_action)
+        {
+          activeLink->createInertialProperty();
+          activeLink->loadProperty(property_editor_);
+        }
+        else if (selected_item == visual_action)
+        {
+          activeLink->createVisualProperty();
+          activeLink->loadProperty(property_editor_);
+        }
+        else if (selected_item == collision_action)
+        {
+          activeLink->createCollisionProperty();
+          activeLink->loadProperty(property_editor_);
+        }
+        else
+        {
+          // should never happen
+          qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+          assert (1==0);
+        }
+      }
+  
+      // user right-clicked an 'Interial' property entry: show 'Origin' option
+      // only.
+      if (selb->property()->propertyName() == PROPERTY_INERTIAL_TEXT)
+      {
+        LinkInertialPropertyPtr activeInertia = activeLink->getInertialProperty();
+        QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
+  
+        // if this link already has an 'origin' element, don't allow user to
+        // add another
+        if (activeInertia->hasOriginProperty())
+        {
+          origin->setDisabled(true);
+        }
+  
+        QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+        // don't do anything if user didn't select something
+        if (selected_item == NULL)
+          return;
+  
+        if (selected_item == origin)
+        {
+          activeInertia->createOriginProperty();
+          activeInertia->loadData();
+          activeLink->loadProperty(property_editor_);
+        }
+        else
+        {
+          // should never happen
+          qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+          assert (1==0);
+        }
+      }
+      //   user right-clicked on 'Visual' property entry: show  option
+      // only.
+      else if (selb->property()->propertyName() == PROPERTY_VISUAL_TEXT)
+      {
+        LinkVisualPropertyPtr activeVisual = activeLink->getVisualProperty();
+        QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
+        QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
+        QAction *material = menu.addAction(PROPERTY_MATERIAL_TEXT);
+        // if this link already has an 'origin' element, don't allow user to
+        // add another
+        if (activeVisual->hasOriginProperty())
+        {
+          origin->setDisabled(true);
+        }
+        if (activeVisual->hasGeometryProperty())
+        {
+          geometry->setDisabled(true);
+        }
+        if (activeVisual->hasMaterialProperty())
+        {
+          material->setDisabled(true);
+        }
+        
+  
+        QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+        // don't do anything if user didn't select something
+        if (selected_item == NULL)
+          return;
+  
+        if (selected_item == origin)
+        {
+          activeVisual->createOriginProperty();
+          activeVisual->loadData();
+          activeLink->loadProperty(property_editor_);
+        }
+        else if (selected_item == geometry)
+        {
+          activeVisual->createGeometryProperty();
+          activeVisual->loadData();
+          activeLink->loadProperty(property_editor_);
+        }
+        else if (selected_item == material)
+        {
+          activeVisual->createMaterialProperty();
+          activeVisual->loadData();
+          activeLink->loadProperty(property_editor_);
+        }
+        else
+        {
+          // should never happen
+          qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+          assert (1==0);
+        }
+      }
+        // user right-clicked on 'Collsion' property entry: show  option
+      // only.
+      else if (selb->property()->propertyName() == PROPERTY_COLLISION_TEXT)
+      {
+        LinkCollisionPropertyPtr activeCollision = activeLink->getCollisionProperty();
+        QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
+        QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
+        // if this link already has an 'origin' element, don't allow user to
+        // add another
+        if (activeCollision->hasOriginProperty())
+        {
+          origin->setDisabled(true);
+        }
+        
+        if (activeCollision->hasGeometryProperty())
+        {
+          geometry->setDisabled(true);
+        }
+        
+        
+  
+        QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+        // don't do anything if user didn't select something
+        if (selected_item == NULL)
+          return;
+  
+        if (selected_item == origin)
+        {
+          activeCollision->createOriginProperty();
+          activeCollision->loadData();
+          activeLink->loadProperty(property_editor_);
+        }
+        else if (selected_item == geometry)
+        {
+          activeCollision->createGeometryProperty();
+          activeCollision->loadData();
+          activeLink->loadProperty(property_editor_);
+        }
+        else
+        {
+          // should never happen
+          qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+          assert (1==0);
+        }
+      }
+     return;
+    }//Link
 
-      // if this link already has an 'inertial' element, don't allow user to
-      // add another
-      if (activeLink->hasInertialProperty())
-      {
-        inertial_action->setDisabled(true);
-      }
-
-      QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
-      // don't do anything if user didn't select something
-      if (selected_item == NULL)
-        return;
-
-      if (selected_item == inertial_action)
-      {
-        activeLink->createInertialProperty();
-        activeLink->loadProperty(property_editor_);
-      }
-      else if (selected_item == visual_action)
-      {
-        // Need to implement
-      }
-      else if (selected_item == collision_action)
-      {
-        // Need to implement
-      }
-      else
-      {
-        // should never happen
-        qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
-        assert (1==0);
-      }
-    }
-
-    // user right-clicked an 'Interial' property entry: show 'Origin' option
-    // only.
-    if (selb->property()->propertyName() == PROPERTY_INERTIAL_TEXT)
-    {
-      LinkInertialPropertyPtr activeInertia = activeLink->getInertialProperty();
-      QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
-
-      // if this link already has an 'origin' element, don't allow user to
-      // add another
-      if (activeInertia->hasOriginProperty())
-      {
-        origin->setDisabled(true);
-      }
-
-      QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
-      // don't do anything if user didn't select something
-      if (selected_item == NULL)
-        return;
-
-      if (selected_item == origin)
-      {
-        activeInertia->createOriginProperty();
-        activeInertia->loadData();
-        activeLink->loadProperty(property_editor_);
-      }
-      else
-      {
-        // should never happen
-        qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
-        assert (1==0);
-      }
-    }
+    
   }
 
   void URDFProperty::on_propertyWidget_linkNameChanged(LinkProperty *property, const QVariant &val)

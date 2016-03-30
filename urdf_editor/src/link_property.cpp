@@ -243,6 +243,44 @@ namespace urdf_editor
     loading_ = false;
   }
 
+   bool LinkCollisionProperty::hasOriginProperty()
+  {
+    return (origin_property_ != NULL);
+  }
+
+  void LinkCollisionProperty::createOriginProperty()
+  {
+    if (!origin_property_)
+    {
+      origin_property_.reset(new OriginProperty(collision_->origin));
+      top_item_->addSubProperty(origin_property_->getTopItem());
+    }
+  }
+  
+  /*!
+   *@brief Checks if geometry property exists
+   *@returns geometry property exists
+   */
+  bool LinkCollisionProperty::hasGeometryProperty()
+  {
+    return (geometry_property_ != NULL);
+  }
+
+  /*!
+   * @brief Creates the geometry property 
+   */
+  void LinkCollisionProperty::createGeometryProperty()
+  {
+    if (!geometry_property_)
+    {
+      collision_->geometry.reset(new urdf::Geometry());  //Create the URDF Geometry element 
+      geometry_property_.reset(new LinkGeometryProperty(collision_->geometry));
+      top_item_->addSubProperty(geometry_property_->getTopItem());
+    }
+  }
+  
+  
+  
   LinkCollisionProperty::~LinkCollisionProperty()
   {
     delete manager_;
@@ -393,9 +431,11 @@ namespace urdf_editor
               this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
 
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Visual"));
+   
     item = manager_->addProperty(QVariant::String, tr("Name"));
     top_item_->addSubProperty(item);
 
+    
     origin = visual_->origin;
     p_norm = origin.position.x * origin.position.x;
     p_norm += origin.position.y * origin.position.y;
@@ -435,6 +475,67 @@ namespace urdf_editor
     }
     loading_ = false;
   }
+  
+  bool LinkVisualProperty::hasOriginProperty()
+  {
+    return (origin_property_ != NULL);
+  }
+
+  void LinkVisualProperty::createOriginProperty()
+  {
+    if (!origin_property_)
+    {
+      origin_property_.reset(new OriginProperty(visual_->origin));
+      top_item_->addSubProperty(origin_property_->getTopItem());
+    }
+  }
+  
+  /*!
+   *@brief Checks if geometry property exists
+   *@returns geometry property exists
+   */
+  bool LinkVisualProperty::hasGeometryProperty()
+  {
+    return (geometry_property_ != NULL);
+  }
+
+  /*!
+   * @brief Creates the geometry property 
+   */
+  void LinkVisualProperty::createGeometryProperty()
+  {
+    if (!geometry_property_)
+    {
+      visual_->geometry.reset(new urdf::Geometry());  //Create the URDF Geometry element 
+      geometry_property_.reset(new LinkGeometryProperty(visual_->geometry));
+      top_item_->addSubProperty(geometry_property_->getTopItem());
+    }
+  }
+  
+  /*!
+   *@brief Checks if Material property exists
+   *@returns material property exists
+   */
+  bool LinkVisualProperty::hasMaterialProperty()
+  {
+    return (new_material_property_ != NULL);
+  }
+
+  /*!
+   * @brief Creates the material property 
+   */
+  void LinkVisualProperty::createMaterialProperty()
+  {
+    if (!new_material_property_)
+    {
+       visual_->material.reset(new urdf::Material());  //Create the URDF Material element 
+      new_material_property_.reset(new LinkNewMaterialProperty(visual_->material));
+      top_item_->addSubProperty(new_material_property_->getTopItem());
+    }
+  }
+  
+  
+  
 
   LinkVisualProperty::~LinkVisualProperty()
   {
@@ -564,7 +665,15 @@ namespace urdf_editor
     loading_ = true;
     QtVariantProperty *item;
     QString name;
-    QList<QtProperty *> sub_items = top_item_->subProperties();
+    
+    //Get Mass, since its the first one 
+    item = static_cast<QtVariantProperty *>(top_item_->subProperties()[0]);
+    name = item->propertyName();
+      if (name == "Mass (kg)")
+        item->setValue(inertial_->mass);
+    
+    //Remaining sub-properties are for Inertial values    
+    QList<QtProperty *> sub_items = top_item_->subProperties()[1]->subProperties();
     for (int i = 0; i < sub_items.length(); ++i)
     {
       item = static_cast<QtVariantProperty *>(sub_items[i]);
@@ -746,6 +855,74 @@ namespace urdf_editor
   {
     return inertial_property_;
   }
+  
+  
+  /*!
+   *@brief Checks if the Link has a visual property defined
+   * 
+   *@return returns true of visual property defined
+   */
+  bool LinkProperty::hasVisualProperty()
+  {
+    return (visual_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the visual property
+   * 
+   */
+  void LinkProperty::createVisualProperty()
+  {
+    if(!link_->visual)
+    {
+      link_->visual.reset(new urdf::Visual());
+      visual_property_.reset(new LinkVisualProperty(link_->visual));
+    }
+  }
+  
+   /*!
+   *@brief Get the visual property Object
+   * 
+   *@return LinkVisualPropertyPtr
+   */
+  LinkVisualPropertyPtr LinkProperty::getVisualProperty()
+  {
+    return visual_property_;
+  }
+  
+  /*!
+   *@brief Checks if the Link has a collision property defined
+   * 
+   *@return returns true of collision property defined
+   */
+  bool LinkProperty::hasCollisionProperty()
+  {
+    return (collision_property_ != NULL);
+  }
+
+  /*!
+   *@brief Creates the collision property
+   * 
+   */
+  void LinkProperty::createCollisionProperty()
+  {
+    if(!link_->collision)
+    {
+      link_->collision.reset(new urdf::Collision());
+      collision_property_.reset(new LinkCollisionProperty(link_->collision));
+    }
+  }
+  
+   /*!
+   *@brief Get the collision property Object
+   * 
+   *@return LinkCollisionPropertyPtr
+   */
+  LinkCollisionPropertyPtr LinkProperty::getCollisionProperty()
+  {
+    return collision_property_;
+  }
+  
 
   void LinkProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
