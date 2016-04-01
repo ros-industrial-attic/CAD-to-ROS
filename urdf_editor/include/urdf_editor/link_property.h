@@ -46,6 +46,13 @@ namespace urdf_editor
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
+    bool hasOriginProperty();
+
+    void createOriginProperty();
+    
+    bool hasGeometryProperty();
+    void createGeometryProperty();
+    
     void loadData();
 
     QtProperty *getTopItem() { return top_item_; }
@@ -105,6 +112,15 @@ namespace urdf_editor
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
 
+    bool hasOriginProperty();
+    void createOriginProperty();
+    
+    bool hasGeometryProperty();
+    void createGeometryProperty();
+    
+    bool hasMaterialProperty();
+    void createMaterialProperty();
+    
     void loadData();
 
     QtProperty *getTopItem() { return top_item_; }
@@ -162,7 +178,13 @@ namespace urdf_editor
 
   };
   typedef boost::shared_ptr<LinkInertialProperty> LinkInertialPropertyPtr;
-
+  
+  /*! LinkVisualProperty pointer */
+  typedef boost::shared_ptr<LinkVisualProperty> LinkVisualPropertyPtr;
+  
+  /*! LinkCollisionProperty pointer */
+  typedef boost::shared_ptr<LinkCollisionProperty> LinkCollisionPropertyPtr;
+  
   class LinkProperty : public QObject
   {
     Q_OBJECT
@@ -178,7 +200,26 @@ namespace urdf_editor
     void createInertialProperty();
     LinkInertialPropertyPtr getInertialProperty();
 
-
+    
+    /*! Check if has visual property */
+    bool hasVisualProperty();
+    
+    /*! Create Visual property */
+    void createVisualProperty();
+   
+    /*! Get the Inertial Property */
+    LinkVisualPropertyPtr getVisualProperty();
+    
+    /*! Check if has collision property */
+    bool hasCollisionProperty();
+    
+    /*! Create Collision property */
+    void createCollisionProperty();
+   
+    /*! Get the Collision Property */
+    LinkCollisionPropertyPtr getCollisionProperty();
+    
+    
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
     void onChildValueChanged(QtProperty *property, const QVariant &val);
