@@ -310,6 +310,7 @@ namespace urdf_editor
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
     void onChildValueChanged(QtProperty *property, const QVariant &val);
+    void updateTF(QtProperty *property, const QVariant &val);
 
   signals:
     void jointNameChanged(JointProperty *property, const QVariant &val);
