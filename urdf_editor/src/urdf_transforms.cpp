@@ -1,6 +1,6 @@
 #include <urdf_editor/urdf_transforms.h>
 
-
+namespace urdf_editor {
 
 URDFTransformer::URDFTransformer()
 {
@@ -47,6 +47,18 @@ void URDFTransformer::addLink(std::string parent, std::string child)
   new_frame.header.frame_id = parent;
   new_frame.child_frame_id = child;
   frames_.transforms.push_back(new_frame);
+}
+
+void URDFTransformer::removeLink(std::string name)
+{
+  boost::lock_guard<boost::mutex> lock(data_lock_);
+  for(int i = 0; i < frames_.transforms.size(); ++i)
+  {
+    if(name.compare(frames_.transforms[i].header.frame_id) == 0)
+    {
+      frames_.transforms.erase(frames_.transforms.begin()+i);
+    }
+  }
 }
 
 void URDFTransformer::updateLink(std::string parent, std::string child)
@@ -107,3 +119,4 @@ void URDFTransformer::updateLink(std::string parent, geometry_msgs::Vector3 orig
   }
 }
 
+}
