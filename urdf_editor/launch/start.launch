@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="debug" default="false" />
+  <!-- start gdb in a new xwindow: see https://github.com/ros/ros_comm/issues/223 -->
+  <arg name="debug_new_win" default="true" />
+
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg     if="$(arg debug)" name="launch_prefix"
+    value="gdb -x $(find urdf_builder)/launch/gdb_settings.gdb --ex run --args" />
+
+  <arg unless="$(arg debug_new_win)" name="launch_prefix2"
+    value="$(arg launch_prefix)" />
+  <arg     if="$(arg debug_new_win)" name="launch_prefix2"
+    value="xterm -e $(arg launch_prefix)" />
+
+
+  <node name="urdf_editor" pkg="urdf_builder" type="urdf_builder" required="true"
+    launch-prefix="$(arg launch_prefix2)" />
+</launch>
