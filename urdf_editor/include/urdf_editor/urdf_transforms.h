@@ -73,6 +73,8 @@ private:
 
   void worker_thread();
 
+  bool working;
+
 };
 
 }

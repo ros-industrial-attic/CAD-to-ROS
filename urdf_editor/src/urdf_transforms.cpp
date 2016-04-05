@@ -9,13 +9,16 @@ URDFTransformer::URDFTransformer()
 
 URDFTransformer::~URDFTransformer()
 {
+  working = false;
+  worker_->join();
   delete worker_;
 }
 
 void URDFTransformer::worker_thread()
 {
   ros::Rate rt = 10;
-  while(ros::ok())
+  working = true;
+  while(ros::ok() && working)
   {
     tf::tfMessage tf_copy;
     {
