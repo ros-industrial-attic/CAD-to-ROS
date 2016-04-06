@@ -1,0 +1,30 @@
+<package>
+  <name>test_models</name>
+  <version>0.0.1</version>
+  <description>
+    Local copy of URDFs used to test during development
+  </description>
+  <maintainer email="pbeeson@traclabs.com">Patrick Beeson</maintainer>
+  <license>BSD</license>
+
+  <url></url>
+  <author></author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>pr2_description</run_depend>
+  <run_depend>fetch_description</run_depend>
+  <run_depend>baxter_description</run_depend>
+  <run_depend>abb_irb2400_support</run_depend>
+  <run_depend>abb_irb5400_support</run_depend>
+  <run_depend>abb_irb6600_support</run_depend>
+  <run_depend>fanuc_m430ia_support</run_depend>
+  <run_depend>fanuc_lrmate200ic_support</run_depend>
+  <run_depend>fanuc_m10ia_support</run_depend>
+  <run_depend>fanuc_m16ib_support</run_depend>
+  <run_depend>fanuc_m20ia_support</run_depend>
+  <run_depend>ur_description</run_depend>
+  <run_depend>jaco_description</run_depend>
+  <run_depend>vs060</run_depend>
+
+</package>
