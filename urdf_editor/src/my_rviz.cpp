@@ -30,12 +30,19 @@ namespace urdf_editor
     render_panel_->setEnabled(true);
     render_panel_->setBackgroundColor(Ogre::ColourValue(0.25, 0.25, 0.25, 1));
 
+    manager_->setFixedFrame("base_link");
+
     robot_display_ = new moveit_rviz_plugin::RobotStateDisplay();
     robot_display_->setName("RobotModel");
     robot_display_->subProp("Robot Description")->setValue("ros_workbench");
     manager_->addDisplay(robot_display_, false);
 
     grid_display_ = manager_->createDisplay("rviz/Grid", "MyGrid", true);
+
+    tf_display_ = manager_->createDisplay("rviz/TF", "TF", true);
+    tf_display_->subProp("Show Arrows")->setValue("true");
+    tf_display_->subProp("Show Names")->setValue("true");
+    tf_display_->subProp("Show Axes")->setValue("true");
   }
 
   // Destructor

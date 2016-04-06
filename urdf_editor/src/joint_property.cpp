@@ -58,6 +58,8 @@ namespace urdf_editor
       origin_property_.reset(new OriginProperty(joint->parent_to_joint_origin_transform));
       QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(updateTF(QtProperty *, const QVariant &)));
     }
 
     p_norm = joint_->axis.x * joint_->axis.x;
@@ -104,6 +106,16 @@ namespace urdf_editor
       QObject::connect(safety_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
+
+    tf_transformer_.updateLink(joint_->parent_link_name, joint_->child_link_name);
+    geometry_msgs::Vector3 vect;
+    vect.x = joint_->parent_to_joint_origin_transform.position.x;
+    vect.y = joint_->parent_to_joint_origin_transform.position.y;
+    vect.z = joint_->parent_to_joint_origin_transform.position.z;
+    tf_transformer_.updateLink(joint_->parent_link_name, vect);
+    geometry_msgs::Quaternion quat;
+    joint_->parent_to_joint_origin_transform.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
+    tf_transformer_.updateLink(joint_->parent_link_name, quat);
 
     loading_ = false;
   }
@@ -252,6 +264,21 @@ namespace urdf_editor
     }
 
     emit JointProperty::valueChanged();
+  }
+
+  void JointProperty::updateTF(QtProperty *property, const QVariant &val)
+  {
+    tf_transformer_.updateLink(joint_->parent_link_name, joint_->child_link_name);
+    geometry_msgs::Vector3 vect;
+    vect.x = joint_->parent_to_joint_origin_transform.position.x;
+    vect.y = joint_->parent_to_joint_origin_transform.position.y;
+    vect.z = joint_->parent_to_joint_origin_transform.position.z;
+    tf_transformer_.updateLink(joint_->parent_link_name, vect);
+    ROS_INFO_STREAM("joint property changed: " << joint_->parent_link_name << " " << vect);
+
+    geometry_msgs::Quaternion quat;
+    joint_->parent_to_joint_origin_transform.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
+    tf_transformer_.updateLink(joint_->parent_link_name, quat);
   }
 
   void JointProperty::onChildValueChanged(QtProperty *property, const QVariant &val)

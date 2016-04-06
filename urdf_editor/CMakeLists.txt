@@ -14,11 +14,14 @@ include(${QT_USE_FILE})
 find_package(urdfdom REQUIRED)
 find_package(urdfdom_headers REQUIRED)
 
+find_package(Boost REQUIRED)
+
 set(editor_SRCS
   src/common.cpp
   src/main.cpp
   src/my_rviz.cpp
   src/urdf_editor.cpp
+  src/urdf_transforms.cpp
 
   # properties
   src/joint_axis_property.cpp
@@ -41,6 +44,7 @@ set(editor_SRCS
 set(editor_HDRS
   include/urdf_editor/my_rviz.h
   include/urdf_editor/urdf_editor.h
+  include/urdf_editor/urdf_transforms.h
 
   # properties
   include/urdf_editor/joint_axis_property.h
