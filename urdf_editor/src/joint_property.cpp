@@ -384,9 +384,17 @@ namespace urdf_editor
       item = static_cast<QtVariantProperty *>(sub_items[i]);
       name = item->propertyName();
       if (name == "Rising")
+      {
+        if (!calibration_->rising)
+          calibration_->rising.reset(new double);
         item->setValue(*calibration_->rising);
+      }
       else if (name == "Falling")
+      {
+        if (!calibration_->falling)
+          calibration_->falling.reset(new double);
         item->setValue(*calibration_->falling);
+      }
     }
     loading_ = false;
   }
