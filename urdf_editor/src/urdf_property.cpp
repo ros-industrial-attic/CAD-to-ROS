@@ -34,7 +34,7 @@ namespace urdf_editor
     root_->addChild(link_root_);
 
     joint_root_ = new QTreeWidgetItem();
-    joint_root_->setText(0,"Chain");
+    joint_root_->setText(0,"Joints");
     root_->addChild(joint_root_);
 
     property_editor_.reset(new QtTreePropertyBrowser());
