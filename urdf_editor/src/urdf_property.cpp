@@ -71,6 +71,8 @@ namespace urdf_editor
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
 
+    unsavedChanges=false; // No changes to be saved, yet
+
   }
 
   URDFProperty::~URDFProperty()
@@ -211,6 +213,7 @@ namespace urdf_editor
     QTreeWidgetItem* item = addLinkTreeItem(parent, new_link);
     // now add the property
     addLinkProperty(item, new_link);
+    unsavedChanges = true;
   }
 
   QTreeWidgetItem* URDFProperty::addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link)
@@ -251,6 +254,7 @@ namespace urdf_editor
     QTreeWidgetItem* item = addJointTreeItem(parent, new_joint);
     // now add the property
     addJointProperty(item, new_joint);
+    unsavedChanges = true;
   }
 
   QTreeWidgetItem* URDFProperty::addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint)
@@ -327,7 +331,7 @@ namespace urdf_editor
             addModelJoint(sel);
           }
         }
-        else
+        else // Remove
         {
           if (isLink(sel))
           {
@@ -715,6 +719,8 @@ namespace urdf_editor
   void URDFProperty::on_propertyWidget_valueChanged()
   {
     rviz_widget_->loadRobot(model_);
+
+    unsavedChanges = true;
   }
 
 }

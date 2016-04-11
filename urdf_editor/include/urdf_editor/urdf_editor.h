@@ -24,6 +24,8 @@ private slots:
 
   void on_action_Save_triggered();
 
+  void unsaved_changes();
+
   void on_actionSave_As_triggered();
 
   void on_action_New_triggered();

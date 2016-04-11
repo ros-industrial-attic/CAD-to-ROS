@@ -28,6 +28,8 @@ namespace urdf_editor
 
     bool clear();
 
+    bool unsavedChanges;
+
   private slots:
     void on_treeWidget_customContextMenuRequested(const QPoint &pos);
 

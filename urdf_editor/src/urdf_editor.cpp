@@ -28,6 +28,8 @@ URDFEditor::URDFEditor(QWidget *parent) :
 
 URDFEditor::~URDFEditor()
 {
+  if ( urdf_tree_->unsavedChanges == true ) // If there were unsaved changes
+    unsaved_changes();
   delete ui;
 }
 
@@ -41,6 +43,15 @@ void URDFEditor::on_action_Open_triggered()
     urdf_tree_->loadURDF(file_path);
     ui->action_Save->setDisabled(false);
   }
+}
+
+void URDFEditor::unsaved_changes()
+{
+  QMessageBox::StandardButton reply;
+  reply = QMessageBox::question(this,"Save changes?","Save your changes before exiting?", QMessageBox::Yes|QMessageBox::No);
+
+  if (reply == QMessageBox::Yes)
+    on_actionSave_As_triggered();
 }
 
 void URDFEditor::on_action_Save_triggered()
