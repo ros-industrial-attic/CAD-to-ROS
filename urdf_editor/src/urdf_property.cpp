@@ -26,6 +26,7 @@ namespace urdf_editor
 
     root_ = new QTreeWidgetItem(tree_widget_);
     root_->setText(0, "RobotModel");
+    root_->setExpanded(true);
     tree_widget_->addTopLevelItem(root_);
 
     link_root_ = new QTreeWidgetItem();
