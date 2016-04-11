@@ -49,6 +49,7 @@ namespace urdf_editor
 
     QString getValidName(QString prefix, QList<QString> &current_names);
     bool isJoint(QTreeWidgetItem *item);
+    bool isLink(QTreeWidgetItem *item);
 
     boost::shared_ptr<QtTreePropertyBrowser> property_editor_;
     boost::shared_ptr<urdf::ModelInterface> model_;

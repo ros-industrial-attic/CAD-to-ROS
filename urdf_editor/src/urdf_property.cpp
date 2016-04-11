@@ -232,22 +232,14 @@ namespace urdf_editor
     return name;
   }
 
+  bool URDFProperty::isLink(QTreeWidgetItem *item)
+  {
+    return ltree_to_link_property_.contains(item);
+  }
+
   bool URDFProperty::isJoint(QTreeWidgetItem *item)
   {
-    QTreeWidgetItem *parent = item;
-    while (parent->parent())
-    {
-      if (parent->parent() == joint_root_)
-      {
-        return true;
-      }
-      else
-      {
-        parent = parent->parent();
-      }
-    }
-
-    return false;
+    return ctree_to_joint_property_.contains(item);
   }
 
   void URDFProperty::on_treeWidget_customContextMenuRequested(const QPoint &pos)
