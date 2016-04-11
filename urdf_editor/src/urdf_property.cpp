@@ -255,10 +255,12 @@ namespace urdf_editor
       {
         if (selected_item->text() == "Add")
         {
-          if (sel == link_root_ || sel->parent() == link_root_)
+          // we can only add to the link root item or to other links
+          if (sel == link_root_ || isLink(sel))
           {
             addLink();
           }
+          // or to the joint root item or to other links
           else if (sel == joint_root_ || isJoint(sel))
           {
             addJoint(sel);
@@ -266,7 +268,7 @@ namespace urdf_editor
         }
         else
         {
-          if (sel->parent() == link_root_)
+          if (isLink(sel))
           {
             link_names_.removeOne(sel->text(0));
             link_root_->removeChild(sel);
@@ -284,8 +286,7 @@ namespace urdf_editor
 
   void URDFProperty::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
   {
-
-    if (item->parent() == link_root_)
+    if (isLink(item))
     {
       ltree_to_link_property_[item]->loadProperty(property_editor_);
     }
