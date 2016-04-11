@@ -120,16 +120,15 @@ namespace urdf_editor
     QMessageBox msgBox;
     if (savedCorrectly)
     {
-        msgBox.setWindowTitle("Success");
-        msgBox.setText("The file was saved.");
-        msgBox.exec();
+      msgBox.setWindowTitle("Success");
+      msgBox.setText("The file was saved.");
     }
     else
     {
-        msgBox.setWindowTitle("FAILURE");
-        msgBox.setText("An error occurred during saving.");
-        msgBox.exec();
+      msgBox.setWindowTitle("FAILURE");
+      msgBox.setText("An error occurred during saving.");
     }
+    msgBox.exec();
 
     return true;
   }
