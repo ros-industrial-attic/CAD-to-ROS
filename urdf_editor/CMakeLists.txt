@@ -11,18 +11,36 @@ set(editor_SRCS
       src/main.cpp
       src/urdf_editor.cpp
       src/common.cpp
+      src/my_rviz.cpp
+
+      # properties
+      src/origin_property.cpp
+      src/joint_axis_property.cpp
+      src/joint_calibration_property.cpp
+      src/joint_dynamics_property.cpp
+      src/joint_limits_property.cpp
+      src/joint_mimic_property.cpp
+      src/joint_safety_property.cpp
       src/joint_property.cpp
       src/link_property.cpp
       src/urdf_property.cpp
-      src/my_rviz.cpp
 )
 
 set(editor_HDRS
       include/urdf_editor/urdf_editor.h
+      include/urdf_editor/my_rviz.h
+
+      # properties
+      include/urdf_editor/origin_property.h
+      include/urdf_editor/joint_axis_property.h
+      include/urdf_editor/joint_calibration_property.h
+      include/urdf_editor/joint_dynamics_property.h
+      include/urdf_editor/joint_limits_property.h
+      include/urdf_editor/joint_mimic_property.h
+      include/urdf_editor/joint_safety_property.h
       include/urdf_editor/joint_property.h
       include/urdf_editor/link_property.h
       include/urdf_editor/urdf_property.h
-      include/urdf_editor/my_rviz.h
 )
 
 set(editor_UIS
