@@ -1,17 +1,29 @@
 #ifndef URDF_PROPERTY_H
 #define URDF_PROPERTY_H
+
 #include <QtCore>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QMenu>
 #include <urdf_parser/urdf_parser.h>
-#include "urdf_editor/joint_property.h"
-#include "urdf_editor/link_property.h"
+#include <urdf_editor/joint_property.h>
+#include <urdf_editor/link_property.h>
 #include <qttreepropertybrowser.h>
-#include "urdf_editor/my_rviz.h"
+#include <urdf_editor/my_rviz.h>
+
+namespace urdf
+{
+  class Joint;
+  class Link;
+}
 
 namespace urdf_editor
 {
+  // forward declared
+  class LinkProperty;
+  class JointProperty;
+
+
   class URDFProperty : public QObject
   {
     Q_OBJECT

@@ -1,6 +1,18 @@
-#include "urdf_editor/urdf_property.h"
+
+#include <urdf_editor/urdf_property.h>
+
+#include <urdf_editor/link_collision_property.h>
+// #include <urdf_editor/link_geometry_property.h>
+#include <urdf_editor/link_inertial_property.h>
+#include <urdf_editor/link_new_material_property.h>
+#include <urdf_editor/link_visual_property.h>
+#include <urdf_editor/link_property.h>
+
 #include <QVBoxLayout>
 #include <QMessageBox>
+
+#include <boost/shared_ptr.hpp>
+
 
 const QString PROPERTY_NAME_TEXT = "Name";
 const QString PROPERTY_COLLISION_TEXT = "Collision";

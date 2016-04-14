@@ -22,6 +22,11 @@ set(editor_SRCS
       src/joint_mimic_property.cpp
       src/joint_safety_property.cpp
       src/joint_property.cpp
+      src/link_collision_property.cpp
+      src/link_geometry_property.cpp
+      src/link_inertial_property.cpp
+      src/link_new_material_property.cpp
+      src/link_visual_property.cpp
       src/link_property.cpp
       src/urdf_property.cpp
 )
@@ -39,6 +44,11 @@ set(editor_HDRS
       include/urdf_editor/joint_mimic_property.h
       include/urdf_editor/joint_safety_property.h
       include/urdf_editor/joint_property.h
+      include/urdf_editor/link_collision_property.h
+      include/urdf_editor/link_geometry_property.h
+      include/urdf_editor/link_inertial_property.h
+      include/urdf_editor/link_new_material_property.h
+      include/urdf_editor/link_visual_property.h
       include/urdf_editor/link_property.h
       include/urdf_editor/urdf_property.h
 )
