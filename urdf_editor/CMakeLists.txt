@@ -6,6 +6,7 @@ find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
 
 find_package(urdfdom REQUIRED)
+find_package(urdfdom_headers REQUIRED)
 
 set(editor_SRCS
       src/main.cpp
@@ -72,7 +73,7 @@ catkin_package(
 qt4_wrap_cpp(editor_MOCS ${editor_HDRS})
 qt4_wrap_ui(editor_UIS_H ${editor_UIS})
 
-include_directories(${editor_INCLUDE_DIRECTORIES} ${catkin_INCLUDE_DIRS} ${QT_INCLUDE_DIR} ${urdfdom_INCLUDE_DIR})
+include_directories(${editor_INCLUDE_DIRECTORIES} ${catkin_INCLUDE_DIRS} ${QT_INCLUDE_DIR} ${urdfdom_INCLUDE_DIR} ${urdfdom_headers_INCLUDE_DIR})
 
 add_executable(${PROJECT_NAME}
                   ${editor_UIS_H}
@@ -82,6 +83,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
                           ${catkin_LIBRARIES}
                           ${urdfdom_LIBRARIES}
+                          ${urdfdom_headers_LIBRARIES}
                           ${QT_LIBRARIES}
                           ${QT_QTCORE_LIBRARY}
                           ${QT_QTGUI_LIBRARY})
