@@ -49,6 +49,8 @@ namespace urdf_editor
     void addJoint(QTreeWidgetItem *parent);
     void addJointProperty(QTreeWidgetItem *parent, boost::shared_ptr<urdf::Joint> joint);
 
+    void setRvizPropertyForLinkProperty(LinkPropertyPtr link_property, QString link_name);
+    
     QString getValidName(QString prefix, QList<QString> &current_names);
     bool isJoint(QTreeWidgetItem *item);
 

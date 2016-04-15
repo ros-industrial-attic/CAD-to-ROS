@@ -30,9 +30,9 @@ namespace urdf_editor
     virtual ~MyRviz();
 
     bool loadRobot(boost::shared_ptr<urdf::ModelInterface> robot_model);
-    
-    moveit_rviz_plugin::RobotStateDisplay* getRobotDisplay();
 
+    moveit_rviz_plugin::RobotStateDisplay* getRobotDisplay();
+    
     bool clear();
 
   private:

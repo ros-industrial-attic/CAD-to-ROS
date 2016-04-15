@@ -1,4 +1,5 @@
 #include "urdf_editor/urdf_property.h"
+#include <qt4/QtGui/qtreewidget.h>
 #include <QVBoxLayout>
 #include <QMessageBox>
 
@@ -157,6 +158,7 @@ namespace urdf_editor
 
     }
 
+    
     return true;
   }
 
@@ -166,7 +168,7 @@ namespace urdf_editor
     boost::shared_ptr<urdf::Link> new_link(new urdf::Link());
     new_link->name = name.toStdString();
     model_->links_.insert(std::make_pair(name.toStdString(), new_link));
-
+    
     addLinkProperty(new_link);
   }
 
@@ -175,26 +177,8 @@ namespace urdf_editor
     QTreeWidgetItem *item = new QTreeWidgetItem(link_root_);
     item->setText(0, QString::fromStdString(link->name));
     root_->addChild(item);
-
     
-    
-    std::cout << "rviz widget has children: " << rviz_widget_->getRobotDisplay()->numChildren() << std::endl;
-    for(int i=0; i < rviz_widget_->getRobotDisplay()->numChildren(); ++i) {
-      std::cout << rviz_widget_->getRobotDisplay()->childAt(i)->getNameStd() << std::endl;
-    }
-    
-    std::cout << "found widgets with name " << link->name.c_str() << ": " << rviz_widget_->getRobotDisplay()->subProp(link->name.c_str())->getNameStd() << std::endl;
-    std::cout << "child count: " << rviz_widget_->getRobotDisplay()->childAt(9)->numChildren() << std::endl;
-    
-    rviz::Property* target = rviz_widget_->getRobotDisplay()->subProp("Links");
-    for(int i=0; i < target->numChildren(); ++i) {
-      std::cout << target->childAt(i)->getNameStd() << std::endl;
-    }
-    std::cout << "found widgets with name " << link->name.c_str() << ": " << target->subProp(link->name.c_str())->getNameStd() << std::endl;
-    target->subProp(link->name.c_str())->setValue(false);
-    
-    
-    LinkPropertyPtr tree_link(new LinkProperty(link, rviz_widget_->getRobotDisplay()->findChildren<rviz::RobotLink*>("Links")[0] ));
+    LinkPropertyPtr tree_link(new LinkProperty(link));
     QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
     QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
@@ -202,8 +186,10 @@ namespace urdf_editor
 
     ltree_to_link_property_[item] = tree_link;
     link_property_to_ltree_[tree_link.get()] = item;
-
+    
     link_names_.append(QString::fromStdString(link->name));
+    
+    setRvizPropertyForLinkProperty(tree_link, link->name.c_str());
   }
 
   void URDFProperty::addJoint(QTreeWidgetItem *parent)
@@ -236,6 +222,11 @@ namespace urdf_editor
     joint_property_to_ctree_[tree_joint.get()] = item;
 
     joint_names_.append(name);
+  }
+  
+  void URDFProperty::setRvizPropertyForLinkProperty(LinkPropertyPtr link_property, QString link_name)
+  {
+    link_property->setRvizProperty(rviz_widget_->getRobotDisplay()->subProp("Links")->subProp(link_name));
   }
 
   QString URDFProperty::getValidName(QString prefix, QList<QString> &current_names)
@@ -509,6 +500,7 @@ namespace urdf_editor
         {
           activeLink->createVisualProperty();
           activeLink->loadProperty(property_editor_);
+          setRvizPropertyForLinkProperty(activeLink, selt->text(0));
         }
         else if (selected_item == collision_action)
         {
@@ -679,6 +671,10 @@ namespace urdf_editor
   void URDFProperty::on_propertyWidget_valueChanged()
   {
     rviz_widget_->loadRobot(model_);
+    for(int i=0; i < link_root_->childCount(); ++i)
+    {
+      setRvizPropertyForLinkProperty(ltree_to_link_property_[link_root_->child(i)], link_root_->child(i)->text(0));
+    }
   }
 
 }

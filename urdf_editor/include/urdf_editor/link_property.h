@@ -108,7 +108,7 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual, rviz::RobotLink *rviz_link);
+    LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual);
     ~LinkVisualProperty();
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
@@ -123,6 +123,8 @@ namespace urdf_editor
     void createMaterialProperty();
     
     void loadData();
+    
+    void setRvizProperty(rviz::Property* rviz_property);
 
     QtProperty *getTopItem() { return top_item_; }
 
@@ -139,11 +141,12 @@ namespace urdf_editor
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
+    bool visible_in_editor_;
     boost::shared_ptr<OriginProperty> origin_property_;
     boost::shared_ptr<LinkNewMaterialProperty> new_material_property_;
     boost::shared_ptr<LinkGeometryProperty> geometry_property_;
     
-    rviz::RobotLink *rviz_link_;
+    rviz::Property *rviz_property_;
   };
 
   class LinkInertialProperty : public QObject
@@ -191,7 +194,7 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    LinkProperty(boost::shared_ptr<urdf::Link> link, rviz::RobotLink* rviz_link);
+    LinkProperty(boost::shared_ptr<urdf::Link> link);
     ~LinkProperty();
 
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
@@ -201,7 +204,6 @@ namespace urdf_editor
     bool hasInertialProperty();
     void createInertialProperty();
     LinkInertialPropertyPtr getInertialProperty();
-
     
     /*! Check if has visual property */
     bool hasVisualProperty();
@@ -221,7 +223,9 @@ namespace urdf_editor
     /*! Get the Collision Property */
     LinkCollisionPropertyPtr getCollisionProperty();
     
-    
+    /*! Set the RViz Property, which the link property uses to control editor visualization */
+    void setRvizProperty(rviz::Property* rviz_property);
+
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
     void onChildValueChanged(QtProperty *property, const QVariant &val);
