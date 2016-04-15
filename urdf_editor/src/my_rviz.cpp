@@ -44,7 +44,12 @@ namespace urdf_editor
     robot_display_->reset();
     robot_display_->setEnabled(true);
   }
-
+  
+  moveit_rviz_plugin::RobotStateDisplay* MyRviz::getRobotDisplay()
+  {
+    return robot_display_;
+  }
+    
   bool MyRviz::clear()
   {
     robot_display_->setEnabled(false);

@@ -22,6 +22,8 @@ namespace urdf_editor
     bool loadURDF(QString file_path);
 
     bool saveURDF(QString file_path);
+    
+    urdf_editor::MyRviz* getRvizWidget();
 
     bool clear();
 

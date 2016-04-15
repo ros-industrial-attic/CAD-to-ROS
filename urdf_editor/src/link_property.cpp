@@ -1,5 +1,6 @@
 #include "urdf_editor/link_property.h"
 #include <qt4/QtCore/qvariant.h>
+#include "urdf_editor/urdf_property.h"
 
 namespace urdf_editor
 {
@@ -421,7 +422,8 @@ namespace urdf_editor
   }
 
   // Link Visual Property
-  LinkVisualProperty::LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual): visual_(visual), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkVisualProperty::LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual, rviz::RobotLink *rviz_link): 
+    visual_(visual), rviz_link_(rviz_link), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -437,7 +439,6 @@ namespace urdf_editor
     top_item_->addSubProperty(item);
     
     item = manager_->addProperty(QVariant::Bool, tr("Show in Editor"));
-    QObject::connect(
     top_item_->addSubProperty(item);
 
     
@@ -595,7 +596,31 @@ namespace urdf_editor
 
     QString name = property->propertyName();
     if (name == "Name")
+    {
       visual_->group_name = val.toString().toStdString();
+    }
+    else if (name == "Show in Editor")
+    {
+      std::cout << "visibility toggled" << std::endl;
+      std::cout << "rviz link is " << rviz_link_ << std::endl;
+      std::cout << "rviz link propery is " << rviz_link_->getLinkProperty() << std::endl;
+      rviz_link_->getLinkProperty()->setValue(val.toBool());
+      
+//       QObject* theParent = parent();
+//       while(theParent != NULL) {
+//         URDFProperty* urdfParent = dynamic_cast<URDFProperty*>(theParent);
+//         std::cout << theParent->objectName().toStdString() << std::endl;
+//         if(!urdfParent)
+//         {
+//             std::cout << "parent is not URDFProperty" << std::endl;
+//         }
+//         else
+//         {
+//             std::cout << urdfParent->getRvizWidget()->getRobotDisplay()->findChild<rviz::RobotLink*>(tr(visual_->group_name.c_str())) << std::endl;
+//         }
+//         theParent = theParent->parent();
+//       }
+    }
 
     emit LinkVisualProperty::valueChanged(property, val);
   }
@@ -759,7 +784,8 @@ namespace urdf_editor
   }
 
   // Link Property
-  LinkProperty::LinkProperty(boost::shared_ptr<urdf::Link> link):link_(link), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkProperty::LinkProperty(boost::shared_ptr<urdf::Link> link, rviz::RobotLink* rviz_link):
+    link_(link), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
@@ -778,7 +804,7 @@ namespace urdf_editor
 
     if (link_->visual)
     {
-      visual_property_.reset(new LinkVisualProperty(link_->visual));
+      visual_property_.reset(new LinkVisualProperty(link_->visual, rviz_link));
       QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
@@ -953,6 +979,7 @@ namespace urdf_editor
 
       emit LinkProperty::linkNameChanged(this, val);
     }
+
     emit LinkProperty::valueChanged();
   }
 

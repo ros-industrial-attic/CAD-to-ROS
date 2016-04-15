@@ -93,15 +93,11 @@ namespace urdf_editor
   {
     model_ = urdf::parseURDFFile(file_path.toStdString());
     if (model_)
-      if (buildTree())
-      {
+    {
         rviz_widget_->loadRobot(model_);
+        buildTree();
         return true;
-      }
-      else
-      {
-        return false;
-      }
+    }
     else
     {
       return false;
@@ -131,6 +127,10 @@ namespace urdf_editor
     }
 
     return true;
+  }
+  
+  urdf_editor::MyRviz* URDFProperty::getRvizWidget() {
+    return rviz_widget_;
   }
 
   bool URDFProperty::buildTree()
@@ -176,7 +176,25 @@ namespace urdf_editor
     item->setText(0, QString::fromStdString(link->name));
     root_->addChild(item);
 
-    LinkPropertyPtr tree_link(new LinkProperty(link));
+    
+    
+    std::cout << "rviz widget has children: " << rviz_widget_->getRobotDisplay()->numChildren() << std::endl;
+    for(int i=0; i < rviz_widget_->getRobotDisplay()->numChildren(); ++i) {
+      std::cout << rviz_widget_->getRobotDisplay()->childAt(i)->getNameStd() << std::endl;
+    }
+    
+    std::cout << "found widgets with name " << link->name.c_str() << ": " << rviz_widget_->getRobotDisplay()->subProp(link->name.c_str())->getNameStd() << std::endl;
+    std::cout << "child count: " << rviz_widget_->getRobotDisplay()->childAt(9)->numChildren() << std::endl;
+    
+    rviz::Property* target = rviz_widget_->getRobotDisplay()->subProp("Links");
+    for(int i=0; i < target->numChildren(); ++i) {
+      std::cout << target->childAt(i)->getNameStd() << std::endl;
+    }
+    std::cout << "found widgets with name " << link->name.c_str() << ": " << target->subProp(link->name.c_str())->getNameStd() << std::endl;
+    target->subProp(link->name.c_str())->setValue(false);
+    
+    
+    LinkPropertyPtr tree_link(new LinkProperty(link, rviz_widget_->getRobotDisplay()->findChildren<rviz::RobotLink*>("Links")[0] ));
     QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
     QObject::connect(tree_link.get(), SIGNAL(valueChanged()),

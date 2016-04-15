@@ -7,6 +7,7 @@
 #include "urdf_editor/common.h"
 #include "urdf_editor/joint_property.h"
 #include <urdf_model/link.h>
+#include <rviz/robot/robot_link.h>
 
 namespace urdf_editor
 {
@@ -107,7 +108,7 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual);
+    LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual, rviz::RobotLink *rviz_link);
     ~LinkVisualProperty();
 
     void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
@@ -141,7 +142,8 @@ namespace urdf_editor
     boost::shared_ptr<OriginProperty> origin_property_;
     boost::shared_ptr<LinkNewMaterialProperty> new_material_property_;
     boost::shared_ptr<LinkGeometryProperty> geometry_property_;
-
+    
+    rviz::RobotLink *rviz_link_;
   };
 
   class LinkInertialProperty : public QObject
@@ -189,7 +191,7 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    LinkProperty(boost::shared_ptr<urdf::Link> link);
+    LinkProperty(boost::shared_ptr<urdf::Link> link, rviz::RobotLink* rviz_link);
     ~LinkProperty();
 
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
@@ -226,7 +228,6 @@ namespace urdf_editor
 
   signals:
     void linkNameChanged(LinkProperty *property, const QVariant &val);
-    void linkVisibilityChanged(LinkProperty *property, const QVariant &val);
     void valueChanged();
 
   private:
