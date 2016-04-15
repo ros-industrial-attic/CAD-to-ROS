@@ -100,6 +100,10 @@ namespace urdf_editor
         rviz_widget_->loadRobot(model_);
         return true;
       }
+      else
+      {
+        return false;
+      }
     }
     else
     {
