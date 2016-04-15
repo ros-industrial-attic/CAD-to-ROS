@@ -95,9 +95,11 @@ namespace urdf_editor
     model_ = urdf::parseURDFFile(file_path.toStdString());
     if (model_)
     {
+      if(buildTree())
+      {
         rviz_widget_->loadRobot(model_);
-        buildTree();
         return true;
+      }
     }
     else
     {
