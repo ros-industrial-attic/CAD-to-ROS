@@ -1,29 +1,20 @@
-#ifndef URDF_PROPERTY_H
-#define URDF_PROPERTY_H
+#ifndef __URDF_PROPERTY_H__
+#define __URDF_PROPERTY_H__
 
 #include <QtCore>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QMenu>
-#include <urdf_parser/urdf_parser.h>
-#include <urdf_editor/joint_property.h>
-#include <urdf_editor/link_property.h>
 #include <qttreepropertybrowser.h>
 #include <urdf_editor/my_rviz.h>
 
-namespace urdf
-{
-  class Joint;
-  class Link;
-}
+#include <urdf_editor/urdf_types.h>
+#include <urdf_editor/property_types.h>
+#include <urdf_editor/qt_types.h>
+
 
 namespace urdf_editor
 {
-  // forward declared
-  class LinkProperty;
-  class JointProperty;
-
-
   class URDFProperty : public QObject
   {
     Q_OBJECT
@@ -53,16 +44,16 @@ namespace urdf_editor
   private:
     bool populateTreeWidget();
 
-    void addToTreeWidget(boost::shared_ptr<urdf::Link> link, QTreeWidgetItem* parent);
-    void addToTreeWidget(boost::shared_ptr<urdf::Joint> joint, QTreeWidgetItem* parent);
+    void addToTreeWidget(urdf::LinkSharedPtr link, QTreeWidgetItem* parent);
+    void addToTreeWidget(urdf::JointSharedPtr joint, QTreeWidgetItem* parent);
 
     void addModelLink(QTreeWidgetItem* parent);
-    QTreeWidgetItem* addLinkTreeItem(QTreeWidgetItem* parent, boost::shared_ptr<urdf::Link> link);
-    LinkPropertyPtr addLinkProperty(QTreeWidgetItem* item, boost::shared_ptr<urdf::Link> link);
+    QTreeWidgetItem* addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link);
+    LinkPropertySharedPtr addLinkProperty(QTreeWidgetItem* item, urdf::LinkSharedPtr link);
 
     void addModelJoint(QTreeWidgetItem *parent);
-    QTreeWidgetItem* addJointTreeItem(QTreeWidgetItem* parent, boost::shared_ptr<urdf::Joint> joint);
-    JointPropertyPtr addJointProperty(QTreeWidgetItem *item, boost::shared_ptr<urdf::Joint> joint);
+    QTreeWidgetItem* addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint);
+    JointPropertySharedPtr addJointProperty(QTreeWidgetItem *item, urdf::JointSharedPtr joint);
 
     QString getValidName(QString prefix, QList<QString> &current_names);
 
@@ -70,16 +61,16 @@ namespace urdf_editor
     bool isLink(QTreeWidgetItem *item);
 
     boost::shared_ptr<QtTreePropertyBrowser> property_editor_;
-    boost::shared_ptr<urdf::ModelInterface> model_;
-    QMap<boost::shared_ptr<urdf::Link>, QTreeWidgetItem *> joint_child_to_ctree_;
+    urdf::ModelInterfaceSharedPtr model_;
+    QMap<urdf::LinkSharedPtr, QTreeWidgetItem *> joint_child_to_ctree_;
 
     // these map chain-tree-items to joint properties
-    QMap<QTreeWidgetItem *, JointPropertyPtr> ctree_to_joint_property_;
+    QMap<QTreeWidgetItem *, JointPropertySharedPtr> ctree_to_joint_property_;
     // and joint properties to chain-tree-items
     QMap<JointProperty *, QTreeWidgetItem *> joint_property_to_ctree_;
 
     // these map link-tree-items to link properties
-    QMap<QTreeWidgetItem *, LinkPropertyPtr> ltree_to_link_property_;
+    QMap<QTreeWidgetItem *, LinkPropertySharedPtr> ltree_to_link_property_;
     // and link properties to link-tree-items
     QMap<LinkProperty *, QTreeWidgetItem *> link_property_to_ltree_;
 
@@ -90,8 +81,7 @@ namespace urdf_editor
     QTreeWidget *tree_widget_;
     QWidget *browser_parent_;
     urdf_editor::MyRviz *rviz_widget_;
-
   };
-  typedef boost::shared_ptr<URDFProperty> URDFPropertyPtr;
 }
-#endif // URDF_TREE_PROPERTY_H
+
+#endif // __URDF_PROPERTY_H__

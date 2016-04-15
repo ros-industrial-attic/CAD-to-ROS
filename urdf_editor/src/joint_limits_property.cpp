@@ -1,11 +1,16 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/joint_limits_property.h>
 #include <urdf_editor/common.h>
+
+#include <urdf_model/joint.h>
 
 
 namespace urdf_editor
 {
-  JointLimitsProperty::JointLimitsProperty(boost::shared_ptr<urdf::JointLimits> limits): limits_(limits), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  JointLimitsProperty::JointLimitsProperty(urdf::JointLimitsSharedPtr limits): limits_(limits), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -64,7 +69,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointLimitsProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void JointLimitsProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }

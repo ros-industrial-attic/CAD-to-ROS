@@ -2,52 +2,20 @@
 #define __JOINT_PROPERTY_H__
 
 #include <QtCore>
-#include <boost/shared_container_iterator.hpp>
-
-#include <qttreepropertybrowser.h>
-#include <qtvariantproperty.h>
 
 #include <urdf_editor/common.h>
-#include <urdf_model/joint.h>
-
-#include <urdf_editor/origin_property.h>
-#include <urdf_editor/joint_axis_property.h>
-#include <urdf_editor/joint_calibration_property.h>
-#include <urdf_editor/joint_dynamics_property.h>
-#include <urdf_editor/joint_limits_property.h>
-#include <urdf_editor/joint_mimic_property.h>
-#include <urdf_editor/joint_safety_property.h>
+#include <urdf_editor/property_types.h>
+#include <urdf_editor/qt_types.h>
+#include <urdf_editor/urdf_types_ext.h>
 
 
 namespace urdf_editor
 {
-  /*! OriginProperty pointer */
-  typedef boost::shared_ptr<OriginProperty> OriginPropertyPtr;
-  
-  /*! JointAxisProperty pointer */
-  typedef boost::shared_ptr<JointAxisProperty> JointAxisPropertyPtr;
-  
-  /*! JointLimitsProperty pointer */
-  typedef boost::shared_ptr<JointLimitsProperty> JointLimitsPropertyPtr;
-  
-  /*! JointCalibrationProperty pointer */
-  typedef boost::shared_ptr<JointCalibrationProperty> JointCalibrationPropertyPtr;
-  
-  /*! JointDynamicsProperty pointer */
-  typedef boost::shared_ptr<JointDynamicsProperty> JointDynamicsPropertyPtr;
-  
-  /*! JointMimicProperty pointer */
-  typedef boost::shared_ptr<JointMimicProperty> JointMimicPropertyPtr;
-  
-  /*! JointSafetyProperty pointer */
-  typedef boost::shared_ptr<JointSafetyProperty> JointSafetyPropertyPtr;
-  
-  
   class JointProperty : public QObject
   {
     Q_OBJECT
   public:
-    JointProperty(boost::shared_ptr<urdf::Joint> joint, QStringList &link_names, QStringList &joint_names);
+    JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names);
     ~JointProperty();
 
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
@@ -61,7 +29,7 @@ namespace urdf_editor
     void createOriginProperty();
    
     /*! Get the Origin Property */
-    OriginPropertyPtr getOriginProperty();
+    OriginPropertySharedPtr getOriginProperty();
     
     /*! Check if has axis property */
     bool hasAxisProperty();
@@ -70,7 +38,7 @@ namespace urdf_editor
     void createAxisProperty();
    
     /*! Get the axis Property */
-    JointAxisPropertyPtr getAxisProperty();
+    JointAxisPropertySharedPtr getAxisProperty();
     
     /*! Check if has limits property */
     bool hasLimitsProperty();
@@ -79,7 +47,7 @@ namespace urdf_editor
     void createLimitsProperty();
    
     /*! Get the limits Property */
-    JointLimitsPropertyPtr getLimitsProperty();
+    JointLimitsPropertySharedPtr getLimitsProperty();
     
     /*! Check if has calibration property */
     bool hasCalibrationProperty();
@@ -88,7 +56,7 @@ namespace urdf_editor
     void createCalibrationProperty();
    
     /*! Get the calibration Property */
-    JointCalibrationPropertyPtr getCalibrationProperty();
+    JointCalibrationPropertySharedPtr getCalibrationProperty();
     
     /*! Check if has dyanmics property */
     bool hasDynamicsProperty();
@@ -97,7 +65,7 @@ namespace urdf_editor
     void createDynamicsProperty();
    
     /*! Get the dynamics Property */
-    JointDynamicsPropertyPtr getDynamicsProperty();
+    JointDynamicsPropertySharedPtr getDynamicsProperty();
     
     /*! Check if has mimic property */
     bool hasMimicProperty();
@@ -106,7 +74,7 @@ namespace urdf_editor
     void createMimicProperty();
    
     /*! Get the mimic Property */
-    JointMimicPropertyPtr getMimicProperty();
+    JointMimicPropertySharedPtr getMimicProperty();
     
     /*! Check if has safety property */
     bool hasSafetyProperty();
@@ -115,7 +83,7 @@ namespace urdf_editor
     void createSafetyProperty();
    
     /*! Get the safety Property */
-    JointSafetyPropertyPtr getSafetyProperty();
+    JointSafetyPropertySharedPtr getSafetyProperty();
     
     
     
@@ -129,26 +97,24 @@ namespace urdf_editor
     void valueChanged();
 
   private:
-    boost::shared_ptr<urdf::Joint> joint_;
+    urdf::JointSharedPtr joint_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     bool loading_;
     QStringList &link_names_;
     QStringList &joint_names_;
-    boost::shared_ptr<JointLimitsProperty> limits_property_;
-    boost::shared_ptr<JointDynamicsProperty> dynamics_property_;
-    boost::shared_ptr<JointCalibrationProperty> calibration_property_;
-    boost::shared_ptr<JointMimicProperty> mimic_property_;
-    boost::shared_ptr<JointSafetyProperty> safety_property_;
-    boost::shared_ptr<JointAxisProperty> axis_property_;
-    boost::shared_ptr<OriginProperty> origin_property_;
+    JointLimitsPropertySharedPtr limits_property_;
+    JointDynamicsPropertySharedPtr dynamics_property_;
+    JointCalibrationPropertySharedPtr calibration_property_;
+    JointMimicPropertySharedPtr mimic_property_;
+    JointSafetyPropertySharedPtr safety_property_;
+    JointAxisPropertySharedPtr axis_property_;
+    OriginPropertySharedPtr origin_property_;
     QtVariantProperty *name_item_;
     QtVariantProperty *type_item_;
     QtVariantProperty *parent_item_;
     QtVariantProperty *child_item_;
   };
-
-  typedef boost::shared_ptr<JointProperty> JointPropertyPtr;
 }
 
 #endif // __JOINT_PROPERTY_H__

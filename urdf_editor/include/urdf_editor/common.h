@@ -1,8 +1,11 @@
-#ifndef COMMON_H
-#define COMMON_H
-#include <QtCore>
-#include <qtvariantproperty.h>
-#include <urdf_model/joint.h>
+#ifndef __URDF_EDITOR_COMMON_H__
+#define __URDF_EDITOR_COMMON_H__
+
+#include <urdf_editor/qt_types.h>
+#include <QString>
+
+#include <urdf_editor/urdf_types_ext.h>
+
 
 namespace urdf_editor
 {
@@ -15,5 +18,7 @@ namespace urdf_editor
   };
 
 }
+
 typedef urdf_editor::Attributes Attributes;
-#endif // COMMON_H
+
+#endif // __URDF_EDITOR_COMMON_H__

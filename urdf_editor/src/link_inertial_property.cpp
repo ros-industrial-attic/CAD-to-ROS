@@ -1,12 +1,17 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/link_inertial_property.h>
 #include <urdf_editor/origin_property.h>
 #include <urdf_editor/common.h>
 
+#include <urdf_model/link.h>
+
 
 namespace urdf_editor
 {
-  LinkInertialProperty::LinkInertialProperty(boost::shared_ptr<urdf::Inertial> inertial): inertial_(inertial), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkInertialProperty::LinkInertialProperty(urdf::InertialSharedPtr inertial): inertial_(inertial), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -116,7 +121,7 @@ namespace urdf_editor
     }
   }
 
-  void LinkInertialProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void LinkInertialProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
     if (origin_property_)

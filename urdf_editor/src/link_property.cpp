@@ -1,4 +1,9 @@
 
+#include <string>
+
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_model/link.h>
 
 #include <urdf_editor/link_collision_property.h>
@@ -11,7 +16,7 @@
 
 namespace urdf_editor
 {
-  LinkProperty::LinkProperty(boost::shared_ptr<urdf::Link> link):link_(link), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkProperty::LinkProperty(urdf::LinkSharedPtr link):link_(link), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
@@ -108,7 +113,7 @@ namespace urdf_editor
     }
   }
 
-  LinkInertialPropertyPtr LinkProperty::getInertialProperty()
+  LinkInertialPropertySharedPtr LinkProperty::getInertialProperty()
   {
     return inertial_property_;
   }
@@ -140,9 +145,9 @@ namespace urdf_editor
    /*!
    *@brief Get the visual property Object
    * 
-   *@return LinkVisualPropertyPtr
+   *@return LinkVisualPropertySharedPtr
    */
-  LinkVisualPropertyPtr LinkProperty::getVisualProperty()
+  LinkVisualPropertySharedPtr LinkProperty::getVisualProperty()
   {
     return visual_property_;
   }
@@ -173,9 +178,9 @@ namespace urdf_editor
    /*!
    *@brief Get the collision property Object
    * 
-   *@return LinkCollisionPropertyPtr
+   *@return LinkCollisionPropertySharedPtr
    */
-  LinkCollisionPropertyPtr LinkProperty::getCollisionProperty()
+  LinkCollisionPropertySharedPtr LinkProperty::getCollisionProperty()
   {
     return collision_property_;
   }

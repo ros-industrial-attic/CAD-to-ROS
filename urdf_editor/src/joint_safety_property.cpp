@@ -1,11 +1,16 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/joint_safety_property.h>
 #include <urdf_editor/common.h>
+
+#include <urdf_model/joint.h>
 
 
 namespace urdf_editor
 {
-  JointSafetyProperty::JointSafetyProperty(boost::shared_ptr<urdf::JointSafety> safety): safety_(safety), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  JointSafetyProperty::JointSafetyProperty(urdf::JointSafetySharedPtr safety): safety_(safety), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -58,7 +63,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointSafetyProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void JointSafetyProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }

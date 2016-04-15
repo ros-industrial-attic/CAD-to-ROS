@@ -1,13 +1,18 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/link_collision_property.h>
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/origin_property.h>
 #include <urdf_editor/common.h>
 
+#include <urdf_model/link.h>
+
 
 namespace urdf_editor
 {
-  LinkCollisionProperty::LinkCollisionProperty(boost::shared_ptr<urdf::Collision> collision): collision_(collision), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkCollisionProperty::LinkCollisionProperty(urdf::CollisionSharedPtr collision): collision_(collision), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -118,7 +123,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void LinkCollisionProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void LinkCollisionProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
     if (origin_property_)

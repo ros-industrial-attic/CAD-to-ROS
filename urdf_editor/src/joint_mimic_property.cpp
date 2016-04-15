@@ -1,11 +1,16 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/joint_mimic_property.h>
 #include <urdf_editor/common.h>
+
+#include <urdf_model/joint.h>
 
 
 namespace urdf_editor
 {
-  JointMimicProperty::JointMimicProperty(boost::shared_ptr<urdf::JointMimic> mimic, QStringList &joint_names): mimic_(mimic), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), joint_names_(joint_names)
+  JointMimicProperty::JointMimicProperty(urdf::JointMimicSharedPtr mimic, QStringList &joint_names): mimic_(mimic), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), joint_names_(joint_names)
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -56,7 +61,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointMimicProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void JointMimicProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }

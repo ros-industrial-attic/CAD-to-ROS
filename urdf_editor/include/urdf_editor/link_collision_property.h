@@ -3,31 +3,21 @@
 
 #include <QtCore>
 
-#include <qttreepropertybrowser.h>
-#include <qtvariantproperty.h>
+#include <urdf_editor/qt_types.h>
+#include <urdf_editor/urdf_types_ext.h>
+#include <urdf_editor/property_types.h>
 
-#include <boost/shared_ptr.hpp>
-
-
-namespace urdf
-{
-  class Collision;
-}
 
 namespace urdf_editor
 {
-  // forward declared
-  class OriginProperty;
-  class LinkGeometryProperty;
-
   class LinkCollisionProperty : public QObject
   {
     Q_OBJECT
   public:
-    LinkCollisionProperty(boost::shared_ptr<urdf::Collision> collision);
+    LinkCollisionProperty(urdf::CollisionSharedPtr collision);
     ~LinkCollisionProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
+    void loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor);
 
     bool hasOriginProperty();
 
@@ -48,13 +38,13 @@ namespace urdf_editor
     void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
-    boost::shared_ptr<urdf::Collision> collision_;
+    urdf::CollisionSharedPtr collision_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
-    boost::shared_ptr<OriginProperty> origin_property_;
-    boost::shared_ptr<LinkGeometryProperty> geometry_property_;
+    OriginPropertySharedPtr origin_property_;
+    LinkGeometryPropertySharedPtr geometry_property_;
   };
 }
 

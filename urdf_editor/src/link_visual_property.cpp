@@ -1,16 +1,20 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/link_visual_property.h>
 #include <urdf_editor/link_new_material_property.h>
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/origin_property.h>
+
 #include <urdf_editor/common.h>
 
-#include <boost/shared_ptr.hpp>
+#include <urdf_model/link.h>
 
 
 namespace urdf_editor
 {
-  LinkVisualProperty::LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual): visual_(visual), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkVisualProperty::LinkVisualProperty(urdf::VisualSharedPtr visual): visual_(visual), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -156,7 +160,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void LinkVisualProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void LinkVisualProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
     if (origin_property_)

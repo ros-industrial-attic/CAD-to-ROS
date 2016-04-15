@@ -1,27 +1,27 @@
-#ifndef MYRVIZ_H
-#define MYRVIZ_H
+#ifndef __MYRVIZ_H__
+#define __MYRVIZ_H__
 
-#include <rviz/visualization_manager.h>
-#include <rviz/render_panel.h>
-#include <rviz/display.h>
-#include <moveit/robot_state_rviz_plugin/robot_state_display.h>
-#include <urdf/model.h>
+#include <QWidget>
+
+#include <urdf_editor/urdf_types_ext.h>
+
+#include <ros/node_handle.h>
+
 
 namespace rviz
 {
-class Display;
-class RenderPanel;
-class VisualizationManager;
+  class Display;
+  class RenderPanel;
+  class VisualizationManager;
 }
 
 namespace moveit_rviz_plugin
 {
-class RobotStateDisplay;
+  class RobotStateDisplay;
 }
 
 namespace urdf_editor
 {
-
   class MyRviz: public QWidget
   {
     Q_OBJECT
@@ -29,7 +29,7 @@ namespace urdf_editor
     MyRviz(QWidget *parent = 0);
     virtual ~MyRviz();
 
-    bool loadRobot(boost::shared_ptr<urdf::ModelInterface> robot_model);
+    bool loadRobot(urdf::ModelInterfaceSharedPtr robot_model);
 
     bool clear();
 
@@ -40,7 +40,6 @@ namespace urdf_editor
     rviz::Display *grid_display_;
     ros::NodeHandle nh_;
   };
-
 }
 
-#endif // MYRVIZ_H
+#endif // __MYRVIZ_H__

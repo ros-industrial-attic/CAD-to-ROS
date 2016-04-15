@@ -1,19 +1,10 @@
-#ifndef URDF_EDITOR_H
-#define URDF_EDITOR_H
+#ifndef __URDF_EDITOR_H__
+#define __URDF_EDITOR_H__
 
 #include <QMainWindow>
-#include <QtCore>
-#include <QtGui>
-#include <QObject>
-#include <qtvariantproperty.h>
-#include <qtpropertymanager.h>
-#include <qteditorfactory.h>
-#include <qteditorfactory.h>
-#include <qttreepropertybrowser.h>
-#include "urdf_editor/joint_property.h"
-#include "urdf_editor/link_property.h"
-#include "urdf_editor/urdf_property.h"
-#include "my_rviz.h"
+
+#include <urdf_editor/property_types.h>
+
 
 namespace Ui
 {
@@ -44,8 +35,8 @@ private:
   QList<QString> link_names;
   QList<QString> joint_names;
 
-  urdf_editor::URDFPropertyPtr urdf_tree_;
+  urdf_editor::URDFPropertySharedPtr urdf_tree_;
   QString file_path_;
 };
 
-#endif // URDF_EDITOR_H
+#endif // __URDF_EDITOR_H__

@@ -1,9 +1,24 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/joint_property.h>
+
+#include <urdf_editor/origin_property.h>
+#include <urdf_editor/joint_axis_property.h>
+#include <urdf_editor/joint_calibration_property.h>
+#include <urdf_editor/joint_dynamics_property.h>
+#include <urdf_editor/joint_limits_property.h>
+#include <urdf_editor/joint_mimic_property.h>
+#include <urdf_editor/joint_safety_property.h>
+
+#include <urdf_model/pose.h>
+#include <urdf_model/joint.h>
+
 
 namespace urdf_editor
 {
-  JointProperty::JointProperty(boost::shared_ptr<urdf::Joint> joint, QStringList &link_names, QStringList &joint_names): joint_(joint), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), link_names_(link_names), joint_names_(joint_names)
+  JointProperty::JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names): joint_(joint), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), link_names_(link_names), joint_names_(joint_names)
   {
     loading_ = true;
     double p_norm, r_norm;
@@ -264,9 +279,9 @@ namespace urdf_editor
    /*!
    *@brief Get the origin property Object
    * 
-   *@return OriginPropertyPtr
+   *@return OriginPropertySharedPtr
    */
-  OriginPropertyPtr JointProperty::getOriginProperty()
+  OriginPropertySharedPtr JointProperty::getOriginProperty()
   {
     return origin_property_;
   }
@@ -296,9 +311,9 @@ namespace urdf_editor
    /*!
    *@brief Get the axis property Object
    * 
-   *@return JointAxisPropertyPtr
+   *@return JointAxisPropertySharedPtr
    */
-  JointAxisPropertyPtr JointProperty::getAxisProperty()
+  JointAxisPropertySharedPtr JointProperty::getAxisProperty()
   {
     return axis_property_;
   }
@@ -329,9 +344,9 @@ namespace urdf_editor
    /*!
    *@brief Get the limts property Object
    * 
-   *@return JointLimitsPropertyPtr
+   *@return JointLimitsPropertySharedPtr
    */
-  JointLimitsPropertyPtr JointProperty::getLimitsProperty()
+  JointLimitsPropertySharedPtr JointProperty::getLimitsProperty()
   {
     return limits_property_;
   }
@@ -362,9 +377,9 @@ namespace urdf_editor
    /*!
    *@brief Get the calibration property Object
    * 
-   *@return JointCalibrationPropertyPtr
+   *@return JointCalibrationPropertySharedPtr
    */
-  JointCalibrationPropertyPtr JointProperty::getCalibrationProperty()
+  JointCalibrationPropertySharedPtr JointProperty::getCalibrationProperty()
   {
     return calibration_property_;
   }
@@ -395,9 +410,9 @@ namespace urdf_editor
    /*!
    *@brief Get the dynamics property Object
    * 
-   *@return JointDynamicsPropertyPtr
+   *@return JointDynamicsPropertySharedPtr
    */
-  JointDynamicsPropertyPtr JointProperty::getDynamicsProperty()
+  JointDynamicsPropertySharedPtr JointProperty::getDynamicsProperty()
   {
     return dynamics_property_;
   }
@@ -428,9 +443,9 @@ namespace urdf_editor
    /*!
    *@brief Get the mimic property Object
    * 
-   *@return JointMimicPropertyPtr
+   *@return JointMimicPropertySharedPtr
    */
-  JointMimicPropertyPtr JointProperty::getMimicProperty()
+  JointMimicPropertySharedPtr JointProperty::getMimicProperty()
   {
     return mimic_property_;
   }
@@ -461,9 +476,9 @@ namespace urdf_editor
    /*!
    *@brief Get the safety property Object
    * 
-   *@return JointSafetyPropertyPtr
+   *@return JointSafetyPropertySharedPtr
    */
-  JointSafetyPropertyPtr JointProperty::getSafetyProperty()
+  JointSafetyPropertySharedPtr JointProperty::getSafetyProperty()
   {
     return safety_property_;
   }

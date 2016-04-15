@@ -3,10 +3,8 @@
 
 #include <QtCore>
 
-#include <qttreepropertybrowser.h>
-#include <qtvariantproperty.h>
-
-#include <urdf_model/link.h>
+#include <urdf_editor/qt_types.h>
+#include <urdf_editor/urdf_types_ext.h>
 
 
 namespace urdf_editor
@@ -15,10 +13,10 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    LinkGeometryProperty(boost::shared_ptr<urdf::Geometry> geometry);
+    LinkGeometryProperty(urdf::GeometrySharedPtr geometry);
     ~LinkGeometryProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
+    void loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor);
 
     void loadData();
 
@@ -31,7 +29,7 @@ namespace urdf_editor
     void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
-    boost::shared_ptr<urdf::Geometry> geometry_;
+    urdf::GeometrySharedPtr geometry_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;

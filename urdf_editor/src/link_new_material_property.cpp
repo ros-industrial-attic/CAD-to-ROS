@@ -1,11 +1,16 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/link_new_material_property.h>
 #include <urdf_editor/common.h>
+
+#include <urdf_model/link.h>
 
 
 namespace urdf_editor
 {
-  LinkNewMaterialProperty::LinkNewMaterialProperty(boost::shared_ptr<urdf::Material> material): material_(material), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkNewMaterialProperty::LinkNewMaterialProperty(urdf::MaterialSharedPtr material): material_(material), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -54,7 +59,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void LinkNewMaterialProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void LinkNewMaterialProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }

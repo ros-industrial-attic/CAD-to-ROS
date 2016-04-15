@@ -3,10 +3,8 @@
 
 #include <QtCore>
 
-#include <qttreepropertybrowser.h>
-#include <qtvariantproperty.h>
-
-#include <urdf_model/joint.h>
+#include <urdf_editor/qt_types.h>
+#include <urdf_editor/urdf_types_ext.h>
 
 
 namespace urdf_editor
@@ -18,7 +16,7 @@ namespace urdf_editor
     JointAxisProperty(urdf::Vector3 &axis);
     ~JointAxisProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
+    void loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor);
 
     void loadData();
 

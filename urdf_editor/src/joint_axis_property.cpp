@@ -1,6 +1,11 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/joint_axis_property.h>
 #include <urdf_editor/common.h>
+
+#include <urdf_model/pose.h>
 
 
 namespace urdf_editor
@@ -53,7 +58,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointAxisProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void JointAxisProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }

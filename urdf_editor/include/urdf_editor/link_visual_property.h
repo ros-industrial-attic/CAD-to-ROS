@@ -3,27 +3,21 @@
 
 #include <QtCore>
 
-#include <qttreepropertybrowser.h>
-#include <qtvariantproperty.h>
-
-#include <urdf_model/link.h>
+#include <urdf_editor/qt_types.h>
+#include <urdf_editor/urdf_types_ext.h>
+#include <urdf_editor/property_types.h>
 
 
 namespace urdf_editor
 {
-  // forward declared
-  class LinkGeometryProperty;
-  class LinkNewMaterialProperty;
-  class OriginProperty;
-
   class LinkVisualProperty : public QObject
   {
     Q_OBJECT
   public:
-    LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual);
+    LinkVisualProperty(urdf::VisualSharedPtr visual);
     ~LinkVisualProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
+    void loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor);
 
     bool hasOriginProperty();
     void createOriginProperty();
@@ -46,15 +40,14 @@ namespace urdf_editor
     void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
-    boost::shared_ptr<urdf::Visual> visual_;
+    urdf::VisualSharedPtr visual_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
-    boost::shared_ptr<OriginProperty> origin_property_;
-    boost::shared_ptr<LinkNewMaterialProperty> new_material_property_;
-    boost::shared_ptr<LinkGeometryProperty> geometry_property_;
-
+    OriginPropertySharedPtr origin_property_;
+    LinkNewMaterialPropertySharedPtr new_material_property_;
+    LinkGeometryPropertySharedPtr geometry_property_;
   };
 }
 

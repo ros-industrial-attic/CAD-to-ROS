@@ -3,10 +3,8 @@
 
 #include <QtCore>
 
-#include <qttreepropertybrowser.h>
-#include <qtvariantproperty.h>
-
-#include <urdf_model/joint.h>
+#include <urdf_editor/qt_types.h>
+#include <urdf_editor/urdf_types_ext.h>
 
 
 namespace urdf_editor
@@ -15,10 +13,10 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    JointCalibrationProperty(boost::shared_ptr<urdf::JointCalibration> calibration);
+    JointCalibrationProperty(urdf::JointCalibrationSharedPtr calibration);
     ~JointCalibrationProperty();
 
-    void loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor);
+    void loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor);
 
     void loadData();
 
@@ -31,7 +29,7 @@ namespace urdf_editor
     void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
-    boost::shared_ptr<urdf::JointCalibration> calibration_;
+    urdf::JointCalibrationSharedPtr calibration_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;

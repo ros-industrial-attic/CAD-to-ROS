@@ -1,11 +1,16 @@
 
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 #include <urdf_editor/joint_dynamics_property.h>
 #include <urdf_editor/common.h>
+
+#include <urdf_model/joint.h>
 
 
 namespace urdf_editor
 {
-  JointDynamicsProperty::JointDynamicsProperty(boost::shared_ptr<urdf::JointDynamics> dynamics): dynamics_(dynamics), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  JointDynamicsProperty::JointDynamicsProperty(urdf::JointDynamicsSharedPtr dynamics): dynamics_(dynamics), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -50,7 +55,7 @@ namespace urdf_editor
     loading_ = false;
   }
 
-  void JointDynamicsProperty::loadFactoryForManager(boost::shared_ptr<QtTreePropertyBrowser> &property_editor)
+  void JointDynamicsProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
   }

@@ -3,39 +3,19 @@
 
 #include <QtCore>
 
-#include <qttreepropertybrowser.h>
-#include <qtvariantproperty.h>
-
 #include <urdf_editor/common.h>
+#include <urdf_editor/property_types.h>
+#include <urdf_editor/qt_types.h>
+#include <urdf_editor/urdf_types_ext.h>
 
-
-namespace urdf
-{
-  class Link;
-}
 
 namespace urdf_editor
 {
-  // forward declared
-  //class OriginProperty;
-  class LinkGeometryProperty;
-  class LinkInertialProperty;
-  class LinkVisualProperty;
-  class LinkCollisionProperty;
-
-  typedef boost::shared_ptr<LinkInertialProperty> LinkInertialPropertyPtr;
-  
-  /*! LinkVisualProperty pointer */
-  typedef boost::shared_ptr<LinkVisualProperty> LinkVisualPropertyPtr;
-  
-  /*! LinkCollisionProperty pointer */
-  typedef boost::shared_ptr<LinkCollisionProperty> LinkCollisionPropertyPtr;
-  
   class LinkProperty : public QObject
   {
     Q_OBJECT
   public:
-    LinkProperty(boost::shared_ptr<urdf::Link> link);
+    LinkProperty(urdf::LinkSharedPtr link);
     ~LinkProperty();
 
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
@@ -44,7 +24,7 @@ namespace urdf_editor
 
     bool hasInertialProperty();
     void createInertialProperty();
-    LinkInertialPropertyPtr getInertialProperty();
+    LinkInertialPropertySharedPtr getInertialProperty();
 
     
     /*! Check if has visual property */
@@ -54,7 +34,7 @@ namespace urdf_editor
     void createVisualProperty();
    
     /*! Get the Inertial Property */
-    LinkVisualPropertyPtr getVisualProperty();
+    LinkVisualPropertySharedPtr getVisualProperty();
     
     /*! Check if has collision property */
     bool hasCollisionProperty();
@@ -63,7 +43,7 @@ namespace urdf_editor
     void createCollisionProperty();
    
     /*! Get the Collision Property */
-    LinkCollisionPropertyPtr getCollisionProperty();
+    LinkCollisionPropertySharedPtr getCollisionProperty();
     
     
   private slots:
@@ -75,18 +55,16 @@ namespace urdf_editor
     void valueChanged();
 
   private:
-    boost::shared_ptr<urdf::Link> link_;
+    urdf::LinkSharedPtr link_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
-    boost::shared_ptr<LinkInertialProperty> inertial_property_;
-    boost::shared_ptr<LinkVisualProperty> visual_property_; // this needs to be array since multiple visuals models are allowed.
-    boost::shared_ptr<LinkCollisionProperty> collision_property_; // this needs to be array since multiple collisions models are allowed.
+    LinkInertialPropertySharedPtr inertial_property_;
+    LinkVisualPropertySharedPtr visual_property_; // this needs to be array since multiple visuals models are allowed.
+    LinkCollisionPropertySharedPtr collision_property_; // this needs to be array since multiple collisions models are allowed.
     QtVariantProperty *name_item_;
   };
-
-  typedef boost::shared_ptr<LinkProperty> LinkPropertyPtr;
 }
 
 #endif // __LINK_PROPERTY_H__
