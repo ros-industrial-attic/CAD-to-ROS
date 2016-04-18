@@ -582,11 +582,12 @@ namespace urdf_editor
     type_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
     type_item_->setAttribute(Common::attributeStr(EnumNames), QStringList() << tr("Unknown") << tr("Revolute") << tr("Continuous") << tr("Prismatic") <<  tr("Floating") << tr("Planar") << tr("Fixed"));
 
-    parent_item_ = manager_->addProperty(QVariant::String, tr("Parent"));
-    parent_item_->setAttribute(Common::attributeStr(ReadOnly), true);
+    parent_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Parent"));
+    parent_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
 
     child_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Child"));
     child_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
+
 
     origin = joint_->parent_to_joint_origin_transform;
     p_norm = origin.position.x * origin.position.x;
@@ -600,6 +601,8 @@ namespace urdf_editor
       origin_property_.reset(new OriginProperty(joint->parent_to_joint_origin_transform));
       QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(updateTF(QtProperty *, const QVariant &)));
     }
 
     p_norm = joint_->axis.x * joint_->axis.x;
@@ -647,6 +650,16 @@ namespace urdf_editor
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
 
+    tf_transformer_.updateLink(joint_->parent_link_name, joint_->child_link_name);
+    geometry_msgs::Vector3 vect;
+    vect.x = joint_->parent_to_joint_origin_transform.position.x;
+    vect.y = joint_->parent_to_joint_origin_transform.position.y;
+    vect.z = joint_->parent_to_joint_origin_transform.position.z;
+    tf_transformer_.updateLink(joint_->parent_link_name, vect);
+    geometry_msgs::Quaternion quat;
+    joint_->parent_to_joint_origin_transform.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
+    tf_transformer_.updateLink(joint_->parent_link_name, quat);
+
     loading_ = false;
   }
 
@@ -661,9 +674,13 @@ namespace urdf_editor
     loading_ = true;
     name_item_->setValue(QString::fromStdString(joint_->name));
     type_item_->setValue(joint_->type);
-    parent_item_->setValue(QString::fromStdString(joint_->parent_link_name));
+    
+    parent_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
+    parent_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->parent_link_name)));
+
     child_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
     child_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->child_link_name)));
+
 
     if (origin_property_)
       origin_property_->loadData();
@@ -784,7 +801,7 @@ namespace urdf_editor
     }
     else if (name == "Parent")
     {
-      joint_->parent_link_name = val.toString().toStdString();
+      joint_->parent_link_name = link_names_[val.toInt()].toStdString();
     }
     else if (name == "Child")
     {
@@ -793,6 +810,21 @@ namespace urdf_editor
     }
 
     emit JointProperty::valueChanged();
+  }
+
+  void JointProperty::updateTF(QtProperty *property, const QVariant &val)
+  {
+    tf_transformer_.updateLink(joint_->parent_link_name, joint_->child_link_name);
+    geometry_msgs::Vector3 vect;
+    vect.x = joint_->parent_to_joint_origin_transform.position.x;
+    vect.y = joint_->parent_to_joint_origin_transform.position.y;
+    vect.z = joint_->parent_to_joint_origin_transform.position.z;
+    tf_transformer_.updateLink(joint_->parent_link_name, vect);
+    ROS_INFO_STREAM("joint property changed: " << joint_->parent_link_name << " " << vect);
+
+    geometry_msgs::Quaternion quat;
+    joint_->parent_to_joint_origin_transform.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
+    tf_transformer_.updateLink(joint_->parent_link_name, quat);
   }
 
   void JointProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
