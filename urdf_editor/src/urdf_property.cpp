@@ -179,8 +179,9 @@ namespace urdf_editor
     LinkPropertyPtr tree_link(new LinkProperty(link));
     QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
-    QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
-              this, SLOT(on_propertyWidget_valueChanged()));
+        QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
+              this, SLOT(on_propertyWidget_linkValueChanged()));
+
 
     ltree_to_link_property_[item] = tree_link;
     link_property_to_ltree_[tree_link.get()] = item;
@@ -208,16 +209,19 @@ namespace urdf_editor
 
     joint_child_to_ctree_[model_->links_.find(joint->child_link_name)->second] = item;
 
-    JointPropertyPtr tree_joint(new JointProperty(joint, link_names_, joint_names_));
+    JointPropertyPtr tree_joint(new JointProperty(joint, link_names_, joint_names_, &tf_transformer_));
     QObject::connect(tree_joint.get(), SIGNAL(jointNameChanged(JointProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_jointNameChanged(JointProperty*,QVariant)));
-    QObject::connect(tree_joint.get(), SIGNAL(valueChanged()),
-              this, SLOT(on_propertyWidget_valueChanged()));
+    QObject::connect(tree_joint.get(), SIGNAL(valueChanged(JointProperty *)),
+              this, SLOT(on_propertyWidget_jointValueChanged(JointProperty *)));
 
     ctree_to_joint_property_[item] = tree_joint;
     joint_property_to_ctree_[tree_joint.get()] = item;
 
     joint_names_.append(name);
+
+    JointProperty *my_joint = &*tree_joint;
+    tf_transformer_.updateLink(my_joint);
   }
 
   QString URDFProperty::getValidName(QString prefix, QList<QString> &current_names)
@@ -658,9 +662,16 @@ namespace urdf_editor
     joint_property_to_ctree_[property]->setText(0, val.toString());
   }
 
-  void URDFProperty::on_propertyWidget_valueChanged()
+  void URDFProperty::on_propertyWidget_linkValueChanged()
   {
     rviz_widget_->loadRobot(model_);
+  }
+
+  void URDFProperty::on_propertyWidget_jointValueChanged(JointProperty *property)
+  {
+    rviz_widget_->loadRobot(model_);
+
+    tf_transformer_.updateLink(property);
   }
 
 }

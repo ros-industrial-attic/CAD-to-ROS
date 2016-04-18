@@ -7,11 +7,14 @@
 #include <urdf_parser/urdf_parser.h>
 #include "urdf_editor/joint_property.h"
 #include "urdf_editor/link_property.h"
+#include "urdf_editor/urdf_transforms.h"
 #include <qttreepropertybrowser.h>
 #include "urdf_editor/my_rviz.h"
 
 namespace urdf_editor
 {
+
+
   class URDFProperty : public QObject
   {
     Q_OBJECT
@@ -36,7 +39,8 @@ namespace urdf_editor
 
     void on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val);
 
-    void on_propertyWidget_valueChanged();
+    void on_propertyWidget_linkValueChanged();
+    void on_propertyWidget_jointValueChanged(JointProperty *property);
 
   private:
     bool buildTree();
@@ -65,6 +69,7 @@ namespace urdf_editor
     QTreeWidget *tree_widget_;
     QWidget *browser_parent_;
     urdf_editor::MyRviz *rviz_widget_;
+    URDFTransformer tf_transformer_;
 
   };
   typedef boost::shared_ptr<URDFProperty> URDFPropertyPtr;
