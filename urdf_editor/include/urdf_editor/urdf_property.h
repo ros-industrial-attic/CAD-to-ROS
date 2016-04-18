@@ -12,9 +12,13 @@
 #include <urdf_editor/property_types.h>
 #include <urdf_editor/qt_types.h>
 
+#include <urdf_editor/urdf_transforms.h>
+
 
 namespace urdf_editor
 {
+
+
   class URDFProperty : public QObject
   {
     Q_OBJECT
@@ -41,7 +45,8 @@ namespace urdf_editor
 
     void on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val);
 
-    void on_propertyWidget_valueChanged();
+    void on_propertyWidget_linkValueChanged();
+    void on_propertyWidget_jointValueChanged(JointProperty *property);
 
     void on_unsavedChanges();
 
@@ -94,6 +99,7 @@ namespace urdf_editor
     QTreeWidget *tree_widget_;
     QWidget *browser_parent_;
     urdf_editor::MyRviz *rviz_widget_;
+    URDFTransformer tf_transformer_;
   };
 }
 

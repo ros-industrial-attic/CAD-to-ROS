@@ -131,4 +131,9 @@ namespace urdf_editor
 
     emit OriginProperty::valueChanged(property, val);
   }
+
+  urdf::Pose& OriginProperty::getOriginData()
+  {
+    return origin_;
+  }
 }

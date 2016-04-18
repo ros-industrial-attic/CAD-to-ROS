@@ -34,52 +34,56 @@ void URDFTransformer::worker_thread()
   }
 }
 
-void URDFTransformer::addLink(std::string parent, std::string child)
+void URDFTransformer::addLink(const std::string parent, const std::string child)
 {
   boost::lock_guard<boost::mutex> lock(data_lock_);
-  for(int i = 0; i < frames_.transforms.size(); ++i)
+  int index = findLink(parent, child);
+  if (index >= 0 && index < frames_.transforms.size())
   {
-    if(parent.compare(frames_.transforms[i].header.frame_id) == 0)
-    {
-      ROS_WARN("frame name %s already exists, not adding to list", parent.c_str());
-      return;
-    }
+    geometry_msgs::TransformStamped new_frame;
+    new_frame.header.frame_id = parent;
+    new_frame.child_frame_id = child;
+    frames_.transforms.push_back(new_frame);
   }
-
-  geometry_msgs::TransformStamped new_frame;
-  new_frame.header.frame_id = parent;
-  new_frame.child_frame_id = child;
-  frames_.transforms.push_back(new_frame);
-}
-
-void URDFTransformer::removeLink(std::string name)
-{
-  boost::lock_guard<boost::mutex> lock(data_lock_);
-  for(int i = 0; i < frames_.transforms.size(); ++i)
+  else
   {
-    if(name.compare(frames_.transforms[i].header.frame_id) == 0)
-    {
-      frames_.transforms.erase(frames_.transforms.begin()+i);
-    }
+    ROS_WARN("frame name %s already exists, not adding to list", parent.c_str());
   }
 }
 
-void URDFTransformer::updateLink(std::string parent, std::string child)
+int URDFTransformer::findLink(const std::string parent, const std::string child)
 {
-  boost::lock_guard<boost::mutex> lock(data_lock_);
-  int i;
-  for(i = 0; i < frames_.transforms.size(); ++i)
+  for(int i = 0; i < frames_.transforms.size(); ++i)
   {
-    // find frame to update
-    if(parent.compare(frames_.transforms[i].header.frame_id) == 0)
+    if(parent.compare(frames_.transforms[i].header.frame_id) == 0 && child.compare(frames_.transforms[i].child_frame_id) == 0)
     {
-      frames_.transforms[i].child_frame_id = child;
-      break;
+      return i;
     }
   }
 
-  // Do we need to add the transform here or just return a bool success/failure?
-  if(i == frames_.transforms.size())
+  return -1;
+}
+
+void URDFTransformer::removeLink(const std::string parent, const std::string child)
+{
+  boost::lock_guard<boost::mutex> lock(data_lock_);
+  int index = findLink(parent, child);
+  if (index >= 0 && index < frames_.transforms.size())
+  {
+    frames_.transforms.erase(frames_.transforms.begin()+index);
+  }
+}
+
+void URDFTransformer::updateLink(const std::string parent, const std::string child, const std::string new_parent, const std::string new_child)
+{
+  boost::lock_guard<boost::mutex> lock(data_lock_);
+  int index = findLink(parent, child);
+  if (index >= 0 && index < frames_.transforms.size())
+  {
+    frames_.transforms[index].header.frame_id = new_parent;
+    frames_.transforms[index].child_frame_id = new_child;
+  }
+  else
   {
     geometry_msgs::TransformStamped new_frame;
     new_frame.header.frame_id = parent;
@@ -88,37 +92,66 @@ void URDFTransformer::updateLink(std::string parent, std::string child)
   }
 }
 
-void URDFTransformer::updateLink(std::string parent, geometry_msgs::Transform trans)
+void URDFTransformer::updateLink(const std::string parent, const std::string child, const geometry_msgs::Transform trans)
 {
-  updateLink(parent, trans.rotation);
-  updateLink(parent, trans.translation);
+  updateLink(parent, child, trans.rotation);
+  updateLink(parent, child, trans.translation);
 }
 
-void URDFTransformer::updateLink(std::string parent, geometry_msgs::Quaternion quat)
+void URDFTransformer::updateLink(const std::string parent, const std::string child, const geometry_msgs::Quaternion quat)
 {
   boost::lock_guard<boost::mutex> lock(data_lock_);
-  for(int i = 0; i < frames_.transforms.size(); ++i)
+  int index = findLink(parent, child);
+
+  if (index >= 0 && index < frames_.transforms.size())
   {
-    // find frame to update
-    if(parent.compare(frames_.transforms[i].header.frame_id) == 0)
-    {
-      frames_.transforms[i].transform.rotation = quat;
-      break;
-    }
+    frames_.transforms[index].transform.rotation = quat;
+  }
+  else
+  {
+    geometry_msgs::TransformStamped new_frame;
+    new_frame.transform.rotation = quat;
+    new_frame.header.frame_id = parent;
+    new_frame.child_frame_id = child;
+    frames_.transforms.push_back(new_frame);
   }
 }
 
-void URDFTransformer::updateLink(std::string parent, geometry_msgs::Vector3 origin)
+void URDFTransformer::updateLink(const std::string parent, const std::string child, const geometry_msgs::Vector3 origin)
 {
   boost::lock_guard<boost::mutex> lock(data_lock_);
-  for(int i = 0; i < frames_.transforms.size(); ++i)
+  int index = findLink(parent, child);
+
+  if (index >= 0 && index < frames_.transforms.size())
   {
-    // find frame to update
-    if(parent.compare(frames_.transforms[i].header.frame_id) == 0)
-    {
-      frames_.transforms[i].transform.translation = origin;
-      break;
-    }
+    frames_.transforms[index].transform.translation = origin;
+  }
+  else
+  {
+    geometry_msgs::TransformStamped new_frame;
+    new_frame.transform.translation = origin;
+    new_frame.header.frame_id = parent;
+    new_frame.child_frame_id = child;
+    frames_.transforms.push_back(new_frame);
+  }
+}
+
+void URDFTransformer::updateLink(JointProperty *property)
+{
+  if(property->hasOriginProperty())
+  {
+    OriginPropertyPtr origin = property->getOriginProperty();
+    urdf::Pose pose = origin->getOriginData();
+    geometry_msgs::Vector3 vect;
+    vect.x = pose.position.x;
+    vect.y = pose.position.y;
+    vect.z = pose.position.z;
+    updateLink(property->getParent(), property->getChild(), vect);
+
+    // Update rotation
+    geometry_msgs::Quaternion quat;
+    pose.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
+    updateLink(property->getParent(), property->getChild(), quat);
   }
 }
 

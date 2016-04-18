@@ -7,16 +7,17 @@
 #include <urdf_editor/property_types.h>
 #include <urdf_editor/qt_types.h>
 #include <urdf_editor/urdf_types_ext.h>
-#include <urdf_editor/urdf_transforms.h>
 
 
 namespace urdf_editor
 {
+  class URDFTransformer;
+
   class JointProperty : public QObject
   {
     Q_OBJECT
   public:
-    JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names);
+    JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names, URDFTransformer *tf);
     ~JointProperty();
 
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
@@ -86,17 +87,17 @@ namespace urdf_editor
     /*! Get the safety Property */
     JointSafetyPropertySharedPtr getSafetyProperty();
     
-    
+    std::string getParent();
+    std::string getChild();
     
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
     void onChildValueChanged(QtProperty *property, const QVariant &val);
-    void updateTF(QtProperty *property, const QVariant &val);
 
   signals:
     void jointNameChanged(JointProperty *property, const QVariant &val);
-    void valueChanged();
+    void valueChanged(JointProperty *property);
 
   private:
     urdf::JointSharedPtr joint_;
@@ -116,7 +117,7 @@ namespace urdf_editor
     QtVariantProperty *type_item_;
     QtVariantProperty *parent_item_;
     QtVariantProperty *child_item_;
-    URDFTransformer tf_transformer_;
+    URDFTransformer *tf_;
   };
 }
 

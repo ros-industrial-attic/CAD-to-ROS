@@ -6,14 +6,22 @@
 #include <tf/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
 
-
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread.hpp>
 
+#include <urdf_editor/joint_property.h>
+#include <urdf_editor/origin_property.h>
+#include <urdf_model/pose.h>
 
 namespace urdf_editor
 {
+
+class JointProperty;
+typedef boost::shared_ptr<JointProperty> JointPropertyPtr;
+class OriginProperty;
+typedef boost::shared_ptr<OriginProperty> OriginPropertyPtr;
+
 class URDFTransformer{
 
 public:
@@ -26,41 +34,46 @@ public:
    * @param parent The name of the parent frame id for the link
    * @param child The name of the child frame id for the link
    */
-  void addLink(std::string parent, std::string child);
+  void addLink(const std::string parent, const std::string child);
+
 
   /**
    * @brief removeLink Removes a link from the list if it exists
    * @param name The name of the link to remove from the list
    */
-  void removeLink(std::string name);
+  void removeLink(const std::string parent, const std::string child);
 
   /**
    * @brief updateLink Looks for a link in the existing tree to update the child information for
    * @param parent The name of the link to find and update
-   * @param child The name of the child to update to
+   * @param child The name of the child to find and update
+   * @param new_parent The new parent link name
+   * @param new_child The new child link name
    */
-  void updateLink(std::string parent, std::string child);
+  void updateLink(const std::string parent, const std::string child, const std::string new_parent, const std::string new_child);
 
   /**
    * @brief updateLink Looks for a link in the existing tree to update the origin orientation information for
    * @param parent The name of the link to find and update
    * @param quat The orientation, in quaternion format
    */
-  void updateLink(std::string parent, geometry_msgs::Quaternion quat);
+  void updateLink(const std::string parent, const std::string child, const geometry_msgs::Quaternion quat);
 
   /**
    * @brief updateLink Looks for a link in the existing tree to update the origin position information for
    * @param parent The name of the link to find and update
    * @param origin The origin position
    */
-  void updateLink(std::string parent, geometry_msgs::Vector3 origin);
+  void updateLink(const std::string parent, const std::string child, const geometry_msgs::Vector3 origin);
 
   /**
    * @brief updateLink Looks for a link in the existing tree to update the origin information for
    * @param parent The name of the link to find and update
    * @param trans The origin information, in tranformation format
    */
-  void updateLink(std::string parent, geometry_msgs::Transform trans);
+  void updateLink(const std::string parent, const std::string child, const geometry_msgs::Transform trans);
+
+  void updateLink(JointProperty *property);
 
 private:
 
@@ -72,6 +85,8 @@ private:
   tf::TransformBroadcaster broadcaster_; /**< @brief The TF broadcaster for publishing frames to the /tf ROS topic */
 
   void worker_thread();
+
+  int findLink(const std::string parent, const std::string child);
 
   bool working;
 

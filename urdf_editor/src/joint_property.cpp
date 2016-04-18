@@ -15,10 +15,12 @@
 #include <urdf_model/pose.h>
 #include <urdf_model/joint.h>
 
+#include <urdf_editor/urdf_transforms.h>
+
 
 namespace urdf_editor
 {
-  JointProperty::JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names): joint_(joint), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), link_names_(link_names), joint_names_(joint_names)
+  JointProperty::JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names, URDFTransformer *tf): joint_(joint), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), link_names_(link_names), joint_names_(joint_names), tf_(tf)
   {
     loading_ = true;
     double p_norm, r_norm;
@@ -58,8 +60,6 @@ namespace urdf_editor
       origin_property_.reset(new OriginProperty(joint->parent_to_joint_origin_transform));
       QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(updateTF(QtProperty *, const QVariant &)));
     }
 
     p_norm = joint_->axis.x * joint_->axis.x;
@@ -107,15 +107,6 @@ namespace urdf_editor
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
 
-    tf_transformer_.updateLink(joint_->parent_link_name, joint_->child_link_name);
-    geometry_msgs::Vector3 vect;
-    vect.x = joint_->parent_to_joint_origin_transform.position.x;
-    vect.y = joint_->parent_to_joint_origin_transform.position.y;
-    vect.z = joint_->parent_to_joint_origin_transform.position.z;
-    tf_transformer_.updateLink(joint_->parent_link_name, vect);
-    geometry_msgs::Quaternion quat;
-    joint_->parent_to_joint_origin_transform.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
-    tf_transformer_.updateLink(joint_->parent_link_name, quat);
 
     loading_ = false;
   }
@@ -255,38 +246,39 @@ namespace urdf_editor
     }
     else if (name == "Parent")
     {
+      // Update parent link only
+      tf_->updateLink(joint_->parent_link_name, joint_->child_link_name, link_names_[val.toInt()].toStdString(), joint_->child_link_name);
       joint_->parent_link_name = link_names_[val.toInt()].toStdString();
     }
     else if (name == "Child")
     {
+      tf_->updateLink(joint_->parent_link_name, joint_->child_link_name, joint_->parent_link_name, val.toString().toStdString());
       joint_->child_link_name = link_names_[val.toInt()].toStdString();
       // TODO: When child is changed need to change additional data within joint_
     }
 
-    emit JointProperty::valueChanged();
+    tf_->updateLink(this);
+
+    emit JointProperty::valueChanged(this);
   }
 
-  void JointProperty::updateTF(QtProperty *property, const QVariant &val)
-  {
-    tf_transformer_.updateLink(joint_->parent_link_name, joint_->child_link_name);
-    geometry_msgs::Vector3 vect;
-    vect.x = joint_->parent_to_joint_origin_transform.position.x;
-    vect.y = joint_->parent_to_joint_origin_transform.position.y;
-    vect.z = joint_->parent_to_joint_origin_transform.position.z;
-    tf_transformer_.updateLink(joint_->parent_link_name, vect);
-    ROS_INFO_STREAM("joint property changed: " << joint_->parent_link_name << " " << vect);
-
-    geometry_msgs::Quaternion quat;
-    joint_->parent_to_joint_origin_transform.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
-    tf_transformer_.updateLink(joint_->parent_link_name, quat);
-  }
 
   void JointProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
 
-    emit JointProperty::valueChanged();
+    emit JointProperty::valueChanged(this);
+  }
+
+  std::string JointProperty::getParent()
+  {
+    return joint_->parent_link_name;
+  }
+
+  std::string JointProperty::getChild()
+  {
+    return joint_->child_link_name;
   }
 
    /*!
