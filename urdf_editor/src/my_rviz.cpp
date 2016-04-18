@@ -26,7 +26,6 @@ namespace urdf_editor
     manager_->addDisplay(robot_display_, false);
 
     grid_display_ = manager_->createDisplay("rviz/Grid", "MyGrid", true);
-    grid_display_->subProp("Line Style")->setValue("Billboards");
   }
 
   // Destructor
