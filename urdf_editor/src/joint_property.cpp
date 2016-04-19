@@ -793,12 +793,12 @@ namespace urdf_editor
     else if (name == "Parent")
     {
       // Update parent link only
-      tf_->updateLink(joint_->parent_link_name, joint_->child_link_name, val.toString().toStdString(), joint_->child_link_name);
-      joint_->parent_link_name = val.toString().toStdString();
+      tf_->updateLink(joint_->parent_link_name, joint_->child_link_name, link_names_[val.toInt()].toStdString(), joint_->child_link_name);
+      joint_->parent_link_name = link_names_[val.toInt()].toStdString();
     }
     else if (name == "Child")
     {
-      tf_->updateLink(joint_->parent_link_name, joint_->child_link_name, joint_->parent_link_name, val.toString().toStdString());
+      tf_->updateLink(joint_->parent_link_name, joint_->child_link_name, joint_->parent_link_name, link_names_[val.toInt()].toStdString());
       joint_->child_link_name = link_names_[val.toInt()].toStdString();
       // TODO: When child is changed need to change additional data within joint_
     }
