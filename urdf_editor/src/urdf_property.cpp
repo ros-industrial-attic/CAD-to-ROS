@@ -97,7 +97,7 @@ namespace urdf_editor
     {
       if(buildTree())
       {
-        rviz_widget_->loadRobot(model_);
+        loadRvizRobot();
         return true;
       }
       else
@@ -163,7 +163,6 @@ namespace urdf_editor
       }
 
     }
-
     
     return true;
   }
@@ -194,8 +193,6 @@ namespace urdf_editor
     link_property_to_ltree_[tree_link.get()] = item;
     
     link_names_.append(QString::fromStdString(link->name));
-    
-    setRvizPropertyForLinkProperty(tree_link, link->name.c_str());
   }
 
   void URDFProperty::addJoint(QTreeWidgetItem *parent)
@@ -228,6 +225,14 @@ namespace urdf_editor
     joint_property_to_ctree_[tree_joint.get()] = item;
 
     joint_names_.append(name);
+  }
+
+  void URDFProperty::loadRvizRobot() {
+    rviz_widget_->loadRobot(model_);    
+    for(int i=0; i < link_root_->childCount(); ++i)
+    {
+      setRvizPropertyForLinkProperty(ltree_to_link_property_[link_root_->child(i)], link_root_->child(i)->text(0));
+    }
   }
   
   void URDFProperty::setRvizPropertyForLinkProperty(LinkPropertyPtr link_property, QString link_name)
@@ -676,11 +681,7 @@ namespace urdf_editor
 
   void URDFProperty::on_propertyWidget_valueChanged()
   {
-    rviz_widget_->loadRobot(model_);
-    for(int i=0; i < link_root_->childCount(); ++i)
-    {
-      setRvizPropertyForLinkProperty(ltree_to_link_property_[link_root_->child(i)], link_root_->child(i)->text(0));
-    }
+    loadRvizRobot();
   }
 
 }
