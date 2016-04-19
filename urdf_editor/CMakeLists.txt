@@ -6,7 +6,6 @@ find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
 
 find_package(urdfdom REQUIRED)
-find_package(Boost REQUIRED)
 
 set(editor_SRCS
       src/main.cpp
@@ -25,7 +24,6 @@ set(editor_HDRS
       include/urdf_editor/link_property.h
       include/urdf_editor/urdf_property.h
       include/urdf_editor/my_rviz.h
-      include/urdf_editor/urdf_transforms.h
 )
 
 set(editor_UIS
