@@ -43,6 +43,9 @@ namespace urdf_editor
     nh_.setParam("ros_workbench", printer.CStr());
     robot_display_->reset();
     robot_display_->setEnabled(true);
+
+    // TODO: return result of serialisation
+    return true;
   }
 
   bool MyRviz::clear()
@@ -51,6 +54,9 @@ namespace urdf_editor
     nh_.deleteParam("ros_workbench");
     robot_display_->reset();
     robot_display_->setEnabled(true);
+
+    // TODO: return result of parameter deletion
+    return true;
   }
 
 }

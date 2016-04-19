@@ -39,23 +39,36 @@ namespace urdf_editor
     void on_propertyWidget_valueChanged();
 
   private:
-    bool buildTree();
+    bool populateTreeWidget();
 
-    void addLink();
-    void addLinkProperty(boost::shared_ptr<urdf::Link> link);
+    void addToTreeWidget(boost::shared_ptr<urdf::Link> link, QTreeWidgetItem* parent);
+    void addToTreeWidget(boost::shared_ptr<urdf::Joint> joint, QTreeWidgetItem* parent);
 
-    void addJoint(QTreeWidgetItem *parent);
-    void addJointProperty(QTreeWidgetItem *parent, boost::shared_ptr<urdf::Joint> joint);
+    void addModelLink(QTreeWidgetItem* parent);
+    QTreeWidgetItem* addLinkTreeItem(QTreeWidgetItem* parent, boost::shared_ptr<urdf::Link> link);
+    LinkPropertyPtr addLinkProperty(QTreeWidgetItem* item, boost::shared_ptr<urdf::Link> link);
+
+    void addModelJoint(QTreeWidgetItem *parent);
+    QTreeWidgetItem* addJointTreeItem(QTreeWidgetItem* parent, boost::shared_ptr<urdf::Joint> joint);
+    JointPropertyPtr addJointProperty(QTreeWidgetItem *item, boost::shared_ptr<urdf::Joint> joint);
 
     QString getValidName(QString prefix, QList<QString> &current_names);
+
     bool isJoint(QTreeWidgetItem *item);
+    bool isLink(QTreeWidgetItem *item);
 
     boost::shared_ptr<QtTreePropertyBrowser> property_editor_;
     boost::shared_ptr<urdf::ModelInterface> model_;
     QMap<boost::shared_ptr<urdf::Link>, QTreeWidgetItem *> joint_child_to_ctree_;
+
+    // these map chain-tree-items to joint properties
     QMap<QTreeWidgetItem *, JointPropertyPtr> ctree_to_joint_property_;
+    // and joint properties to chain-tree-items
     QMap<JointProperty *, QTreeWidgetItem *> joint_property_to_ctree_;
+
+    // these map link-tree-items to link properties
     QMap<QTreeWidgetItem *, LinkPropertyPtr> ltree_to_link_property_;
+    // and link properties to link-tree-items
     QMap<LinkProperty *, QTreeWidgetItem *> link_property_to_ltree_;
 
     QStringList link_names_, joint_names_;
