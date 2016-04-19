@@ -56,7 +56,7 @@ void URDFEditor::unsaved_changes()
 
 void URDFEditor::on_action_Save_triggered()
 {
-  urdf_tree_->saveURDF(file_path_);
+  urdf_tree_->saveURDF_withConfirm(file_path_);
 }
 
 void URDFEditor::on_actionSave_As_triggered()
@@ -65,7 +65,7 @@ void URDFEditor::on_actionSave_As_triggered()
   if (!file_path.isEmpty())
   {
     file_path_ = file_path;
-    urdf_tree_->saveURDF(file_path);
+    urdf_tree_->saveURDF_noConfirm(file_path);
     ui->action_Save->setDisabled(false);
   }
 }

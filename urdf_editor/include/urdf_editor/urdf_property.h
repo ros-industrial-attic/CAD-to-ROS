@@ -24,7 +24,9 @@ namespace urdf_editor
 
     bool loadURDF(QString file_path);
 
-    bool saveURDF(QString file_path);
+    bool saveURDF_withConfirm(QString file_path);
+
+    bool saveURDF_noConfirm(QString file_path);
 
     bool clear();
 
@@ -42,6 +44,17 @@ namespace urdf_editor
     void on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val);
 
     void on_propertyWidget_valueChanged();
+
+    void on_unsavedChanges();
+
+  signals:
+    void jointAddition();
+
+    void jointDeletion();
+
+    void linkAddition();
+
+    void linkDeletion();
 
   private:
     bool populateTreeWidget();
