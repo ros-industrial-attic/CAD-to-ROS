@@ -22,6 +22,8 @@ namespace urdf_editor
     bool loadURDF(QString file_path);
 
     bool saveURDF(QString file_path);
+    
+    urdf_editor::MyRviz* getRvizWidget();
 
     bool clear();
 
@@ -47,6 +49,9 @@ namespace urdf_editor
     void addJoint(QTreeWidgetItem *parent);
     void addJointProperty(QTreeWidgetItem *parent, boost::shared_ptr<urdf::Joint> joint);
 
+    void loadRvizRobot();
+    void setRvizPropertyForLinkProperty(LinkPropertyPtr link_property, QString link_name);
+    
     QString getValidName(QString prefix, QList<QString> &current_names);
     bool isJoint(QTreeWidgetItem *item);
 

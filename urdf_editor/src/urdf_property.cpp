@@ -1,4 +1,5 @@
 #include "urdf_editor/urdf_property.h"
+#include <qt4/QtGui/qtreewidget.h>
 #include <QVBoxLayout>
 #include <QMessageBox>
 
@@ -93,15 +94,17 @@ namespace urdf_editor
   {
     model_ = urdf::parseURDFFile(file_path.toStdString());
     if (model_)
-      if (buildTree())
+    {
+      if(buildTree())
       {
-        rviz_widget_->loadRobot(model_);
+        loadRvizRobot();
         return true;
       }
       else
       {
         return false;
       }
+    }
     else
     {
       return false;
@@ -132,6 +135,10 @@ namespace urdf_editor
 
     return true;
   }
+  
+  urdf_editor::MyRviz* URDFProperty::getRvizWidget() {
+    return rviz_widget_;
+  }
 
   bool URDFProperty::buildTree()
   {
@@ -156,7 +163,7 @@ namespace urdf_editor
       }
 
     }
-
+    
     return true;
   }
 
@@ -166,7 +173,7 @@ namespace urdf_editor
     boost::shared_ptr<urdf::Link> new_link(new urdf::Link());
     new_link->name = name.toStdString();
     model_->links_.insert(std::make_pair(name.toStdString(), new_link));
-
+    
     addLinkProperty(new_link);
   }
 
@@ -175,7 +182,7 @@ namespace urdf_editor
     QTreeWidgetItem *item = new QTreeWidgetItem(link_root_);
     item->setText(0, QString::fromStdString(link->name));
     root_->addChild(item);
-
+    
     LinkPropertyPtr tree_link(new LinkProperty(link));
     QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
@@ -184,7 +191,7 @@ namespace urdf_editor
 
     ltree_to_link_property_[item] = tree_link;
     link_property_to_ltree_[tree_link.get()] = item;
-
+    
     link_names_.append(QString::fromStdString(link->name));
   }
 
@@ -218,6 +225,19 @@ namespace urdf_editor
     joint_property_to_ctree_[tree_joint.get()] = item;
 
     joint_names_.append(name);
+  }
+
+  void URDFProperty::loadRvizRobot() {
+    rviz_widget_->loadRobot(model_);    
+    for(int i=0; i < link_root_->childCount(); ++i)
+    {
+      setRvizPropertyForLinkProperty(ltree_to_link_property_[link_root_->child(i)], link_root_->child(i)->text(0));
+    }
+  }
+  
+  void URDFProperty::setRvizPropertyForLinkProperty(LinkPropertyPtr link_property, QString link_name)
+  {
+    link_property->setRvizProperty(rviz_widget_->getRobotDisplay()->subProp("Links")->subProp(link_name));
   }
 
   QString URDFProperty::getValidName(QString prefix, QList<QString> &current_names)
@@ -491,6 +511,7 @@ namespace urdf_editor
         {
           activeLink->createVisualProperty();
           activeLink->loadProperty(property_editor_);
+          setRvizPropertyForLinkProperty(activeLink, selt->text(0));
         }
         else if (selected_item == collision_action)
         {
@@ -660,7 +681,7 @@ namespace urdf_editor
 
   void URDFProperty::on_propertyWidget_valueChanged()
   {
-    rviz_widget_->loadRobot(model_);
+    loadRvizRobot();
   }
 
 }

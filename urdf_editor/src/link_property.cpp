@@ -1,4 +1,6 @@
 #include "urdf_editor/link_property.h"
+#include <qt4/QtCore/qvariant.h>
+#include "urdf_editor/urdf_property.h"
 
 namespace urdf_editor
 {
@@ -420,7 +422,8 @@ namespace urdf_editor
   }
 
   // Link Visual Property
-  LinkVisualProperty::LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual): visual_(visual), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkVisualProperty::LinkVisualProperty(boost::shared_ptr<urdf::Visual> visual): 
+    visual_(visual), rviz_property_(0), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), visible_in_editor_(true)
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -433,6 +436,10 @@ namespace urdf_editor
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Visual"));
    
     item = manager_->addProperty(QVariant::String, tr("Name"));
+    top_item_->addSubProperty(item);
+    
+    item = manager_->addProperty(QVariant::Bool, tr("Show in Editor"));
+    item->setValue(visible_in_editor_);
     top_item_->addSubProperty(item);
 
     
@@ -588,11 +595,28 @@ namespace urdf_editor
     if (loading_)
       return;
 
+    // set should_emit to false if it's a change that doesn't affect the URDF representation
+    // for example, hiding links only in the editor, but not changing their actual visibility
+    bool should_emit = true;
+    
     QString name = property->propertyName();
     if (name == "Name")
+    {
       visual_->group_name = val.toString().toStdString();
+    }
+    else if (name == "Show in Editor")
+    {
+      should_emit = false;
+      visible_in_editor_ = val.toBool();
+      if(rviz_property_)
+      {
+        rviz_property_->setValue(visible_in_editor_);
+      }
+    }
 
-    emit LinkVisualProperty::valueChanged(property, val);
+    if(should_emit) {
+      emit LinkVisualProperty::valueChanged(property, val);
+    }
   }
 
   void LinkVisualProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
@@ -601,6 +625,15 @@ namespace urdf_editor
       return;
 
     emit LinkVisualProperty::valueChanged(property, val);
+  }
+  
+  /**
+   * Note: we CAN'T do the following: Store the previous editor visibility, update the 
+   * property pointer, and apply the previous visibility. There's no guarantee that the older property is valid.
+   */
+  void LinkVisualProperty::setRvizProperty(rviz::Property *rviz_property) {
+    rviz_property_ = rviz_property;
+    rviz_property_->setValue(visible_in_editor_);
   }
 
   // Link Inertial Property
@@ -754,7 +787,8 @@ namespace urdf_editor
   }
 
   // Link Property
-  LinkProperty::LinkProperty(boost::shared_ptr<urdf::Link> link):link_(link), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkProperty::LinkProperty(boost::shared_ptr<urdf::Link> link):
+    link_(link), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
@@ -856,7 +890,6 @@ namespace urdf_editor
     return inertial_property_;
   }
   
-  
   /*!
    *@brief Checks if the Link has a visual property defined
    * 
@@ -923,6 +956,12 @@ namespace urdf_editor
     return collision_property_;
   }
   
+  
+  void LinkProperty::setRvizProperty(rviz::Property *rviz_property) {
+    if(visual_property_) {
+      visual_property_->setRvizProperty(rviz_property);
+    }
+  }
 
   void LinkProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
@@ -948,6 +987,7 @@ namespace urdf_editor
 
       emit LinkProperty::linkNameChanged(this, val);
     }
+
     emit LinkProperty::valueChanged();
   }
 

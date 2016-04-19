@@ -7,6 +7,7 @@
 #include "urdf_editor/common.h"
 #include "urdf_editor/joint_property.h"
 #include <urdf_model/link.h>
+#include <rviz/robot/robot_link.h>
 
 namespace urdf_editor
 {
@@ -122,6 +123,8 @@ namespace urdf_editor
     void createMaterialProperty();
     
     void loadData();
+    
+    void setRvizProperty(rviz::Property* rviz_property);
 
     QtProperty *getTopItem() { return top_item_; }
 
@@ -138,10 +141,12 @@ namespace urdf_editor
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
+    bool visible_in_editor_;
     boost::shared_ptr<OriginProperty> origin_property_;
     boost::shared_ptr<LinkNewMaterialProperty> new_material_property_;
     boost::shared_ptr<LinkGeometryProperty> geometry_property_;
-
+    
+    rviz::Property *rviz_property_;
   };
 
   class LinkInertialProperty : public QObject
@@ -199,7 +204,6 @@ namespace urdf_editor
     bool hasInertialProperty();
     void createInertialProperty();
     LinkInertialPropertyPtr getInertialProperty();
-
     
     /*! Check if has visual property */
     bool hasVisualProperty();
@@ -219,7 +223,9 @@ namespace urdf_editor
     /*! Get the Collision Property */
     LinkCollisionPropertyPtr getCollisionProperty();
     
-    
+    /*! Set the RViz Property, which the link property uses to control editor visualization */
+    void setRvizProperty(rviz::Property* rviz_property);
+
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
     void onChildValueChanged(QtProperty *property, const QVariant &val);
