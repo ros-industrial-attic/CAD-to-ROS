@@ -1,9 +1,19 @@
-#include "urdf_editor/urdf_editor.h"
-#include "ui_industrial_robot_builder.h"
-#include "rviz/visualization_manager.h"
-#include "rviz/render_panel.h"
-#include <sstream>
+
+#include <urdf_editor/urdf_editor.h>
+#include <urdf_editor/urdf_property.h>
+
+#include <ui_industrial_robot_builder.h>
+
+#include <rviz/render_panel.h>
+#include <rviz/visualization_manager.h>
+
 #include <QFileDialog>
+
+#include <qteditorfactory.h>
+#include <qtpropertymanager.h>
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
 
 URDFEditor::URDFEditor(QWidget *parent) :
   QMainWindow(parent),

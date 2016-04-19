@@ -1,5 +1,10 @@
-#include "urdf_editor/urdf_editor.h"
+
+#include <urdf_editor/urdf_editor.h>
+
 #include <QApplication>
+
+#include <ros/ros.h>
+
 
 int main(int argc, char *argv[])
 {
