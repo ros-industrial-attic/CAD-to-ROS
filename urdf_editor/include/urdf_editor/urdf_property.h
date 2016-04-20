@@ -24,9 +24,7 @@ namespace urdf_editor
 
     bool loadURDF(QString file_path);
 
-    bool saveURDF_withConfirm(QString file_path);
-
-    bool saveURDF_noConfirm(QString file_path);
+    bool saveURDF(QString file_path);
 
     bool clear();
 
