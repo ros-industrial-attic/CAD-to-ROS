@@ -24,7 +24,7 @@ private slots:
 
   void on_action_Save_triggered();
 
-  void unsaved_changes();
+  bool unsaved_changes();
 
   void on_actionSave_As_triggered();
 
@@ -39,6 +39,8 @@ private:
 
   urdf_editor::URDFPropertySharedPtr urdf_tree_;
   QString file_path_;
+
+  virtual void closeEvent(QCloseEvent *event);
 };
 
 #endif // __URDF_EDITOR_H__
