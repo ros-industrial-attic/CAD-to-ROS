@@ -33,8 +33,9 @@ namespace urdf_editor
     type_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
     type_item_->setAttribute(Common::attributeStr(EnumNames), QStringList() << tr("Unknown") << tr("Revolute") << tr("Continuous") << tr("Prismatic") <<  tr("Floating") << tr("Planar") << tr("Fixed"));
 
-    parent_item_ = manager_->addProperty(QVariant::String, tr("Parent"));
-    parent_item_->setAttribute(Common::attributeStr(ReadOnly), true);
+    parent_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Parent"));
+    parent_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
+
 
     child_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Child"));
     child_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
@@ -112,7 +113,8 @@ namespace urdf_editor
     loading_ = true;
     name_item_->setValue(QString::fromStdString(joint_->name));
     type_item_->setValue(joint_->type);
-    parent_item_->setValue(QString::fromStdString(joint_->parent_link_name));
+    parent_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
+    parent_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->parent_link_name)));
     child_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
     child_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->child_link_name)));
 
@@ -235,7 +237,7 @@ namespace urdf_editor
     }
     else if (name == "Parent")
     {
-      joint_->parent_link_name = val.toString().toStdString();
+      joint_->parent_link_name = link_names_[val.toInt()].toStdString();
     }
     else if (name == "Child")
     {
