@@ -79,6 +79,16 @@ namespace urdf_editor
   }
 
   /*!
+   *@brief Get the geometry property Object
+   * 
+   *@return LinkGeometryPropertySharedPtr
+   */
+  LinkGeometryPropertySharedPtr LinkCollisionProperty::getGeometryProperty()
+  {
+    return geometry_property_;
+  }
+
+  /*!
    * @brief Creates the geometry property 
    */
   void LinkCollisionProperty::createGeometryProperty()
@@ -136,9 +146,6 @@ namespace urdf_editor
 
   void LinkCollisionProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
-    if (loading_)
-      return;
-
     QString name = property->propertyName();
     if (name == "Name")
       collision_->group_name = val.toString().toStdString();
@@ -148,9 +155,14 @@ namespace urdf_editor
 
   void LinkCollisionProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
   {
-    if (loading_)
-      return;
-
-    emit LinkCollisionProperty::valueChanged(property, val);
+    if (property->propertyName() == "Type")
+    {
+      if (hasGeometryProperty())
+        emit LinkCollisionProperty::geometryChanged();
+    }
+    else
+    {
+      emit LinkCollisionProperty::valueChanged(property, val);
+    }
   }
 }
