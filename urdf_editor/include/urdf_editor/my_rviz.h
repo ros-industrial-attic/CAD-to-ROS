@@ -31,6 +31,8 @@ namespace urdf_editor
 
     bool loadRobot(boost::shared_ptr<urdf::ModelInterface> robot_model);
 
+    void updateBaseLink(std::string base);
+
     bool clear();
 
   private:

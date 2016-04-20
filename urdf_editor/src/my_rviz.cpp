@@ -1,6 +1,7 @@
 #include "urdf_editor/my_rviz.h"
 #include <urdf_parser/urdf_parser.h>
 #include <QVBoxLayout>
+#include <QtCore>
 
 namespace urdf_editor
 {
@@ -20,7 +21,10 @@ namespace urdf_editor
     render_panel_->setEnabled(true);
     render_panel_->setBackgroundColor(Ogre::ColourValue(0.25, 0.25, 0.25, 1));
 
-    manager_->setFixedFrame("base_link");
+    //QString base_link;
+    //base_link.fromStdString(robot_display_->getRobotModel()->getRootLinkName());
+    //ROS_INFO_STREAM("base link: " << base_link.toStdString());
+    //manager_->setFixedFrame(base_link);
 
     robot_display_ = new moveit_rviz_plugin::RobotStateDisplay();
     robot_display_->setName("RobotModel");
@@ -33,6 +37,7 @@ namespace urdf_editor
     tf_display_->subProp("Show Arrows")->setValue("true");
     tf_display_->subProp("Show Names")->setValue("true");
     tf_display_->subProp("Show Axes")->setValue("true");
+    tf_display_->subProp("Frame Timeout")->setValue("1");
   }
 
   // Destructor
@@ -50,6 +55,12 @@ namespace urdf_editor
     nh_.setParam("ros_workbench", printer.CStr());
     robot_display_->reset();
     robot_display_->setEnabled(true);
+  }
+
+  void MyRviz::updateBaseLink(std::string base)
+  {
+    QString base_link = QString::fromStdString(base);
+    manager_->setFixedFrame(base_link);
   }
 
   bool MyRviz::clear()

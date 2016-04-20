@@ -28,8 +28,17 @@ void URDFTransformer::worker_thread()
 
     if(tf_copy.transforms.size() > 0)
     {
+      for(int i = 0; i < tf_copy.transforms.size(); ++i)
+      {
+        tf_copy.transforms[i].header.stamp = ros::Time::now();
+      }
       broadcaster_.sendTransform(tf_copy.transforms);
     }
+    /*else
+    {
+      tf::tfMessage empty;
+      broadcaster_.sendTransform(empty.transforms);
+    }*/
     rt.sleep();
   }
 }
@@ -49,6 +58,12 @@ void URDFTransformer::addLink(const std::string parent, const std::string child)
   {
     ROS_WARN("frame name %s already exists, not adding to list", parent.c_str());
   }
+}
+
+void URDFTransformer::clear()
+{
+  boost::lock_guard<boost::mutex> lock(data_lock_);
+  frames_.transforms.clear();
 }
 
 int URDFTransformer::findLink(const std::string parent, const std::string child)

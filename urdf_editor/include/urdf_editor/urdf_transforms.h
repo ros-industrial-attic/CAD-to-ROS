@@ -34,6 +34,7 @@ public:
    */
   void addLink(const std::string parent, const std::string child);
 
+  void clear();
 
   /**
    * @brief removeLink Removes a link from the list if it exists
