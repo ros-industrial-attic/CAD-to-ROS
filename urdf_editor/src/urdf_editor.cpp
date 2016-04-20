@@ -28,8 +28,6 @@ URDFEditor::URDFEditor(QWidget *parent) :
 
 URDFEditor::~URDFEditor()
 {
-  if ( urdf_tree_->unsavedChanges == true ) // If there were unsaved changes
-    unsaved_changes();
   delete ui;
 }
 
@@ -45,13 +43,17 @@ void URDFEditor::on_action_Open_triggered()
   }
 }
 
-void URDFEditor::unsaved_changes()
+bool URDFEditor::unsaved_changes()
 {
   QMessageBox::StandardButton reply;
-  reply = QMessageBox::question(this,"Save changes?","Save your changes before exiting?", QMessageBox::Yes|QMessageBox::No);
+  reply = QMessageBox::question(this,"Save changes?","Save your changes before exiting?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 
   if (reply == QMessageBox::Yes)
     on_actionSave_As_triggered();
+  if (reply == QMessageBox::Cancel)
+      return false;
+  if (reply == QMessageBox::No)
+      return true;
 }
 
 void URDFEditor::on_action_Save_triggered()
@@ -79,5 +81,23 @@ void URDFEditor::on_action_New_triggered()
 
 void URDFEditor::on_actionE_xit_triggered()
 {
-    QApplication::quit();
+    QCloseEvent closing;
+    closeEvent(&closing);
+}
+
+void URDFEditor::closeEvent(QCloseEvent *event)
+{
+    if ( urdf_tree_->unsavedChanges == true ) // If there were unsaved changes
+    {
+        bool exit = unsaved_changes();
+        if (!exit)
+            event->ignore();
+        else
+        {
+            event->accept();
+            QMainWindow::closeEvent(event);
+        }
+    }
+    else
+        QMainWindow::closeEvent(event);
 }

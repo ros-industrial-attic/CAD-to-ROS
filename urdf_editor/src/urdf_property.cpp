@@ -137,8 +137,10 @@ namespace urdf_editor
     QMessageBox msgBox;
     if (savedCorrectly)
     {
-      msgBox.setWindowTitle("Success");
-      msgBox.setText("The file was saved.");
+        unsavedChanges = false;
+        msgBox.setWindowTitle("Success");
+        msgBox.setText("The file was saved.");
+        msgBox.exec();
     }
     else
     {
@@ -155,7 +157,18 @@ namespace urdf_editor
     TiXmlDocument* doc = urdf::exportURDF(model_);
     TiXmlDeclaration decl("1.0", "", "");
     doc->InsertBeforeChild(doc->RootElement(), decl);
-    doc->SaveFile(file_path.toStdString());
+    bool savedCorrectly = false;
+    savedCorrectly = doc->SaveFile(file_path.toStdString());
+
+    QMessageBox msgBox;
+    if (!savedCorrectly)
+    {
+        msgBox.setWindowTitle("FAILURE");
+        msgBox.setText("An error occurred during saving.");
+        msgBox.exec();
+    }
+    else
+        unsavedChanges = false;
 
     return true;
   }
@@ -741,6 +754,7 @@ namespace urdf_editor
   void URDFProperty::on_propertyWidget_valueChanged()
   {
     rviz_widget_->loadRobot(model_);
+    unsavedChanges = true;
   }
 
   void URDFProperty::on_unsavedChanges()
