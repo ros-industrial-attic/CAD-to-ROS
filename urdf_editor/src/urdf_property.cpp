@@ -1,6 +1,5 @@
 
 #include <QVBoxLayout>
-#include <QMessageBox>
 
 #include <urdf_parser/urdf_parser.h>
 
@@ -126,7 +125,7 @@ namespace urdf_editor
     return rviz_widget_->loadRobot(model_);
   }
 
-  bool URDFProperty::saveURDF_withConfirm(QString file_path)
+  bool URDFProperty::saveURDF(QString file_path)
   {
     TiXmlDocument* doc = urdf::exportURDF(model_);
     TiXmlDeclaration decl("1.0", "", "");
@@ -134,43 +133,7 @@ namespace urdf_editor
     bool savedCorrectly = false;
     savedCorrectly = doc->SaveFile(file_path.toStdString());
 
-    QMessageBox msgBox;
-    if (savedCorrectly)
-    {
-        unsavedChanges = false;
-        msgBox.setWindowTitle("Success");
-        msgBox.setText("The file was saved.");
-        msgBox.exec();
-    }
-    else
-    {
-      msgBox.setWindowTitle("FAILURE");
-      msgBox.setText("An error occurred during saving.");
-    }
-    msgBox.exec();
-
-    return true;
-  }
-
-  bool URDFProperty::saveURDF_noConfirm(QString file_path)
-  {
-    TiXmlDocument* doc = urdf::exportURDF(model_);
-    TiXmlDeclaration decl("1.0", "", "");
-    doc->InsertBeforeChild(doc->RootElement(), decl);
-    bool savedCorrectly = false;
-    savedCorrectly = doc->SaveFile(file_path.toStdString());
-
-    QMessageBox msgBox;
-    if (!savedCorrectly)
-    {
-        msgBox.setWindowTitle("FAILURE");
-        msgBox.setText("An error occurred during saving.");
-        msgBox.exec();
-    }
-    else
-        unsavedChanges = false;
-
-    return true;
+    return savedCorrectly;
   }
 
   bool URDFProperty::populateTreeWidget()
