@@ -110,6 +110,7 @@ namespace urdf_editor
     link_property_to_ltree_.clear();
     link_names_.clear();
     joint_names_.clear();
+    tf_transformer_.clear();
     unsavedChanges = false;
   }
 
@@ -123,7 +124,12 @@ namespace urdf_editor
     if (!populateTreeWidget())
       return false;
 
-    return rviz_widget_->loadRobot(model_);
+    if (!rviz_widget_->loadRobot(model_))
+      return false;
+
+    rviz_widget_->updateBaseLink(model_->getRoot()->name);
+
+    return true;
   }
 
   bool URDFProperty::saveURDF(QString file_path)
@@ -734,6 +740,8 @@ namespace urdf_editor
     rviz_widget_->loadRobot(model_);
 
     tf_transformer_.updateLink(property);
+    // update Rviz base link in the event that root has changed
+    rviz_widget_->updateBaseLink(model_->getRoot()->name);
   }
 
 }
