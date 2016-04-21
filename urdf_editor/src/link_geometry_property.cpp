@@ -122,22 +122,23 @@ namespace urdf_editor
           if (name == "File Name")
             item->setValue(QString::fromStdString(mesh->filename));
 
-         if (name == "Scale")
-         {
-          //Remaining sub-properties are for Mesh
-          QList<QtProperty *> sub_items =  top_item_ ->subProperties()[2]->subProperties();
-          for (int i = 0; i < sub_items.length(); ++i)
+          if (name == "Scale")
           {
-            item = static_cast<QtVariantProperty *>(sub_items[i]);
-            name = item->propertyName();
-           if (name == "X")
-              item->setValue(mesh->scale.x);
-            else if (name == "Y")
-              item->setValue(mesh->scale.y);
-            else if (name == "Z")
-              item->setValue(mesh->scale.z);
+            //Remaining sub-properties are for Mesh
+            QList<QtProperty *> sub_items =  top_item_ ->subProperties()[2]->subProperties();
+           
+            for (int i = 0; i < sub_items.length(); ++i)  //load scale values
+            {
+              item = static_cast<QtVariantProperty *>(sub_items[i]);
+              name = item->propertyName();
+              if (name == "X")
+                item->setValue(mesh->scale.x);
+              else if (name == "Y")
+                item->setValue(mesh->scale.y);
+              else if (name == "Z")
+                item->setValue(mesh->scale.z);
+            }
           }
-         }
         }
       }
     }
