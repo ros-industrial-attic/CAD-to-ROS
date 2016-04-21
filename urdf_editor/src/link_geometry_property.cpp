@@ -121,12 +121,23 @@ namespace urdf_editor
           boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
           if (name == "File Name")
             item->setValue(QString::fromStdString(mesh->filename));
-          else if (name == "X")
-            item->setValue(mesh->scale.x);
-          else if (name == "Y")
-            item->setValue(mesh->scale.y);
-          else if (name == "Z")
-            item->setValue(mesh->scale.z);
+
+         if (name == "Scale")
+         {
+          //Remaining sub-properties are for Mesh
+          QList<QtProperty *> sub_items =  top_item_ ->subProperties()[2]->subProperties();
+          for (int i = 0; i < sub_items.length(); ++i)
+          {
+            item = static_cast<QtVariantProperty *>(sub_items[i]);
+            name = item->propertyName();
+           if (name == "X")
+              item->setValue(mesh->scale.x);
+            else if (name == "Y")
+              item->setValue(mesh->scale.y);
+            else if (name == "Z")
+              item->setValue(mesh->scale.z);
+          }
+         }
         }
       }
     }
