@@ -30,7 +30,7 @@ private slots:
 
   void on_action_New_triggered();
 
-  void on_actionE_xit_triggered();
+  void on_action_Exit_triggered();
 
 private:
   Ui::URDFEditor *ui;
@@ -40,7 +40,7 @@ private:
   urdf_editor::URDFPropertySharedPtr urdf_tree_;
   QString file_path_;
 
-  virtual void closeEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent *event);
 };
 
 #endif // __URDF_EDITOR_H__
