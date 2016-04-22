@@ -1,10 +1,12 @@
 #ifndef __ORIGIN_PROPERTY_H__
 #define __ORIGIN_PROPERTY_H__
 
+#define _USE_MATH_DEFINES
 #include <QtCore>
 
 #include <urdf_editor/qt_types.h>
 #include <urdf_editor/urdf_types_ext.h>
+#include <cmath>
 
 
 namespace urdf_editor
@@ -29,11 +31,17 @@ namespace urdf_editor
     void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
+    double meterToInch(double val);
+    double inchToMeter(double val);
+    double radianToDegree(double val);
+    double degreeToRadian(double val);
+
     urdf::Pose &origin_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
+    int metric_units_[2];
   };
 }
 
