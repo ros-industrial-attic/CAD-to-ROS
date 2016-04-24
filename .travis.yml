@@ -5,10 +5,8 @@ compiler:
   - gcc
 notifications:
   email:
-    on_success: always
+    on_success: change
     on_failure: always
-#    recipients:
-#      - jane@doe
 env:
   matrix:
     - USE_DEB=true  ROS_DISTRO="indigo" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu
