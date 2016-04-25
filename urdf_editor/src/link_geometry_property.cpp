@@ -7,7 +7,6 @@
 
 #include <urdf_model/link.h>
 
-
 namespace urdf_editor
 {
   LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
@@ -18,6 +17,7 @@ namespace urdf_editor
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
               this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
+
     //{SPHERE, BOX, CYLINDER, MESH}
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Geometry"));
     item = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
@@ -68,8 +68,6 @@ namespace urdf_editor
       item->addSubProperty(sub_item);
       top_item_->addSubProperty(item);
     }
-
-    std::cout<<"THE Geometry TYPE IS "<<geometry_->type<<std::endl;
     loading_ = false;
   }
 
@@ -81,7 +79,6 @@ namespace urdf_editor
 
   void LinkGeometryProperty::loadData()
   {
-    std::cout<<"LOADING Geometry data.........................."<<std::endl;
     loading_ = true;
     QtVariantProperty *item;
     QString name;
@@ -92,7 +89,9 @@ namespace urdf_editor
       name = item->propertyName();
 
       if (name == "Type")
+      {
         item->setValue(geometry_->type);
+      }
       else
       {
         if (geometry_->type == urdf::Geometry::BOX)
@@ -166,6 +165,8 @@ namespace urdf_editor
       case 0:
         {
         geometry_.reset(new urdf::Sphere);
+        boost::shared_ptr<urdf::Sphere> sphere = boost::static_pointer_cast<urdf::Sphere>(geometry_);
+        sphere->radius = 0.01;
         geometry_->type = urdf::Geometry::SPHERE;
 
         item = manager_->addProperty(QVariant::Double, tr("Radius (m)"));
@@ -175,6 +176,10 @@ namespace urdf_editor
       case 1:
         {
         geometry_.reset(new urdf::Box);
+        boost::shared_ptr<urdf::Box> box = boost::static_pointer_cast<urdf::Box>(geometry_);
+        box->dim.x = 0.01;
+        box->dim.y = 0.01;
+        box->dim.z = 0.01;
         geometry_->type = urdf::Geometry::BOX;
         
         item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Size"));
@@ -192,6 +197,9 @@ namespace urdf_editor
       case 2:
         {
         geometry_.reset(new urdf::Cylinder);
+        boost::shared_ptr<urdf::Cylinder> cylinder = boost::static_pointer_cast<urdf::Cylinder>(geometry_);
+        cylinder->radius = 0.01;
+        cylinder->length = 0.01;
         geometry_->type = urdf::Geometry::CYLINDER;
 
         item = manager_->addProperty(QVariant::Double, tr("Radius (m)"));
@@ -204,6 +212,10 @@ namespace urdf_editor
       case 3:
         {
         geometry_.reset(new urdf::Mesh);
+        boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
+        mesh->scale.x = 0.01;
+        mesh->scale.y = 0.01;
+        mesh->scale.z = 0.01;
         geometry_->type = urdf::Geometry::MESH;
 
         item = manager_->addProperty(QVariant::String, tr("File Name"));
@@ -224,14 +236,8 @@ namespace urdf_editor
     }
     else
     {
-
       if (geometry_->type == urdf::Geometry::BOX)
       {
-        if (urdf::dynamic_pointer_cast<urdf::Box>(geometry_))
-        {
-          std::cout<<"was able to recast the geometry_ shape into box while EDITING VALUES!!!!!"<<std::endl;
-        } else std::cout<<"WAS NOT able to recast the geometry_ shape into a box while EDITING VALUES!!!!"<<std::endl;
-
         boost::shared_ptr<urdf::Box> box = boost::static_pointer_cast<urdf::Box>(geometry_);
         if (name == "Length X (m)")
           box->dim.x = val.toDouble();
@@ -242,12 +248,7 @@ namespace urdf_editor
       }
       else if (geometry_->type == urdf::Geometry::CYLINDER)
       {
-        if (urdf::dynamic_pointer_cast<urdf::Cylinder>(geometry_))
-        {
-          std::cout<<"was able to recast the geometry_ shape into cylinder while EDITING VALUES!!!!!"<<std::endl;
-        } else std::cout<<"WAS NOT able to recast the geometry_ shape into a cylinder while EDITING VALUES!!!!"<<std::endl;
-
-        boost::shared_ptr<urdf::Cylinder> cylinder = urdf::static_pointer_cast<urdf::Cylinder>(geometry_);
+        boost::shared_ptr<urdf::Cylinder> cylinder = boost::static_pointer_cast<urdf::Cylinder>(geometry_);
         if (name == "Radius (m)")
           cylinder->radius = val.toDouble();
         else if (name == "Length (m)")
@@ -255,22 +256,12 @@ namespace urdf_editor
       }
       else if (geometry_->type == urdf::Geometry::SPHERE)
       {
-        if (urdf::dynamic_pointer_cast<urdf::Sphere>(geometry_))
-        {
-          std::cout<<"was able to recast the geometry_ shape into sphere while EDITING VALUES!!!!!"<<std::endl;
-        } else std::cout<<"WAS NOT able to recast the geometry_ shape into a sphere while EDITING VALUES!!!!"<<std::endl;
-
         boost::shared_ptr<urdf::Sphere> sphere = boost::static_pointer_cast<urdf::Sphere>(geometry_);
         if (name == "Radius (m)")
           sphere->radius = val.toDouble();
       }
       else if (geometry_->type == urdf::Geometry::MESH)
-      {
-        if (urdf::dynamic_pointer_cast<urdf::Mesh>(geometry_))
-        {
-          std::cout<<"was able to recast the geometry_ shape into mesh while EDITING VALUES!!!!!"<<std::endl;
-        } else std::cout<<"WAS NOT able to recast the geometry_ shape into a mesh while EDITING VALUES!!!!"<<std::endl;
-        
+      {        
         boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
         if (name == "File Name")
           mesh->filename = val.toString().toStdString();
@@ -281,7 +272,6 @@ namespace urdf_editor
         else if (name == "Z")
           mesh->scale.z = val.toDouble();
       }
-      std::cout<<"CHANGED some type "<<geometry_->type<<std::endl;
     }
 
     emit LinkGeometryProperty::valueChanged(property, val);

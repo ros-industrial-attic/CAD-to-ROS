@@ -24,6 +24,7 @@ namespace urdf_editor
     void createOriginProperty();
     
     bool hasGeometryProperty();
+    LinkGeometryPropertySharedPtr getGeometryProperty();
     void createGeometryProperty();
     
     void loadData();
@@ -36,6 +37,7 @@ namespace urdf_editor
 
   signals:
     void valueChanged(QtProperty *property, const QVariant &val);
+    void geometryChanged();
 
   private:
     urdf::CollisionSharedPtr collision_;

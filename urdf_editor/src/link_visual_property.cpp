@@ -94,6 +94,16 @@ namespace urdf_editor
   }
 
   /*!
+   *@brief Get the geometry property Object
+   * 
+   *@return LinkGeometryPropertySharedPtr
+   */
+  LinkGeometryPropertySharedPtr LinkVisualProperty::getGeometryProperty()
+  {
+    return geometry_property_;
+  }
+
+  /*!
    * @brief Creates the geometry property 
    */
   void LinkVisualProperty::createGeometryProperty()
@@ -188,9 +198,14 @@ namespace urdf_editor
 
   void LinkVisualProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
   {
-    if (loading_)
-      return;
-
-    emit LinkVisualProperty::valueChanged(property, val);
+    if (property->propertyName() == "Type")
+    {
+      if (hasGeometryProperty())
+        emit LinkVisualProperty::geometryChanged();
+    }
+    else
+    {
+      emit LinkVisualProperty::valueChanged(property, val);
+    }
   }
 }

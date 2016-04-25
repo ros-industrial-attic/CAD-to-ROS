@@ -6,7 +6,6 @@
 #include <urdf_editor/qt_types.h>
 #include <urdf_editor/urdf_types_ext.h>
 
-
 namespace urdf_editor
 {
   class LinkGeometryProperty : public QObject
@@ -21,6 +20,8 @@ namespace urdf_editor
     void loadData();
 
     QtProperty *getTopItem() { return top_item_; }
+
+    urdf::GeometrySharedPtr getGeometry() { return geometry_; } 
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
