@@ -110,7 +110,7 @@ qt4_add_resources(
 
 catkin_package(
   INCLUDE_DIRS ${qtpropertyeditor_INCLUDE_DIRECTORIES}
-  LIBRARIES qt_property_browser
+  LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS 
   DEPENDS Qt4
   CFG_EXTRAS qt_property_browser-extras.cmake
@@ -119,12 +119,12 @@ catkin_package(
 
 include_directories(${qtpropertyeditor_INCLUDE_DIRECTORIES})
 
-add_library(qt_property_browser
+add_library(${PROJECT_NAME}
                   ${qtpropertyeditor_MOC}
                   ${qtpropertyeditor_SRCS}
                   ${qtpropertyeditor_RESOURCES})
 
-target_link_libraries(qt_property_browser
+target_link_libraries(${PROJECT_NAME}
                         ${QT_LIBRARIES}
                         ${QT_QTCORE_LIBRARY}
                         ${QT_QTGUI_LIBRARY})
@@ -136,7 +136,10 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 #ADD_DEFINITIONS(-DQT_SHARED)
 
 ## Install
-install(TARGETS qt_property_browser DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
 # TODO: remove hack for catkin_tools / travis
 install(DIRECTORY src/
