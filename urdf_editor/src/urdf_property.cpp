@@ -68,6 +68,12 @@ namespace urdf_editor
     connect(tree_widget, SIGNAL(itemClicked(QTreeWidgetItem*,int)),
               this, SLOT(on_treeWidget_itemClicked(QTreeWidgetItem*,int)));
 
+    connect(tree_widget, SIGNAL(itemPressed(QTreeWidgetItem*,int)), 
+              this, SLOT(on_treeWidget_itemPressed(QTreeWidgetItem*,int)));
+
+    connect(tree_widget, SIGNAL(itemDropped(QTreeWidgetItem*)),
+              this, SLOT(on_treeWidget_itemDropped(QTreeWidgetItem*)));
+
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
 
@@ -101,6 +107,29 @@ namespace urdf_editor
     link_property_to_ltree_.clear();
     link_names_.clear();
     joint_names_.clear();
+  }
+
+  void URDFProperty::redrawJointTree()
+  {
+
+    // Clear Joints from tree
+    while (joint_root_->childCount() > 0)
+    {
+      joint_root_->removeChild(joint_root_->child(0));
+    }
+
+    // add all links to the tree, starting with the root
+    urdf::LinkSharedPtr rlink;
+    model_->getLink(model_->getRoot()->name, rlink);
+    // addToTreeWidget(rlink, link_root_);
+
+    // add all joints, starting with those that have the root as parent
+    std::vector<urdf::JointSharedPtr>& child_joints = rlink->child_joints;
+    std::vector<urdf::JointSharedPtr>::iterator joint_it;
+
+    for (joint_it = child_joints.begin(); joint_it != child_joints.end(); ++joint_it)
+      addToTreeWidget(*joint_it, joint_root_);
+
   }
 
   bool URDFProperty::loadURDF(QString file_path)
@@ -281,6 +310,52 @@ namespace urdf_editor
     return tree_joint;
   }
 
+  bool URDFProperty::processLinkDrop(QString drag_link, QString drop_link){
+
+    QMap<LinkProperty *, QTreeWidgetItem *>::iterator lit;
+    urdf::LinkSharedPtr link, clink, plink;
+
+    QMap<JointProperty *, QTreeWidgetItem *>::iterator it, itp;
+    // find the joint that has the dragged link as the child
+    for (it = joint_property_to_ctree_.begin(); it != joint_property_to_ctree_.end(); ++it) {
+      // set its parent as the link dropped on
+      if(it.key()->getChildLinkName()==drag_link) {    
+        it.key()->setParentLinkName(drop_link);
+
+        // get link* from property drop_link
+        model_->getLink(drop_link.toStdString(), link);
+
+        // get joint* from property it
+        boost::shared_ptr<urdf::Joint> joint(boost::const_pointer_cast<urdf::Joint>(model_->getJoint(it.key()->getName().toStdString())));
+
+        // remove link from where it was before?
+        for (lit = link_property_to_ltree_.begin(); lit != link_property_to_ltree_.end(); ++lit) {
+
+          // add all joints, starting with those that have the root as parent
+          model_->getLink(lit.key()->getName().toStdString(), clink);
+          std::vector<urdf::JointSharedPtr>& child_joints = clink->child_joints;
+          std::vector<urdf::JointSharedPtr>::iterator cit;
+
+          for (cit = child_joints.begin(); cit != child_joints.end();) {
+            if(*cit == joint) {
+              child_joints.erase(cit); 
+            } else {
+              ++cit;
+            }
+          }
+
+        }        
+
+        std::vector<urdf::JointSharedPtr >& child_joints = link->child_joints;
+        child_joints.push_back(joint);
+
+        redrawJointTree();
+        return true;
+      } 
+    }
+    return false;
+  }
+
   QString URDFProperty::getValidName(QString prefix, QList<QString> &current_names)
   {
     int i = 0;
@@ -359,6 +434,26 @@ namespace urdf_editor
     else
     {
       property_editor_->clear();
+    }
+  }
+
+  void URDFProperty::on_treeWidget_itemPressed(QTreeWidgetItem *item, int col)
+  {
+    item_dragged = item; // don't like this, but not sure how else to "know" what object we are dragging and dropping -- @swhart115
+  }
+
+  void URDFProperty::on_treeWidget_itemDropped(QTreeWidgetItem *item)
+  {
+    item_dropped = item;
+    if(ltree_to_link_property_.contains(item_dragged)) {
+      if(ltree_to_link_property_.contains(item_dropped)) {
+        LinkPropertySharedPtr link_dragged = ltree_to_link_property_[item_dragged];
+        LinkPropertySharedPtr link_dropped = ltree_to_link_property_[item_dropped];
+        if(!processLinkDrop(item_dragged->text(0), item_dropped->text(0))){
+          qDebug() << QString("Problem dragging link %1 to %2").arg(item_dropped->text(0), item_dragged->text(0));
+          return;
+        }
+      }
     }
   }
 
