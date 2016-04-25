@@ -6,19 +6,45 @@ find_package(catkin REQUIRED
     moveit_ros_visualization
     qt_property_browser
     roscpp
-    rviz)
-
+    rviz
+    pcl_ros)
+    
 find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
 
 find_package(urdfdom REQUIRED)
 find_package(urdfdom_headers REQUIRED)
 
+find_package(PkgConfig REQUIRED)
+find_package(ASSIMP QUIET)
+if (NOT ASSIMP_FOUND)
+  pkg_check_modules(ASSIMP assimp)
+endif()
+if (ASSIMP_FOUND)
+  if( NOT ${ASSIMP_VERSION} VERSION_LESS "2.0.1150" )
+    add_definitions(-DASSIMP_UNIFIED_HEADER_NAMES)
+    message(STATUS "Assimp version has unified headers")
+  else()
+    message(STATUS "Assimp version does not have unified headers")
+  endif()
+  include_directories(${ASSIMP_INCLUDE_DIRS})
+  link_directories(${ASSIMP_LIBRARY_DIRS})
+else() 
+  message(STATUS "could not find assimp (perhaps available thorugh ROS package?), so assimping assimp v2")
+  set(ASSIMP_LIBRARIES assimp)
+  set(ASSIMP_LIBRARY_DIRS)
+  set(ASSIMP_CXX_FLAGS)
+  set(ASSIMP_CFLAGS_OTHER)
+  set(ASSIMP_LINK_FLAGS)
+  set(ASSIMP_INCLUDE_DIRS)
+endif()
+
 set(editor_SRCS
   src/common.cpp
   src/main.cpp
   src/my_rviz.cpp
   src/urdf_editor.cpp
+  src/utils/convex_hull_generator.cpp
 
   # properties
   src/joint_axis_property.cpp
@@ -41,6 +67,7 @@ set(editor_SRCS
 set(editor_HDRS
   include/urdf_editor/my_rviz.h
   include/urdf_editor/urdf_editor.h
+  include/urdf_editor/utils/convex_hull_generator.h
 
   # properties
   include/urdf_editor/joint_axis_property.h
@@ -87,7 +114,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${QT_INCLUDE_DIR}
   ${urdfdom_INCLUDE_DIR}
-  ${urdfdom_headers_INCLUDE_DIR})
+  ${urdfdom_headers_INCLUDE_DIR}
+  ${ASSIMP_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}
   ${editor_UIS_H}
@@ -100,7 +128,8 @@ target_link_libraries(${PROJECT_NAME}
   ${urdfdom_headers_LIBRARIES}
   ${QT_LIBRARIES}
   ${QT_QTCORE_LIBRARY}
-  ${QT_QTGUI_LIBRARY})
+  ${QT_QTGUI_LIBRARY}
+  ${ASSIMP_LIBRARIES})
 
 ## Install
 install(TARGETS ${PROJECT_NAME}
