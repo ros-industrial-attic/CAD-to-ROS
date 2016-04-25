@@ -29,11 +29,16 @@ namespace urdf_editor
     void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
+
+    double radianToDegree(double val);
+    double degreeToRadian(double val);
+    
     urdf::JointLimitsSharedPtr limits_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
+    int non_SI_units_;
   };
 }
 

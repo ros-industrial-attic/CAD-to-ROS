@@ -41,7 +41,9 @@ namespace urdf_editor
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
-    int metric_units_[2];
+    int in_inches_;
+    int in_degrees_;
+    double r, p, y;
   };
 }
 
