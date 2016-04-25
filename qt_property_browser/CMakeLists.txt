@@ -17,66 +17,68 @@ set(qtpropertyeditor_SRCS
       src/qtpropertybrowserutils.cpp
 )
 
+# TODO: hack for catkin_tools / travis: do not place mocs in build dir
+set(qtpe_MOC_DIR ${CATKIN_DEVEL_PREFIX}/${PROJECT_NAME}/moc)
+
 set(qtpropertyeditor_INCLUDE_DIRECTORIES
       src
-      ${CMAKE_CURRENT_BINARY_DIR}
-      ${CMAKE_CURRENT_BINARY_DIR}/src
+      ${qtpe_MOC_DIR}
       ${QT_INCLUDE_DIR}
 )
 
 qt4_generate_moc(
   src/qtpropertybrowser.h
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowser.cpp
+  ${qtpe_MOC_DIR}/moc_qtpropertybrowser.cpp
 )
 qt4_generate_moc(
   src/qtpropertymanager.h
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertymanager.cpp
+  ${qtpe_MOC_DIR}/moc_qtpropertymanager.cpp
 )
 qt4_generate_moc(
   src/qteditorfactory.h
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qteditorfactory.cpp
+  ${qtpe_MOC_DIR}/moc_qteditorfactory.cpp
 )
 qt4_generate_moc(
   src/qtvariantproperty.h
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtvariantproperty.cpp
+  ${qtpe_MOC_DIR}/moc_qtvariantproperty.cpp
 )
 qt4_generate_moc(
   src/qttreepropertybrowser.h
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qttreepropertybrowser.cpp
+  ${qtpe_MOC_DIR}/moc_qttreepropertybrowser.cpp
 )
 qt4_generate_moc(
   src/qtbuttonpropertybrowser.h
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtbuttonpropertybrowser.cpp
+  ${qtpe_MOC_DIR}/moc_qtbuttonpropertybrowser.cpp
 )
 qt4_generate_moc(
   src/qtgroupboxpropertybrowser.h
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtgroupboxpropertybrowser.cpp
+  ${qtpe_MOC_DIR}/moc_qtgroupboxpropertybrowser.cpp
 )
 qt4_generate_moc(
   src/qtpropertymanager.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertymanager.moc
+  ${qtpe_MOC_DIR}/qtpropertymanager.moc
 )
 qt4_generate_moc(
   src/qteditorfactory.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/qteditorfactory.moc
+  ${qtpe_MOC_DIR}/qteditorfactory.moc
 )
 qt4_generate_moc(
   src/qttreepropertybrowser.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/qttreepropertybrowser.moc
+  ${qtpe_MOC_DIR}/qttreepropertybrowser.moc
 )
 
 set(
   qtpropertyeditor_HEADERS_ONLY_MOC
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowser.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertymanager.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qteditorfactory.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtvariantproperty.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qttreepropertybrowser.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtbuttonpropertybrowser.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtgroupboxpropertybrowser.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/qtpropertymanager.moc
-  ${CMAKE_CURRENT_BINARY_DIR}/qteditorfactory.moc
-  ${CMAKE_CURRENT_BINARY_DIR}/qttreepropertybrowser.moc
+  ${qtpe_MOC_DIR}/moc_qtpropertybrowser.cpp
+  ${qtpe_MOC_DIR}/moc_qtpropertymanager.cpp
+  ${qtpe_MOC_DIR}/moc_qteditorfactory.cpp
+  ${qtpe_MOC_DIR}/moc_qtvariantproperty.cpp
+  ${qtpe_MOC_DIR}/moc_qttreepropertybrowser.cpp
+  ${qtpe_MOC_DIR}/moc_qtbuttonpropertybrowser.cpp
+  ${qtpe_MOC_DIR}/moc_qtgroupboxpropertybrowser.cpp
+  ${qtpe_MOC_DIR}/qtpropertymanager.moc
+  ${qtpe_MOC_DIR}/qteditorfactory.moc
+  ${qtpe_MOC_DIR}/qttreepropertybrowser.moc
 )
 
 set_source_files_properties(
@@ -87,12 +89,12 @@ set_source_files_properties(
 
 qt4_generate_moc(
   src/qtpropertybrowserutils_p.h
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowserutils_p.cpp
+  ${qtpe_MOC_DIR}/moc_qtpropertybrowserutils_p.cpp
 )
 
 set(
   qtpropertyeditor_HEADERS_MOC
-  ${CMAKE_CURRENT_BINARY_DIR}/moc_qtpropertybrowserutils_p.cpp
+  ${qtpe_MOC_DIR}/moc_qtpropertybrowserutils_p.cpp
 )
 
 set(
@@ -111,6 +113,7 @@ catkin_package(
   LIBRARIES qt_property_browser
   CATKIN_DEPENDS 
   DEPENDS Qt4
+  CFG_EXTRAS qt_property_browser-extras.cmake
 )
 
 
@@ -134,3 +137,8 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 ## Install
 install(TARGETS qt_property_browser DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+# TODO: remove hack for catkin_tools / travis
+install(DIRECTORY src/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/include/${PROJECT_NAME}
+  FILES_MATCHING PATTERN "*.h")
