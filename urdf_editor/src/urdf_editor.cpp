@@ -8,6 +8,7 @@
 #include <rviz/visualization_manager.h>
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <qteditorfactory.h>
 #include <qtpropertymanager.h>
@@ -43,9 +44,38 @@ void URDFEditor::on_action_Open_triggered()
   }
 }
 
+bool URDFEditor::unsaved_changes()
+{
+  QMessageBox::StandardButton reply;
+  reply = QMessageBox::question(this, "Save changes?", "Save your changes before exiting?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+  if (reply == QMessageBox::Yes)
+  {
+    on_actionSave_As_triggered();
+    return true;
+  }
+  if (reply == QMessageBox::Cancel)
+    return false;
+  if (reply == QMessageBox::No)
+    return true;
+}
+
 void URDFEditor::on_action_Save_triggered()
 {
-  urdf_tree_->saveURDF(file_path_);
+  QMessageBox msgBox;
+  if (urdf_tree_->saveURDF(file_path_))
+  {
+    urdf_tree_->unsavedChanges = false;
+    msgBox.setWindowTitle("Success");
+    msgBox.setText("The file was saved.");
+    msgBox.exec();
+  }
+  else
+  {
+    msgBox.setWindowTitle("FAILURE");
+    msgBox.setText("An error occurred during saving.");
+    msgBox.exec();
+  }
 }
 
 void URDFEditor::on_actionSave_As_triggered()
@@ -54,19 +84,51 @@ void URDFEditor::on_actionSave_As_triggered()
   if (!file_path.isEmpty())
   {
     file_path_ = file_path;
-    urdf_tree_->saveURDF(file_path);
-    ui->action_Save->setDisabled(false);
+
+    QMessageBox msgBox;
+    if (!urdf_tree_->saveURDF(file_path))
+    {
+      msgBox.setWindowTitle("FAILURE");
+      msgBox.setText("An error occurred during saving.");
+      msgBox.exec();
+    }
+    else
+    {
+      urdf_tree_->unsavedChanges = false;
+      ui->action_Save->setDisabled(false);
+    }
   }
 }
 
 void URDFEditor::on_action_New_triggered()
 {
-    file_path_.clear();
-    urdf_tree_->clear();
-    ui->action_Save->setDisabled(true);
+  file_path_.clear();
+  urdf_tree_->clear();
+  ui->action_Save->setDisabled(true);
 }
 
-void URDFEditor::on_actionE_xit_triggered()
+void URDFEditor::on_action_Exit_triggered()
 {
+  QCloseEvent closing;
+  closeEvent( &closing );
+}
+
+void URDFEditor::closeEvent( QCloseEvent *event )
+{
+  if ( urdf_tree_->unsavedChanges == true ) // If there were unsaved changes
+  {
+    if ( !unsaved_changes() ) // User canceled the quit
+      event->ignore();
+    else
+    {
+      event->accept();
+      QMainWindow::closeEvent(event);
+      QApplication::quit();
+    }
+  }
+  else
+  {
+    event->accept();
     QApplication::quit();
+  }
 }

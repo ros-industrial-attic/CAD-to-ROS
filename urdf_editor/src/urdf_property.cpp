@@ -1,6 +1,5 @@
 
 #include <QVBoxLayout>
-#include <QMessageBox>
 
 #include <urdf_parser/urdf_parser.h>
 
@@ -71,6 +70,16 @@ namespace urdf_editor
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
 
+    connect(this, SIGNAL(jointAddition()), SLOT(on_unsavedChanges()));
+
+    connect(this, SIGNAL(jointDeletion()), SLOT(on_unsavedChanges()));
+
+    connect(this, SIGNAL(linkAddition()), SLOT(on_unsavedChanges()));
+
+    connect(this, SIGNAL(linkDeletion()), SLOT(on_unsavedChanges()));
+
+    unsavedChanges=false; // No changes to be saved, yet
+
   }
 
   URDFProperty::~URDFProperty()
@@ -124,20 +133,7 @@ namespace urdf_editor
     bool savedCorrectly = false;
     savedCorrectly = doc->SaveFile(file_path.toStdString());
 
-    QMessageBox msgBox;
-    if (savedCorrectly)
-    {
-      msgBox.setWindowTitle("Success");
-      msgBox.setText("The file was saved.");
-    }
-    else
-    {
-      msgBox.setWindowTitle("FAILURE");
-      msgBox.setText("An error occurred during saving.");
-    }
-    msgBox.exec();
-
-    return true;
+    return savedCorrectly;
   }
 
   bool URDFProperty::populateTreeWidget()
@@ -211,6 +207,8 @@ namespace urdf_editor
     QTreeWidgetItem* item = addLinkTreeItem(parent, new_link);
     // now add the property
     addLinkProperty(item, new_link);
+    emit linkAddition();
+    unsavedChanges = true;
   }
 
   QTreeWidgetItem* URDFProperty::addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link)
@@ -251,6 +249,8 @@ namespace urdf_editor
     QTreeWidgetItem* item = addJointTreeItem(parent, new_joint);
     // now add the property
     addJointProperty(item, new_joint);
+    unsavedChanges = true;
+    emit jointAddition();
   }
 
   QTreeWidgetItem* URDFProperty::addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint)
@@ -333,11 +333,13 @@ namespace urdf_editor
           {
             link_names_.removeOne(sel->text(0));
             link_root_->removeChild(sel);
+            emit linkDeletion();
           }
           else if (isJoint(sel))
           {
             joint_names_.removeOne(sel->text(0));
             sel->parent()->removeChild(sel);
+            emit jointDeletion();
           }
         }
       }
@@ -715,6 +717,12 @@ namespace urdf_editor
   void URDFProperty::on_propertyWidget_valueChanged()
   {
     rviz_widget_->loadRobot(model_);
+    unsavedChanges = true;
+  }
+
+  void URDFProperty::on_unsavedChanges()
+  {
+    unsavedChanges = true;
   }
 
 }
