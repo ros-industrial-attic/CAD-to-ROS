@@ -277,40 +277,23 @@ namespace urdf_editor
         }
         else if (selected_item->text() == "tool0")
         {
-            // (0. if there are existing properties)
-            // 1. remove all properties from link
-
-            // 2. rename to tool0
-            // don't know how to use SIGNAL, so may be better to avoid that......
-
-//            URDFProperty::on_propertyWidget_linkNameChanged(ltree_to_link_property_[sel].get(), "tool0");
-            on_propertyWidget_linkNameChanged(ltree_to_link_property_[sel].get(), "tool0");
-//            emit
-//            QObject::connect(ltree_to_link_property_[sel].get(), SIGNAL(on_propertyWidget_linkNameChanged(LinkProperty *, const QVariant &)),
-//                          this, SLOT(linkNameChanged(LinkProperty*,QVariant)));
-
-            //            linkNameChanged(ltree_to_link_property_[sel].get(), "tool0");
-            // NTR: need to change the property, not only the tree.
-
-/*
-    QMap<QTreeWidgetItem *, LinkPropertyPtr> ltree_to_link_property_;
-
-
-*    QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
-              this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
-    QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
-              this, SLOT(on_propertyWidget_valueChanged()));
-
-    ltree_to_link_property_[item] = tree_link;
-    link_property_to_ltree_[tree_link.get()] = item;
-
- *
- *
-*/
+            // Firstly remove the link, then add new link named "tool0"
+            // on_propertyWidget_linkNameChanged(ltree_to_link_property_[sel].get(), "tool0");
+            link_names_.removeOne(sel->text(0));
+            link_root_->removeChild(sel);
+            boost::shared_ptr<urdf::Link> new_link(new urdf::Link());
+            new_link->name = "tool0";
+            model_->links_.insert(std::make_pair("tool0", new_link));
+            addLinkProperty(new_link);
         }
         else if (selected_item->text() == "base")
         {
-            ;
+            link_names_.removeOne(sel->text(0));
+            link_root_->removeChild(sel);
+            boost::shared_ptr<urdf::Link> new_link(new urdf::Link());
+            new_link->name = "base";
+            model_->links_.insert(std::make_pair("base", new_link));
+            addLinkProperty(new_link);
         }
         else
         {
