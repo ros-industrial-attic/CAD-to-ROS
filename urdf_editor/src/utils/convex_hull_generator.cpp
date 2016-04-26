@@ -3,6 +3,7 @@
 #include <ros/console.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/surface/convex_hull.h>
+#include <string>
 
 
 namespace urdf_editor
@@ -47,7 +48,51 @@ bool ConvexHullGenerator::generate(const std::string& file_path)
 
 bool ConvexHullGenerator::save(const std::string& file_path)
 {
-  return true;
+  using namespace Assimp;
+  Exporter exporter;
+
+  auto check_extension = [this](const std::string e)
+  {
+    auto iter = std::find(supported_extensions_.begin(),supported_extensions_.end(),e);
+    return iter != supported_extensions_.end();
+  };
+
+  // check extensions
+  std::string ext = file_path.substr(file_path.find_last_of('.')+1);
+  if(!check_extension(ext))
+  {
+    ROS_ERROR("Extension %s is not supported",ext.c_str());
+    return false;
+  }
+
+  // creating scene
+  boost::shared_ptr<aiScene> scene;
+  scene.reset(new aiScene());
+  scene->mRootNode = new aiNode();
+
+  scene->mMaterials = new aiMaterial*[ 1 ];
+  scene->mMaterials[ 0 ] = nullptr;
+  scene->mNumMaterials = 1;
+  scene->mMaterials[ 0 ] = new aiMaterial();
+
+  scene->mMeshes = new aiMesh*[1];
+  scene->mMeshes[0] = chull_mesh_.get();
+  scene->mMeshes[ 0 ]->mMaterialIndex = 0;
+  scene->mNumMeshes = 1;
+
+  scene->mRootNode->mMeshes = new unsigned int[ 1 ];
+  scene->mRootNode->mMeshes[ 0 ] = 0;
+  scene->mRootNode->mNumMeshes = 1;
+
+
+  aiReturn res = exporter.Export(scene.get(),"",file_path);
+  if(res == aiReturn_OUTOFMEMORY)
+  {
+    ROS_ERROR("Mesh export failed due to out-of-memory error");
+    return false;
+  }
+
+  return res == aiReturn_SUCCESS;
 }
 
 bool ConvexHullGenerator::generateConvexHull(const aiScene* scene)
