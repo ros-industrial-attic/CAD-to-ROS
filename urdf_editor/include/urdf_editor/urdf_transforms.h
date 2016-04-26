@@ -89,7 +89,7 @@ private:
 
   int findLink(const std::string parent, const std::string child);
 
-  bool working;
+  bool working_;
 
 };
 

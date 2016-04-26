@@ -9,7 +9,7 @@ URDFTransformer::URDFTransformer()
 
 URDFTransformer::~URDFTransformer()
 {
-  working = false;
+  working_ = false;
   worker_->join();
   delete worker_;
 }
@@ -17,8 +17,8 @@ URDFTransformer::~URDFTransformer()
 void URDFTransformer::worker_thread()
 {
   ros::Rate rt = 10;
-  working = true;
-  while(ros::ok() && working)
+  working_ = true;
+  while(ros::ok() && working_)
   {
     tf::tfMessage tf_copy;
     {
@@ -34,11 +34,6 @@ void URDFTransformer::worker_thread()
       }
       broadcaster_.sendTransform(tf_copy.transforms);
     }
-    /*else
-    {
-      tf::tfMessage empty;
-      broadcaster_.sendTransform(empty.transforms);
-    }*/
     rt.sleep();
   }
 }
@@ -167,6 +162,15 @@ void URDFTransformer::updateLink(JointProperty *property)
     geometry_msgs::Quaternion quat;
     pose.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
     updateLink(property->getParent(), property->getChild(), quat);
+  }
+  else
+  {
+    geometry_msgs::Vector3 vect;
+    updateLink(property->getParent(), property->getChild(), vect);
+    geometry_msgs::Quaternion quat;
+    updateLink(property->getParent(), property->getChild(), quat);
+    ROS_WARN_STREAM("Joint for link " << property->getParent() << " to " << property->getChild() << " does not have origin property information.  Setting to zero.");
+
   }
 }
 
