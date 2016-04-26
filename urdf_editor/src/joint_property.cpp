@@ -20,7 +20,7 @@
 
 namespace urdf_editor
 {
-  JointProperty::JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names, URDFTransformer *tf): joint_(joint), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), link_names_(link_names), joint_names_(joint_names), tf_(tf)
+  JointProperty::JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names, boost::shared_ptr<URDFTransformer> tf): joint_(joint), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory()), link_names_(link_names), joint_names_(joint_names), tf_(tf)
   {
     loading_ = true;
     double p_norm, r_norm;

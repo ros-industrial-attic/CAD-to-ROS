@@ -17,7 +17,7 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names, URDFTransformer *tf);
+    JointProperty(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names, boost::shared_ptr<URDFTransformer> tf);
     ~JointProperty();
 
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
@@ -117,7 +117,7 @@ namespace urdf_editor
     QtVariantProperty *type_item_;
     QtVariantProperty *parent_item_;
     QtVariantProperty *child_item_;
-    URDFTransformer *tf_;
+    boost::shared_ptr<URDFTransformer> tf_;
   };
 }
 

@@ -12,12 +12,10 @@
 #include <urdf_editor/property_types.h>
 #include <urdf_editor/qt_types.h>
 
-#include <urdf_editor/urdf_transforms.h>
-
 
 namespace urdf_editor
 {
-
+  class URDFTransformer;
 
   class URDFProperty : public QObject
   {
@@ -99,7 +97,7 @@ namespace urdf_editor
     QTreeWidget *tree_widget_;
     QWidget *browser_parent_;
     urdf_editor::MyRviz *rviz_widget_;
-    URDFTransformer tf_transformer_;
+    boost::shared_ptr<URDFTransformer> tf_transformer_;
   };
 }
 

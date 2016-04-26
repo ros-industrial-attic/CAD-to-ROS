@@ -13,6 +13,8 @@
 
 #include <urdf_editor/joint_property.h>
 
+#include <urdf_editor/urdf_transforms.h>
+
 
 const QString PROPERTY_NAME_TEXT = "Name";
 const QString PROPERTY_COLLISION_TEXT = "Collision";
@@ -60,6 +62,8 @@ namespace urdf_editor
     vlayout->addWidget(property_editor_.get());
 
     rviz_widget_ = new urdf_editor::MyRviz(rviz_parent);
+
+    tf_transformer_.reset(new URDFTransformer());
 
     connect(tree_widget, SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_treeWidget_customContextMenuRequested(QPoint)));
@@ -110,7 +114,7 @@ namespace urdf_editor
     link_property_to_ltree_.clear();
     link_names_.clear();
     joint_names_.clear();
-    tf_transformer_.clear();
+    tf_transformer_->clear();
     unsavedChanges = false;
   }
 
@@ -273,7 +277,7 @@ namespace urdf_editor
     // TODO :document
     joint_child_to_ctree_[model_->links_.find(joint->child_link_name)->second] = item;
 
-    JointPropertySharedPtr tree_joint(new JointProperty(joint, link_names_, joint_names_, &tf_transformer_));
+    JointPropertySharedPtr tree_joint(new JointProperty(joint, link_names_, joint_names_, tf_transformer_));
     QObject::connect(tree_joint.get(), SIGNAL(jointNameChanged(JointProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_jointNameChanged(JointProperty*,QVariant)));
     QObject::connect(tree_joint.get(), SIGNAL(valueChanged(JointProperty *)),
@@ -286,7 +290,7 @@ namespace urdf_editor
 
     joint_names_.append(QString::fromStdString(joint->name));
 
-    tf_transformer_.updateLink(tree_joint.get());
+    tf_transformer_->updateLink(tree_joint.get());
 
     return tree_joint;
   }
@@ -739,7 +743,7 @@ namespace urdf_editor
   {
     rviz_widget_->loadRobot(model_);
 
-    tf_transformer_.updateLink(property);
+    tf_transformer_->updateLink(property);
     // update Rviz base link in the event that root has changed
     rviz_widget_->updateBaseLink(model_->getRoot()->name);
   }
