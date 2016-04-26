@@ -41,9 +41,6 @@ namespace urdf_editor
 
     void on_propertyWidget_valueChanged();
     
-    void on_propertyWidget_visualGeometryChanged(LinkProperty *property);
-    void on_propertyWidget_collisionGeometryChanged(LinkProperty *property);
-
   private:
     bool populateTreeWidget();
 

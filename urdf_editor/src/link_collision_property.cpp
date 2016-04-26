@@ -99,9 +99,7 @@ namespace urdf_editor
       geometry_property_.reset(new LinkGeometryProperty(collision_->geometry));
       top_item_->addSubProperty(geometry_property_->getTopItem());
     }
-  }
-  
-  
+  } 
   
   LinkCollisionProperty::~LinkCollisionProperty()
   {
@@ -146,6 +144,9 @@ namespace urdf_editor
 
   void LinkCollisionProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
+    if (loading_)
+      return;
+
     QString name = property->propertyName();
     if (name == "Name")
       collision_->group_name = val.toString().toStdString();
@@ -155,10 +156,13 @@ namespace urdf_editor
 
   void LinkCollisionProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
   {
+    if (loading_)
+      return;
+    
     if (property->propertyName() == "Type")
     {
       if (hasGeometryProperty())
-        emit LinkCollisionProperty::geometryChanged();
+        emit LinkCollisionProperty::geometryChanged(val.toInt());
     }
     else
     {
