@@ -1,4 +1,17 @@
+
 #include <urdf_editor/urdf_transforms.h>
+
+#include <ros/ros.h>
+#include <geometry_msgs/TransformStamped.h>
+
+#include <boost/thread/locks.hpp>
+#include <boost/thread.hpp>
+
+#include <urdf_editor/joint_property.h>
+#include <urdf_editor/origin_property.h>
+
+#include <urdf_model/pose.h>
+
 
 namespace urdf_editor {
 
@@ -155,7 +168,7 @@ void URDFTransformer::updateLink(JointProperty *property)
 {
   if(property->hasOriginProperty())
   {
-    OriginPropertyPtr origin = property->getOriginProperty();
+    OriginPropertySharedPtr origin = property->getOriginProperty();
     urdf::Pose pose = origin->getOriginData();
     geometry_msgs::Vector3 vect;
     vect.x = pose.position.x;

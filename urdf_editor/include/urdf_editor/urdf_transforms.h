@@ -1,28 +1,27 @@
-#ifndef URDF_TRANSFORMS_H
-#define URDF_TRANSFORMS_H
+#ifndef __URDF_TRANSFORMS_H__
+#define __URDF_TRANSFORMS_H__
 
-#include <ros/ros.h>
+
+#include <urdf_editor/property_types.h>
+
 #include <tf/tfMessage.h>
 #include <tf/transform_broadcaster.h>
-#include <geometry_msgs/TransformStamped.h>
 
-#include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread.hpp>
 
-#include <urdf_editor/joint_property.h>
-#include <urdf_editor/origin_property.h>
-#include <urdf_model/pose.h>
+#include <string>
+
+
+namespace boost
+{
+  class thread;
+}
+
 
 namespace urdf_editor
 {
-
-class JointProperty;
-typedef boost::shared_ptr<JointProperty> JointPropertyPtr;
-class OriginProperty;
-typedef boost::shared_ptr<OriginProperty> OriginPropertyPtr;
-
-class URDFTransformer{
+class URDFTransformer
+{
 
 public:
 
@@ -94,4 +93,4 @@ private:
 };
 
 }
-#endif // URDF_TRANSFORMS_H
+#endif // __URDF_TRANSFORMS_H__
