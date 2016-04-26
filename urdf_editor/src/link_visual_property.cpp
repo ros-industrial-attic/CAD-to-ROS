@@ -198,6 +198,9 @@ namespace urdf_editor
 
   void LinkVisualProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
   {
+    if (loading_)
+      return;
+
     if (property->propertyName() == "Type")
     {
       if (hasGeometryProperty())

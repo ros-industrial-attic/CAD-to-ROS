@@ -273,7 +273,7 @@ namespace urdf_editor
           sphere->radius = val.toDouble();
       }
       else if (geometry_->type == urdf::Geometry::MESH)
-      {        
+      {
         boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
         if (name == "File Name")
           mesh->filename = val.toString().toStdString();

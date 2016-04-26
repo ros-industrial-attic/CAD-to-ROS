@@ -146,6 +146,9 @@ namespace urdf_editor
 
   void LinkCollisionProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
+    if (loading_)
+      return;
+
     QString name = property->propertyName();
     if (name == "Name")
       collision_->group_name = val.toString().toStdString();
@@ -155,6 +158,9 @@ namespace urdf_editor
 
   void LinkCollisionProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
   {
+    if (loading_)
+      return;
+    
     if (property->propertyName() == "Type")
     {
       if (hasGeometryProperty())

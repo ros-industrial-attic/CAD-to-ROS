@@ -222,8 +222,6 @@ namespace urdf_editor
     if (loading_)
       return;
 
-    std::cout<<"some other child value has changed"<<std::endl;
-
     emit LinkProperty::valueChanged();
   }
 
