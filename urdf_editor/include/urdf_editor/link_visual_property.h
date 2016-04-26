@@ -23,6 +23,7 @@ namespace urdf_editor
     void createOriginProperty();
     
     bool hasGeometryProperty();
+    LinkGeometryPropertySharedPtr getGeometryProperty();
     void createGeometryProperty();
     
     bool hasMaterialProperty();
@@ -38,6 +39,7 @@ namespace urdf_editor
 
   signals:
     void valueChanged(QtProperty *property, const QVariant &val);
+    void geometryChanged();
 
   private:
     urdf::VisualSharedPtr visual_;
