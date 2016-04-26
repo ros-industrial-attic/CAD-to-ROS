@@ -22,28 +22,19 @@ void URDFPropertyTree::dropEvent(QDropEvent * event)
   if( !droppedIndex.isValid() )
     return;
 
-  // sanity check to prevent drags outside of links subtree -- don't loe this, 
-  // but have to catch it before calling hte dropEvent() call on the tree
-  if(item->text(0).toStdString() == "RobotModel" || item->text(0).toStdString() == "Joints") {
-    return;
-  }
-  if(dp == QAbstractItemView::AboveItem) {
-    if((item->parent()->text(0).toStdString() == "RobotModel") ||
-       (item->parent()->text(0).toStdString() == "Joints")) {
-      return;
-    }
-  }
-  if(dp == QAbstractItemView::BelowItem || item->text(0).toStdString() == "Links"){
+  // sanity check to prevent drags outside of links subtree
+  if(item->text(0) == tree->topLevelItem(0)->text(0)) {
     return;
   }
 
   // this will actually reorder the tree appropraitely
-  QTreeWidget::dropEvent(event);
-
+  QTreeWidget::dropEvent(event);  
+  
   // send the appropriate item and drop indicator signal
   if (dp == QAbstractItemView::OnItem) {
     itemDropped(item);
-  } else {
+  } else if (dp == QAbstractItemView::AboveItem || dp == QAbstractItemView::BelowItem) {
     itemDropped(item->parent());  
   }
+ 
 }

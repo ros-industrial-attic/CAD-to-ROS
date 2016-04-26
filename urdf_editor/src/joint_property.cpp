@@ -511,20 +511,20 @@ namespace urdf_editor
 
   /*! Set the child link name*/
   bool JointProperty::setChildLinkName(QString link_name){
+    joint_->child_link_name = link_name.toStdString();
     if(!link_names_.contains(link_name)) {
       return false;
     }
-    joint_->child_link_name = link_name.toStdString();
     child_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->child_link_name)));
     return true;
   }
 
   /*! Set the parent link name */
   bool JointProperty::setParentLinkName(QString link_name) {
+    joint_->parent_link_name = link_name.toStdString();
     if(!link_names_.contains(link_name)) {
       return false;
     }
-    joint_->parent_link_name = link_name.toStdString();
     parent_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->parent_link_name)));
     return true;
   }

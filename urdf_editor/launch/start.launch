@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="debug" default="false" />
+  <arg name="debug" default="true" />
   <!-- start gdb in a new xwindow: see https://github.com/ros/ros_comm/issues/223 -->
   <arg name="debug_new_win" default="true" />
 
