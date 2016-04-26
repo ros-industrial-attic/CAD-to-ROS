@@ -1,5 +1,13 @@
-#include "urdf_editor/common.h"
+
+#include <qttreepropertybrowser.h>
+#include <qtvariantproperty.h>
+
+#include <urdf_editor/common.h>
+
 #include <QTranslator>
+
+#include <urdf_model/pose.h>
+
 
 namespace urdf_editor
 {

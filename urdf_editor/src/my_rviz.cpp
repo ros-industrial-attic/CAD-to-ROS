@@ -1,11 +1,21 @@
-#include "urdf_editor/my_rviz.h"
-#include <urdf_parser/urdf_parser.h>
+
+#include <urdf_editor/my_rviz.h>
+
 #include <QVBoxLayout>
 #include <QtCore>
 
+#include <rviz/visualization_manager.h>
+#include <rviz/render_panel.h>
+#include <rviz/display.h>
+
+#include <moveit/robot_state_rviz_plugin/robot_state_display.h>
+
+#include <urdf_parser/urdf_parser.h>
+#include <urdf/model.h>
+
+
 namespace urdf_editor
 {
-
   MyRviz::MyRviz(QWidget *parent): QWidget(parent), nh_("~")
   {
     // Construct and layout render panel
@@ -46,7 +56,7 @@ namespace urdf_editor
     delete manager_;
   }
 
-  bool MyRviz::loadRobot(boost::shared_ptr<urdf::ModelInterface> robot_model)
+  bool MyRviz::loadRobot(urdf::ModelInterfaceSharedPtr robot_model)
   {
     robot_display_->setEnabled(false);
     TiXmlDocument *robot_document = urdf::exportURDF(robot_model);
@@ -55,6 +65,9 @@ namespace urdf_editor
     nh_.setParam("ros_workbench", printer.CStr());
     robot_display_->reset();
     robot_display_->setEnabled(true);
+
+    // TODO: return result of serialisation
+    return true;
   }
 
   void MyRviz::updateBaseLink(std::string base)
@@ -69,6 +82,9 @@ namespace urdf_editor
     nh_.deleteParam("ros_workbench");
     robot_display_->reset();
     robot_display_->setEnabled(true);
+
+    // TODO: return result of parameter deletion
+    return true;
   }
 
 }

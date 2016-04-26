@@ -1,7 +1,18 @@
-#include "urdf_editor/urdf_property.h"
-#include "urdf_model/link.h"
 #include <QVBoxLayout>
 #include <QMessageBox>
+
+#include <urdf_parser/urdf_parser.h>
+
+#include <urdf_editor/urdf_property.h>
+
+#include <urdf_editor/link_collision_property.h>
+#include <urdf_editor/link_inertial_property.h>
+#include <urdf_editor/link_new_material_property.h>
+#include <urdf_editor/link_visual_property.h>
+#include <urdf_editor/link_property.h>
+
+#include <urdf_editor/joint_property.h>
+
 
 const QString PROPERTY_NAME_TEXT = "Name";
 const QString PROPERTY_COLLISION_TEXT = "Collision";
@@ -27,6 +38,7 @@ namespace urdf_editor
 
     root_ = new QTreeWidgetItem(tree_widget_);
     root_->setText(0, "RobotModel");
+    root_->setExpanded(true);
     tree_widget_->addTopLevelItem(root_);
 
     link_root_ = new QTreeWidgetItem();
@@ -34,7 +46,7 @@ namespace urdf_editor
     root_->addChild(link_root_);
 
     joint_root_ = new QTreeWidgetItem();
-    joint_root_->setText(0,"Chain");
+    joint_root_->setText(0,"Joints");
     root_->addChild(joint_root_);
 
     property_editor_.reset(new QtTreePropertyBrowser());
@@ -94,17 +106,18 @@ namespace urdf_editor
   bool URDFProperty::loadURDF(QString file_path)
   {
     model_ = urdf::parseURDFFile(file_path.toStdString());
-    if (model_)
-      if (buildTree())
-      {
-        rviz_widget_->loadRobot(model_);
-        rviz_widget_->updateBaseLink(model_->getRoot()->name);
-        return true;
-      }
-      else
-      {
-        return false;
-      }
+
+    if (!model_)
+      return false;
+
+    if (!populateTreeWidget())
+      return false;
+
+    if (rviz_widget_->loadRobot(model_))
+    {
+      rviz_widget_->updateBaseLink(model_->getRoot()->name);
+      return true;
+    }
     else
     {
       return false;
@@ -122,109 +135,162 @@ namespace urdf_editor
     QMessageBox msgBox;
     if (savedCorrectly)
     {
-        msgBox.setWindowTitle("Success");
-        msgBox.setText("The file was saved.");
-        msgBox.exec();
+      msgBox.setWindowTitle("Success");
+      msgBox.setText("The file was saved.");
     }
     else
     {
-        msgBox.setWindowTitle("FAILURE");
-        msgBox.setText("An error occurred during saving.");
-        msgBox.exec();
+      msgBox.setWindowTitle("FAILURE");
+      msgBox.setText("An error occurred during saving.");
     }
+    msgBox.exec();
 
     return true;
   }
 
-  bool URDFProperty::buildTree()
+  bool URDFProperty::populateTreeWidget()
   {
-    std::map<std::string, boost::shared_ptr<urdf::Link> >::iterator link_it;
-    for (link_it = model_->links_.begin(); link_it != model_->links_.end(); ++link_it)
-    {
-      addLinkProperty(link_it->second);
-    }
+    // add all links to the tree, starting with the root
+    urdf::LinkSharedPtr rlink;
+    model_->getLink(model_->getRoot()->name, rlink);
+    addToTreeWidget(rlink, link_root_);
 
-    std::map<std::string, boost::shared_ptr<urdf::Joint> >::iterator joint_it;
-    std::string name;
-    for (joint_it = model_->joints_.begin(); joint_it != model_->joints_.end(); ++joint_it)
-    {
-      name = joint_it->second->parent_link_name;
-      if (name == model_->root_link_->name)
-      {
-        addJointProperty(joint_root_, joint_it->second);
-      }
-      else
-      {
-        addJointProperty(joint_child_to_ctree_[model_->links_.find(name)->second], joint_it->second);
-      }
+    // add all joints, starting with those that have the root as parent
+    std::vector<urdf::JointSharedPtr>& child_joints = rlink->child_joints;
+    std::vector<urdf::JointSharedPtr>::iterator joint_it;
 
-    }
+    for (joint_it = child_joints.begin(); joint_it != child_joints.end(); ++joint_it)
+      addToTreeWidget(*joint_it, joint_root_);
 
     return true;
   }
 
-  void URDFProperty::addLink()
+  void URDFProperty::addToTreeWidget(urdf::LinkSharedPtr link, QTreeWidgetItem* parent)
   {
+    // first add the tree item
+    QTreeWidgetItem* item = addLinkTreeItem(parent, link);
+    // now add the property
+    LinkPropertySharedPtr lpptr = addLinkProperty(item, link);
+
+    // now do child links
+    std::vector<urdf::LinkSharedPtr >& child_links = link->child_links;
+    std::vector<urdf::LinkSharedPtr >::iterator link_it;
+
+    for (link_it = child_links.begin(); link_it != child_links.end(); ++link_it)
+      addToTreeWidget(*link_it, item);  // recursive
+  }
+
+  void URDFProperty::addToTreeWidget(urdf::JointSharedPtr joint, QTreeWidgetItem* parent)
+  {
+    // first add the tree item
+    QTreeWidgetItem* item = addJointTreeItem(parent, joint);
+    // now add the property
+    JointPropertySharedPtr jpptr =  addJointProperty(item, joint);
+
+    // see which joints are the children of the child_link
+    urdf::LinkSharedPtr child_link;
+    model_->getLink(joint->child_link_name, child_link);
+
+    if (child_link)
+    {
+      std::vector<urdf::JointSharedPtr >& child_joints = child_link->child_joints;
+      std::vector<urdf::JointSharedPtr >::iterator joint_it;
+
+      for (joint_it = child_joints.begin(); joint_it != child_joints.end(); ++joint_it)
+        addToTreeWidget(*joint_it, item);  // recursive
+    }
+    else
+    {
+      qDebug() << QString("Can't find Link object for child_link '%s' of '%s'").arg(
+        joint->child_link_name.c_str(), joint->name.c_str());
+    }
+  }
+
+  void URDFProperty::addModelLink(QTreeWidgetItem* parent)
+  {
+    // add link to urdf model
     QString name = getValidName("link_", link_names_);
-    boost::shared_ptr<urdf::Link> new_link(new urdf::Link());
+    urdf::LinkSharedPtr new_link(new urdf::Link());
     new_link->name = name.toStdString();
     model_->links_.insert(std::make_pair(name.toStdString(), new_link));
 
-    addLinkProperty(new_link);
+    // TODO: adding tree items and creating properties is not this methods responsibility
+    // first add the tree item
+    QTreeWidgetItem* item = addLinkTreeItem(parent, new_link);
+    // now add the property
+    addLinkProperty(item, new_link);
   }
 
-  void URDFProperty::addLinkProperty(boost::shared_ptr<urdf::Link> link)
+  QTreeWidgetItem* URDFProperty::addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link)
   {
-    QTreeWidgetItem *item = new QTreeWidgetItem(link_root_);
+    QTreeWidgetItem *item = new QTreeWidgetItem(parent);
     item->setText(0, QString::fromStdString(link->name));
-    root_->addChild(item);
+    return item;
+  }
 
-    LinkPropertyPtr tree_link(new LinkProperty(link));
+  LinkPropertySharedPtr URDFProperty::addLinkProperty(QTreeWidgetItem* item, urdf::LinkSharedPtr link)
+  {
+    LinkPropertySharedPtr tree_link(new LinkProperty(link));
     QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
         QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
               this, SLOT(on_propertyWidget_linkValueChanged()));
 
 
+    // add mapping from treewidget item to link property
     ltree_to_link_property_[item] = tree_link;
+    // add mapping from link property to treewidget item
     link_property_to_ltree_[tree_link.get()] = item;
 
     link_names_.append(QString::fromStdString(link->name));
+
+    return tree_link;
   }
 
-  void URDFProperty::addJoint(QTreeWidgetItem *parent)
+  void URDFProperty::addModelJoint(QTreeWidgetItem *parent)
   {
+    // add joint to urdf model
     QString name = getValidName("joint_", joint_names_);
-    boost::shared_ptr<urdf::Joint> new_joint(new urdf::Joint());
+    urdf::JointSharedPtr new_joint(new urdf::Joint());
     new_joint->name = name.toStdString();
     model_->joints_.insert(std::make_pair(name.toStdString(), new_joint));
 
-    addJointProperty(parent, new_joint);
+    // TODO: adding tree items and creating properties is not this methods responsibility
+    // first add the tree item
+    QTreeWidgetItem* item = addJointTreeItem(parent, new_joint);
+    // now add the property
+    addJointProperty(item, new_joint);
   }
 
-  void URDFProperty::addJointProperty(QTreeWidgetItem *parent, boost::shared_ptr<urdf::Joint> joint)
+  QTreeWidgetItem* URDFProperty::addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint)
   {
-    QString name = QString::fromStdString(joint->name);
-
     QTreeWidgetItem *item = new QTreeWidgetItem(parent);
-    item->setText(0, name);
-    root_->addChild(item);
+    item->setText(0, QString::fromStdString(joint->name));
+    return item;
+  }
 
+  JointPropertySharedPtr URDFProperty::addJointProperty(QTreeWidgetItem *item, urdf::JointSharedPtr joint)
+  {
+    // TODO :document
     joint_child_to_ctree_[model_->links_.find(joint->child_link_name)->second] = item;
 
-    JointPropertyPtr tree_joint(new JointProperty(joint, link_names_, joint_names_, &tf_transformer_));
+    // JointPropertyPtr tree_joint(new JointProperty(joint, link_names_, joint_names_, &tf_transformer_));
+    JointPropertySharedPtr tree_joint(new JointProperty(joint, link_names_, joint_names_, &tf_transformer_));
     QObject::connect(tree_joint.get(), SIGNAL(jointNameChanged(JointProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_jointNameChanged(JointProperty*,QVariant)));
     QObject::connect(tree_joint.get(), SIGNAL(valueChanged(JointProperty *)),
               this, SLOT(on_propertyWidget_jointValueChanged(JointProperty *)));
 
+    // add mapping from treewidget item to joint property
     ctree_to_joint_property_[item] = tree_joint;
+    // add mapping from joint property to treewidget item
     joint_property_to_ctree_[tree_joint.get()] = item;
-
-    joint_names_.append(name);
 
     JointProperty *my_joint = &*tree_joint;
     tf_transformer_.updateLink(my_joint);
+    joint_names_.append(QString::fromStdString(joint->name));
+
+    return tree_joint;
   }
 
   QString URDFProperty::getValidName(QString prefix, QList<QString> &current_names)
@@ -239,22 +305,14 @@ namespace urdf_editor
     return name;
   }
 
+  bool URDFProperty::isLink(QTreeWidgetItem *item)
+  {
+    return ltree_to_link_property_.contains(item);
+  }
+
   bool URDFProperty::isJoint(QTreeWidgetItem *item)
   {
-    QTreeWidgetItem *parent = item;
-    while (parent->parent())
-    {
-      if (parent->parent() == joint_root_)
-      {
-        return true;
-      }
-      else
-      {
-        parent = parent->parent();
-      }
-    }
-
-    return false;
+    return ctree_to_joint_property_.contains(item);
   }
 
   void URDFProperty::on_treeWidget_customContextMenuRequested(const QPoint &pos)
@@ -270,18 +328,20 @@ namespace urdf_editor
       {
         if (selected_item->text() == "Add")
         {
-          if (sel == link_root_ || sel->parent() == link_root_)
+          // we can only add to the link root item or to other links
+          if (sel == link_root_ || isLink(sel))
           {
-            addLink();
+            addModelLink(sel);
           }
+          // or to the joint root item or to other links
           else if (sel == joint_root_ || isJoint(sel))
           {
-            addJoint(sel);
+            addModelJoint(sel);
           }
         }
         else
         {
-          if (sel->parent() == link_root_)
+          if (isLink(sel))
           {
             link_names_.removeOne(sel->text(0));
             link_root_->removeChild(sel);
@@ -299,8 +359,7 @@ namespace urdf_editor
 
   void URDFProperty::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
   {
-
-    if (item->parent() == link_root_)
+    if (isLink(item))
     {
       ltree_to_link_property_[item]->loadProperty(property_editor_);
     }
@@ -328,7 +387,7 @@ namespace urdf_editor
     {
        qDebug() << QString("The member ctree_to_joint_property_  contains the link %1").arg(selt->text(0));
        
-       JointPropertyPtr activeJoint = ctree_to_joint_property_[selt];
+       JointPropertySharedPtr activeJoint = ctree_to_joint_property_[selt];
        QMenu menu(property_editor_.get());
        
        
@@ -451,7 +510,7 @@ namespace urdf_editor
     {
      
      
-      LinkPropertyPtr activeLink = ltree_to_link_property_[selt];
+      LinkPropertySharedPtr activeLink = ltree_to_link_property_[selt];
       QMenu menu(property_editor_.get());
   
       // user right-clicked a 'Name' property entry: show 'Inertial', 'Visual'
@@ -516,7 +575,7 @@ namespace urdf_editor
       // only.
       if (selb->property()->propertyName() == PROPERTY_INERTIAL_TEXT)
       {
-        LinkInertialPropertyPtr activeInertia = activeLink->getInertialProperty();
+        LinkInertialPropertySharedPtr activeInertia = activeLink->getInertialProperty();
         QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
   
         // if this link already has an 'origin' element, don't allow user to
@@ -548,7 +607,7 @@ namespace urdf_editor
       // only.
       else if (selb->property()->propertyName() == PROPERTY_VISUAL_TEXT)
       {
-        LinkVisualPropertyPtr activeVisual = activeLink->getVisualProperty();
+        LinkVisualPropertySharedPtr activeVisual = activeLink->getVisualProperty();
         QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
         QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
         QAction *material = menu.addAction(PROPERTY_MATERIAL_TEXT);
@@ -602,7 +661,7 @@ namespace urdf_editor
       // only.
       else if (selb->property()->propertyName() == PROPERTY_COLLISION_TEXT)
       {
-        LinkCollisionPropertyPtr activeCollision = activeLink->getCollisionProperty();
+        LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperty();
         QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
         QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
         // if this link already has an 'origin' element, don't allow user to

@@ -11,6 +11,8 @@
 #include <boost/thread.hpp>
 
 #include <urdf_editor/joint_property.h>
+#include <urdf_editor/origin_property.h>
+#include <urdf_model/pose.h>
 
 namespace urdf_editor
 {
