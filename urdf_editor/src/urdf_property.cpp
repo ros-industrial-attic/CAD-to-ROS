@@ -240,6 +240,27 @@ namespace urdf_editor
       QMenu *menu = new QMenu(tree_widget_);
       menu->addAction("Add");
       menu->addAction("Remove");
+
+      // Add menu for converting the link to base/tool0 if there are no base/tool0 before
+      if (sel->parent() == link_root_)
+      {
+          bool base_exist = link_names_.contains("base", Qt::CaseSensitive);
+          bool tool0_exist = link_names_.contains("tool0", Qt::CaseSensitive);
+          if (!base_exist || !tool0_exist)
+          {
+              menu->addSeparator();
+              QMenu *convertMenu = menu->addMenu("Convert to");
+              if (!base_exist)
+              {
+                  convertMenu->addAction("base");
+              }
+              if (!tool0_exist)
+              {
+                  convertMenu->addAction("tool0");
+              }
+          }
+      }
+
       QAction *selected_item = menu->exec(tree_widget_->mapToGlobal(pos));
       if (selected_item)
       {
@@ -253,6 +274,43 @@ namespace urdf_editor
           {
             addJoint(sel);
           }
+        }
+        else if (selected_item->text() == "tool0")
+        {
+            // (0. if there are existing properties)
+            // 1. remove all properties from link
+
+            // 2. rename to tool0
+            // don't know how to use SIGNAL, so may be better to avoid that......
+
+//            URDFProperty::on_propertyWidget_linkNameChanged(ltree_to_link_property_[sel].get(), "tool0");
+            on_propertyWidget_linkNameChanged(ltree_to_link_property_[sel].get(), "tool0");
+//            emit
+//            QObject::connect(ltree_to_link_property_[sel].get(), SIGNAL(on_propertyWidget_linkNameChanged(LinkProperty *, const QVariant &)),
+//                          this, SLOT(linkNameChanged(LinkProperty*,QVariant)));
+
+            //            linkNameChanged(ltree_to_link_property_[sel].get(), "tool0");
+            // NTR: need to change the property, not only the tree.
+
+/*
+    QMap<QTreeWidgetItem *, LinkPropertyPtr> ltree_to_link_property_;
+
+
+*    QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
+              this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
+    QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
+              this, SLOT(on_propertyWidget_valueChanged()));
+
+    ltree_to_link_property_[item] = tree_link;
+    link_property_to_ltree_[tree_link.get()] = item;
+
+ *
+ *
+*/
+        }
+        else if (selected_item->text() == "base")
+        {
+            ;
         }
         else
         {
