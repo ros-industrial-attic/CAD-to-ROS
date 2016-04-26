@@ -3,6 +3,7 @@
 #define URDF_EDITOR_UTILS_CONVEX_HULL_GENERATOR_H_
 
 #include <assimp/Importer.hpp>
+#include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
 #include <boost/shared_ptr.hpp>
 
@@ -41,6 +42,8 @@ protected:
 
   Assimp::Importer importer_;
   boost::shared_ptr<aiMesh> chull_mesh_;
+  std::vector<std::string> supported_extensions_;
+
 
 
 };

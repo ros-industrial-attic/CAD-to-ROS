@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(urdf_builder)
 
+add_definitions(-std=c++0x)
+
 find_package(catkin REQUIRED
   COMPONENTS
     moveit_ros_visualization
@@ -67,7 +69,6 @@ set(editor_SRCS
 set(editor_HDRS
   include/urdf_editor/my_rviz.h
   include/urdf_editor/urdf_editor.h
-  include/urdf_editor/utils/convex_hull_generator.h
 
   # properties
   include/urdf_editor/joint_axis_property.h
