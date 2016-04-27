@@ -7,6 +7,7 @@
 #include <urdf_editor/urdf_property.h>
 
 #include <urdf_editor/link_collision_property.h>
+#include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/link_inertial_property.h>
 #include <urdf_editor/link_new_material_property.h>
 #include <urdf_editor/link_visual_property.h>
@@ -645,7 +646,7 @@ namespace urdf_editor
           assert (1==0);
         }
       }
-        // user right-clicked on 'Collsion' property entry: show  option
+        // user right-clicked on 'Collision' property entry: show  option
       // only.
       else if (selb->property()->propertyName() == PROPERTY_COLLISION_TEXT)
       {
@@ -690,6 +691,36 @@ namespace urdf_editor
           assert (1==0);
         }
       }
+
+      else if (selb->property()->propertyName() == PROPERTY_GEOMETRY_TEXT)
+      {
+        LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperty();
+        LinkGeometryPropertySharedPtr geometry =  activeCollision->getGeometryProperty();
+        QAction *load_mesh = menu.addAction(QString("Load Mesh"));
+        QAction *generate_chull = menu.addAction(QString("Generate Convex"));
+
+
+        QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+        // don't do anything if user didn't select something
+        if (selected_item == NULL)
+          return;
+
+        if (selected_item == load_mesh)
+        {
+          geometry->loadMesh();
+        }
+        else if (selected_item == generate_chull)
+        {
+          geometry->generateConvexMesh();
+        }
+        else
+        {
+          // should never happen
+          qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+          assert (1==0);
+        }
+      }
+
      return;
     }//Link
 

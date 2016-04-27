@@ -5,12 +5,14 @@
 #include <assimp/Importer.hpp>
 #include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
+#include <assimp/material.h>
 #include <boost/shared_ptr.hpp>
 
 namespace urdf_editor
 {
 namespace utils
 {
+
 
 class ConvexHullGenerator
 {
@@ -41,6 +43,7 @@ protected:
 protected:
 
   Assimp::Importer importer_;
+  aiScene* scene_;
   boost::shared_ptr<aiMesh> chull_mesh_;
   std::vector<std::string> supported_extensions_;
 

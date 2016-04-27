@@ -19,5 +19,5 @@
   <arg unless="$(arg debug)" name="launch_prefix3" value="$(arg launch_prefix)" />
 
   <node name="urdf_editor" pkg="urdf_builder" type="urdf_builder" required="true"
-    launch-prefix="$(arg launch_prefix3)" />
+    launch-prefix="$(arg launch_prefix3)" output="screen"/>
 </launch>

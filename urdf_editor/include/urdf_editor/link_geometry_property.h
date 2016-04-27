@@ -2,7 +2,7 @@
 #define __LINK_GEOMETRY_PROPERTY_H__
 
 #include <QtCore>
-
+#include <qwidget.h>
 #include <urdf_editor/qt_types.h>
 #include <urdf_editor/urdf_types_ext.h>
 
@@ -19,8 +19,11 @@ namespace urdf_editor
     void loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor);
 
     void loadData();
+    void loadMesh();
+    void generateConvexMesh();
 
     QtProperty *getTopItem() { return top_item_; }
+
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
@@ -34,6 +37,8 @@ namespace urdf_editor
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
+    std::string mesh_path_;
+    std::string browse_start_dir_;
   };
 }
 
