@@ -29,11 +29,16 @@ namespace urdf_editor
     void valueChanged(QtProperty *property, const QVariant &val);
 
   private:
+
+    double meterToInch(double val);
+    double inchToMeter(double val);
+
     urdf::Vector3 &axis_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
+    int non_SI_units_;
   };
 }
 
