@@ -28,6 +28,7 @@ namespace urdf_editor
 
   signals:
     void valueChanged(QtProperty *property, const QVariant &val);
+    void geometryChanged(LinkGeometryProperty *property);
 
   private:
     urdf::GeometrySharedPtr geometry_;

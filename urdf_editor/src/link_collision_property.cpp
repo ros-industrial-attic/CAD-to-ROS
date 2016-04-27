@@ -163,8 +163,8 @@ namespace urdf_editor
     
     if (property->propertyName() == "Type")
     {
-      if (hasGeometryProperty())
-        emit LinkCollisionProperty::geometryChanged();
+      // if (hasGeometryProperty())
+      //   emit LinkCollisionProperty::geometryChanged();
     }
     else
     {

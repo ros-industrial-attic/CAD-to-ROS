@@ -39,7 +39,7 @@ namespace urdf_editor
 
   signals:
     void valueChanged(QtProperty *property, const QVariant &val);
-    void geometryChanged();
+    // void geometryChanged();
 
   private:
     urdf::VisualSharedPtr visual_;

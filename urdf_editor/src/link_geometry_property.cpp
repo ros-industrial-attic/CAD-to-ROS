@@ -245,6 +245,8 @@ namespace urdf_editor
         }
       }
       loading_ = false;
+
+      emit LinkGeometryProperty::geometryChanged(this);
     }
     else
     {

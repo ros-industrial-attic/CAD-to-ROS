@@ -38,8 +38,8 @@ namespace urdf_editor
       visual_property_.reset(new LinkVisualProperty(link_->visual));
       QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-      QObject::connect(visual_property_.get(), SIGNAL(geometryChanged()),
-                this, SLOT(visualGeometryChanged()));
+      // QObject::connect(visual_property_.get(), SIGNAL(geometryChanged()),
+      //           this, SLOT(visualGeometryChanged()));
     }
 
     if (link_->collision)
@@ -47,8 +47,8 @@ namespace urdf_editor
       collision_property_.reset(new LinkCollisionProperty(link_->collision));
       QObject::connect(collision_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-      QObject::connect(collision_property_.get(), SIGNAL(geometryChanged()),
-                this, SLOT(collisionGeometryChanged()));
+      // QObject::connect(collision_property_.get(), SIGNAL(geometryChanged()),
+      //           this, SLOT(collisionGeometryChanged()));
     }
 
     loading_ = true;
@@ -225,19 +225,19 @@ namespace urdf_editor
     emit LinkProperty::valueChanged();
   }
 
-  void LinkProperty::visualGeometryChanged()
-  {
-    if (loading_)
-      return;
+  // void LinkProperty::visualGeometryChanged()
+  // {
+  //   if (loading_)
+  //     return;
 
-    emit LinkProperty::visualGeometryChanged(this);
-  }
+  //   emit LinkProperty::visualGeometryChanged(this);
+  // }
 
-  void LinkProperty::collisionGeometryChanged()
-  {
-    if (loading_)
-      return;
+  // void LinkProperty::collisionGeometryChanged()
+  // {
+  //   if (loading_)
+  //     return;
 
-    emit LinkProperty::collisionGeometryChanged(this);
-  }
+  //   emit LinkProperty::collisionGeometryChanged(this);
+  // }
 }
