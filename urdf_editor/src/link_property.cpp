@@ -114,6 +114,8 @@ namespace urdf_editor
     {
       link_->inertial.reset(new urdf::Inertial());
       inertial_property_.reset(new LinkInertialProperty(link_->inertial));
+      QObject::connect(inertial_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
   }
 
@@ -142,7 +144,10 @@ namespace urdf_editor
     if(!link_->visual)
     {
       link_->visual.reset(new urdf::Visual());
+      link_->visual_array.push_back(link_->visual);
       visual_property_.reset(new LinkVisualProperty(link_->visual));
+      QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -175,7 +180,12 @@ namespace urdf_editor
     if(!link_->collision)
     {
       link_->collision.reset(new urdf::Collision());
+      link_->collision_array.push_back(link_->collision);
       collision_property_.reset(new LinkCollisionProperty(link_->collision));
+      QObject::connect(collision_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
+
     }
   }
   
