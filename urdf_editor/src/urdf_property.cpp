@@ -694,31 +694,58 @@ namespace urdf_editor
 
       else if (selb->property()->propertyName() == PROPERTY_GEOMETRY_TEXT)
       {
-        LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperty();
-        LinkGeometryPropertySharedPtr geometry =  activeCollision->getGeometryProperty();
-        QAction *load_mesh = menu.addAction(QString("Load Mesh"));
-        QAction *generate_chull = menu.addAction(QString("Generate Convex"));
+        if(selb->parent()->property()->propertyName().compare("Collision")==0)
+        {
+          LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperty();
+          LinkGeometryPropertySharedPtr geometry =  activeCollision->getGeometryProperty();
+          QAction *load_mesh = menu.addAction(QString("Load Mesh"));
+          QAction *generate_chull = menu.addAction(QString("Generate Convex"));
 
 
-        QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
-        // don't do anything if user didn't select something
-        if (selected_item == NULL)
-          return;
+          QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+          // don't do anything if user didn't select something
+          if (selected_item == NULL)
+            return;
 
-        if (selected_item == load_mesh)
-        {
-          geometry->loadMesh();
+          if (selected_item == load_mesh)
+          {
+            geometry->loadMesh();
+          }
+          else if (selected_item == generate_chull)
+          {
+            geometry->generateConvexMesh();
+          }
+          else
+          {
+            // should never happen
+            qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+            assert (1==0);
+          }
         }
-        else if (selected_item == generate_chull)
+        else if(selb->parent()->property()->propertyName().compare("Visual")==0)
         {
-          geometry->generateConvexMesh();
+          LinkVisualPropertySharedPtr active_visual = activeLink->getVisualProperty();
+          LinkGeometryPropertySharedPtr geometry =  active_visual->getGeometryProperty();
+          QAction *load_mesh = menu.addAction(QString("Load Mesh"));
+
+          QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+          // don't do anything if user didn't select something
+          if (selected_item == NULL)
+            return;
+
+          if (selected_item == load_mesh)
+          {
+            geometry->loadMesh();
+          }
+          else
+          {
+            // should never happen
+            qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+            assert (1==0);
+          }
         }
-        else
-        {
-          // should never happen
-          qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
-          assert (1==0);
-        }
+
+
       }
 
      return;

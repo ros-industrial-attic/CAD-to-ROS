@@ -24,6 +24,11 @@ namespace urdf_editor
 
     QtProperty *getTopItem() { return top_item_; }
 
+    urdf::GeometrySharedPtr getGeometry()
+    {
+      return geometry_;
+    }
+
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
@@ -36,9 +41,13 @@ namespace urdf_editor
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
+    QtVariantProperty *type_item_;
     bool loading_;
-    std::string mesh_path_;
     std::string browse_start_dir_;
+
+    std::map<int,urdf::GeometrySharedPtr> geometries_map_;
+
+
   };
 }
 

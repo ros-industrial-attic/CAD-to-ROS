@@ -9,31 +9,49 @@
 #include <urdf_editor/common.h>
 #include <urdf_model/link.h>
 
+#include <urdf_editor/utils/convex_hull_generator.h>
+
 #include <ros/package.h>
 #include <ros/console.h>
 
+static const double DEFAULT_SIDE_LENGHT = 0.1;
 static const std::string PACKAGE_NAME = "urdf_builder";
-static const std::map<std::string,std::string> SUPPORTED_MESH_EXTENSIONS_MAP = {{"Collada" ,"dae"},
-                                                                                {"STL","stl"},
-                                                                                {"Wavefront","obj"}};
+static const std::string MESH_FILE_FILTER = "STL, COLLADA, Wavefront (*.stl *.dae *.obj)";
 
-static std::string getROSFormattedPath(const std::string& full_path)
+struct FilePaths
 {
+  std::string file_name;
+  std::string ros_formatted;
+  std::string parent_dir;
+  std::string full_path;
+  std::string ros_pkg;
+  std::string local_path;
+};
+
+
+static FilePaths getROSFormattedPath(const std::string& full_path)
+{
+
+  FilePaths paths;
+
   // determining file and path
   std::string pkg,local_path;
   std::size_t file_pos = full_path.find_last_of("/");
   std::string file_name = full_path.substr(file_pos+1);
+  paths.full_path = full_path;
+  paths.file_name = file_name;
 
   // finding ros package
   std::size_t start_pos, end_pos = file_pos;
   std::string partial_path = full_path.substr(0,end_pos);
+  paths.parent_dir = partial_path;
   while(start_pos != std::string::npos)
   {
     start_pos = partial_path.find_last_of("/");
     if(start_pos ==  std::string::npos )
     {
       ROS_ERROR("The file %s is not located inside a ros package",file_name.c_str());
-      return "";
+      return paths;
     }
 
     pkg = partial_path.substr(start_pos+1);
@@ -47,9 +65,10 @@ static std::string getROSFormattedPath(const std::string& full_path)
     local_path = pkg + "/" + local_path;
   }
 
-  std::string ros_formatted_path = "package://"+ pkg + "/" + local_path +  file_name;
-
-  return ros_formatted_path;
+  paths.ros_formatted = "package://"+ pkg + "/" + local_path +  file_name;
+  paths.ros_pkg = pkg;
+  paths.local_path = local_path;
+  return paths;
 }
 
 namespace urdf_editor
@@ -58,24 +77,40 @@ namespace urdf_editor
       geometry_(geometry),
       manager_(new QtVariantPropertyManager()),
       factory_(new QtVariantEditorFactory()),
-      mesh_path_("none"),
       browse_start_dir_(ros::package::getPath(PACKAGE_NAME))
   {
     loading_ = true;
-    QtVariantProperty *item;
-    QtVariantProperty *sub_item;
+
+    // creating default geometries
+    urdf::SphereSharedPtr sphere(new urdf::Sphere());
+    urdf::BoxSharedPtr box(new urdf::Box());
+    urdf::CylinderSharedPtr cylinder(new urdf::Cylinder());
+    urdf::MeshSharedPtr mesh(new urdf::Mesh());
+    sphere->radius = DEFAULT_SIDE_LENGHT;
+    box->dim.x = box->dim.y = box->dim.z = DEFAULT_SIDE_LENGHT;
+    cylinder->length = DEFAULT_SIDE_LENGHT;
+    cylinder->radius = 0.5*DEFAULT_SIDE_LENGHT;
+    mesh->scale = urdf::Vector3(1,1,1);
+
+    geometries_map_ = {{int(urdf::Geometry::SPHERE),sphere},
+                       {int(urdf::Geometry::BOX),box},
+                       {int(urdf::Geometry::CYLINDER),cylinder},
+                       {int(urdf::Geometry::MESH),mesh}};
+
+    geometries_map_[int(geometry_->type)] = geometry_;
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
               this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
     //{SPHERE, BOX, CYLINDER, MESH}
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Geometry"));
-    item = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
-    item->setAttribute(Common::attributeStr(EnumNames), QStringList() << "SPHERE" << "BOX" << "CYLINDER" << "MESH");
-    top_item_->addSubProperty(item);
-
-    loadData();
+    type_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
+    type_item_->setAttribute(Common::attributeStr(EnumNames), QStringList() << "SPHERE" << "BOX" << "CYLINDER" << "MESH");
+    top_item_->addSubProperty(type_item_);
+    type_item_->setValue(geometry_->type);
 
     loading_ = false;
+    loadData();
+
   }
 
   LinkGeometryProperty::~LinkGeometryProperty()
@@ -86,45 +121,83 @@ namespace urdf_editor
 
   void LinkGeometryProperty::loadMesh()
   {
-    // create formats filter
-    std::string filter;
-    for(auto& p:SUPPORTED_MESH_EXTENSIONS_MAP)
-    {
-      filter = filter + p.first + " (*." + p.second + ");;";
-    }
-    filter = filter.substr(0,filter.length()-2);
-
+    // open file dialog
     QString qpath = QFileDialog::getOpenFileName(0,QString("Open Mesh"),
                                                    QString::fromStdString(browse_start_dir_),
-                                                   QString::fromStdString(filter));
+                                                   QString::fromStdString(MESH_FILE_FILTER));
 
     if(qpath.isEmpty())
     {
       return;
     }
 
-    std::string ros_path = getROSFormattedPath(qpath.toStdString());
-    ROS_INFO_STREAM("ROS mesh path "<<ros_path);
+    FilePaths paths = getROSFormattedPath(qpath.toStdString());
+    if(paths.ros_formatted.empty())
+    {
+      return;
+    }
+
+    browse_start_dir_ = paths.parent_dir;
+    ROS_INFO_STREAM("ROS mesh path "<<paths.ros_formatted);
+
+    // updating mesh info
+    boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(
+        geometries_map_[int(urdf::Geometry::MESH)]);
+    mesh->scale.x = mesh->scale.y = mesh->scale.z = 1.0;
+    mesh->filename = paths.ros_formatted;
+    geometry_ = mesh;
+    geometry_->type = urdf::Geometry::MESH;
+    type_item_->setValue(urdf::Geometry::MESH);
+
+    loadData();
+
   }
 
   void LinkGeometryProperty::generateConvexMesh()
   {
     // create formats filter
-    std::string filter;
-    for(auto& p:SUPPORTED_MESH_EXTENSIONS_MAP)
-    {
-      filter = filter + p.first + " (*." + p.second + ");;";
-    }
-    filter = filter.substr(0,filter.length()-2);
-
     QString qpath = QFileDialog::getOpenFileName(0,QString("Generate Convex Hull from Mesh"),
                                                     QString::fromStdString(browse_start_dir_),
-                                                    QString::fromStdString(filter));
-
+                                                    QString::fromStdString(MESH_FILE_FILTER));
     if(qpath.isEmpty())
     {
       return;
     }
+    FilePaths paths = getROSFormattedPath(qpath.toStdString());
+    if(paths.ros_formatted.empty())
+    {
+      return;
+    }
+
+    browse_start_dir_ = paths.parent_dir;
+    ROS_INFO_STREAM("ROS mesh path "<<paths.ros_formatted);
+
+    //TODO: Call ConvexHullGenerator here and save mesh
+    utils::ConvexHullGenerator chull_gen;
+    std::string chull_file = "chull-" + paths.file_name;
+    std::string chull_path = paths.parent_dir + "/" + chull_file;
+    if(chull_gen.generate(paths.full_path))
+    {
+      if(!chull_gen.save(chull_path))
+      {
+        ROS_ERROR_STREAM("Failed to save convex hull mesh file at location"<<chull_path);
+        return;
+      }
+    }
+    else
+    {
+      ROS_ERROR_STREAM("Failed to generate convex hull from file "<<paths.full_path);
+      return;
+    }
+
+    // updating mesh info
+    boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(
+        geometries_map_[int(urdf::Geometry::MESH)]);
+    mesh->scale.x = mesh->scale.y = mesh->scale.z = 1.0;
+    mesh->filename = "package://"+ paths.ros_pkg + "/" + paths.local_path +  chull_file;
+    geometry_ = mesh;
+    geometry_->type = urdf::Geometry::MESH;
+    type_item_->setValue(urdf::Geometry::MESH);
 
   }
 
@@ -135,7 +208,7 @@ namespace urdf_editor
     QString name;
     QList<QtProperty *> sub_items = top_item_->subProperties();
 
-    // disable all
+    // remove all
     for (int i = 0; i < sub_items.length(); ++i)
     {
       if(sub_items[i]->propertyName().toStdString().compare("Type") == 0)
@@ -148,7 +221,7 @@ namespace urdf_editor
       top_item_->removeSubProperty(item);
     }
 
-    // updating sub items
+    // updating sub items list
     sub_items = top_item_->subProperties();
 
     // find property func
@@ -180,7 +253,7 @@ namespace urdf_editor
     };
 
 
-    // enable geometry specific subproperties
+    // create geometry specific sub-properties
     switch(geometry_->type)
     {
       case urdf::Geometry::BOX:
@@ -230,8 +303,6 @@ namespace urdf_editor
       case urdf::Geometry::MESH:
       {
         boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
-
-
         // file name
         item = find_property("File Name");
         if(item == nullptr)
@@ -240,7 +311,7 @@ namespace urdf_editor
           top_item_->addSubProperty(item);
         }
         item->setEnabled(false);
-        item->setValue(QString::fromStdString(mesh_path_));
+        item->setValue(QString::fromStdString(mesh->filename));
 
         // set mesh properties
         item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Scale"));
@@ -259,6 +330,8 @@ namespace urdf_editor
     }
 
     loading_ = false;
+    emit LinkGeometryProperty::valueChanged(static_cast<QtProperty* >(type_item_),
+                                            QVariant::fromValue(int(geometry_->type)));
   }
 
   void LinkGeometryProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
@@ -272,10 +345,19 @@ namespace urdf_editor
       return;
 
     QString name = property->propertyName();
+    int type = val.toInt();
     if (name == "Type")
     {
-      // if type is changed need to add functionality to remove current geometry and add new one
-      switch (val.toInt()) //{SPHERE, BOX, CYLINDER, MESH}
+
+      int type = val.toInt();
+      if(geometries_map_.count(type) == 0)
+      {
+        return;
+      }
+
+      geometry_ = geometries_map_[type];
+
+      switch (type) //{SPHERE, BOX, CYLINDER, MESH}
       {
       case 0:
         geometry_->type = urdf::Geometry::SPHERE;
@@ -292,6 +374,7 @@ namespace urdf_editor
       }
 
       loadData();
+
     }
     else
     {
@@ -331,8 +414,9 @@ namespace urdf_editor
         else if (name == "Z")
           mesh->scale.z = val.toDouble();
       }
+
+      emit LinkGeometryProperty::valueChanged(property, val);
     }
 
-    emit LinkGeometryProperty::valueChanged(property, val);
   }
 }

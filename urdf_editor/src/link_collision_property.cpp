@@ -85,9 +85,18 @@ namespace urdf_editor
   {
     if (!geometry_property_)
     {
-      collision_->geometry.reset(new urdf::Geometry());  //Create the URDF Geometry element 
+      urdf::SphereSharedPtr geometry(new urdf::Sphere());
+      geometry->radius = 0.1;
+      collision_->geometry = geometry;  //Create the URDF Geometry element
+      collision_->geometry->type = collision_->geometry->SPHERE;
+
       geometry_property_.reset(new LinkGeometryProperty(collision_->geometry));
       top_item_->addSubProperty(geometry_property_->getTopItem());
+
+      QObject::connect(geometry_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
+      onChildValueChanged(nullptr,QVariant::fromValue(0));
     }
   }
   
@@ -150,6 +159,8 @@ namespace urdf_editor
   {
     if (loading_)
       return;
+
+    collision_->geometry = geometry_property_->getGeometry();
 
     emit LinkCollisionProperty::valueChanged(property, val);
   }

@@ -15,7 +15,7 @@ namespace utils
 ConvexHullGenerator::ConvexHullGenerator():
     scene_(nullptr)
 {
-
+  supported_extensions_={"stl","STL","dae","DAE","obj","OBJ"};
 }
 
 ConvexHullGenerator::~ConvexHullGenerator()
@@ -34,7 +34,7 @@ bool ConvexHullGenerator::generate(const std::string& file_path)
 
   if(!scene)
   {
-    ROS_ERROR_STREAM(importer_.GetErrorString());
+    ROS_ERROR_STREAM("Read Error: " <<importer_.GetErrorString());
     return false;
   }
 
@@ -84,7 +84,7 @@ bool ConvexHullGenerator::save(const std::string& file_path)
 
   if(ext_id.empty())
   {
-    ROS_ERROR("Assimp exported does not support extension %s",ext.c_str());
+    ROS_ERROR("Assimp exporter does not support extension %s",ext.c_str());
     return false;
   }
 
