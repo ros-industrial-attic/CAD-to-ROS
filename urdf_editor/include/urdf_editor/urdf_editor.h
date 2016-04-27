@@ -19,6 +19,9 @@ public:
   explicit URDFEditor(QWidget *parent = 0);
   ~URDFEditor();
 
+protected:
+  void closeEvent(QCloseEvent *event);
+
 private slots:
   void on_action_Open_triggered();
 
@@ -39,8 +42,6 @@ private:
 
   urdf_editor::URDFPropertySharedPtr urdf_tree_;
   QString file_path_;
-
-  void closeEvent(QCloseEvent *event);
 };
 
 #endif // __URDF_EDITOR_H__
