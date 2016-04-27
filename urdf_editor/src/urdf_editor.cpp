@@ -9,6 +9,7 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QCloseEvent>
 
 #include <qteditorfactory.h>
 #include <qtpropertymanager.h>
@@ -109,8 +110,7 @@ void URDFEditor::on_action_New_triggered()
 
 void URDFEditor::on_action_Exit_triggered()
 {
-  QCloseEvent closing;
-  closeEvent( &closing );
+  emit close();
 }
 
 void URDFEditor::closeEvent( QCloseEvent *event )
@@ -122,13 +122,10 @@ void URDFEditor::closeEvent( QCloseEvent *event )
     else
     {
       event->accept();
-      QMainWindow::closeEvent(event);
-      QApplication::quit();
     }
   }
   else
   {
     event->accept();
-    QApplication::quit();
   }
 }
