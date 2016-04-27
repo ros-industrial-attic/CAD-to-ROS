@@ -202,6 +202,25 @@ namespace urdf_editor
 
   }
 
+  QString JointProperty::getParentLinkName() const
+  {
+    return QString::fromStdString(joint_->parent_link_name);
+  }
+
+  QString JointProperty::getChildLinkName() const
+  {
+    return QString::fromStdString(joint_->child_link_name);
+  }
+
+  void JointProperty::setParentLinkName(const QString &link_name)
+  {
+    if (link_names_.contains(link_name))
+    {
+      parent_item_->setValue(link_names_.indexOf(link_name));
+      emit parentLinkChanged(this, link_name);
+    }
+  }
+
   void JointProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
@@ -244,6 +263,7 @@ namespace urdf_editor
     else if (name == "Parent")
     {
       joint_->parent_link_name = link_names_[val.toInt()].toStdString();
+      emit parentLinkChanged(this, link_names_[val.toInt()]);
     }
     else if (name == "Child")
     {

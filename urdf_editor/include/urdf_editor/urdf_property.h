@@ -41,6 +41,8 @@ namespace urdf_editor
 
     void on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val);
 
+    void on_propertyWidget_jointParentLinkChanged(JointProperty *property, const QVariant &val);
+
     void on_propertyWidget_valueChanged();
 
     void on_unsavedChanges();
@@ -57,16 +59,25 @@ namespace urdf_editor
   private:
     bool populateTreeWidget();
 
+    /*! Set expanded value for all children for a QTreeWidgetItem (recursively) */
+    void setAllChildrenExpandedValue(QTreeWidgetItem *parent, bool expanded);
+
     void addToTreeWidget(urdf::LinkSharedPtr link, QTreeWidgetItem* parent);
     void addToTreeWidget(urdf::JointSharedPtr joint, QTreeWidgetItem* parent);
 
-    void addModelLink(QTreeWidgetItem* parent);
+    urdf::LinkSharedPtr addModelLink(QTreeWidgetItem* parent);
     QTreeWidgetItem* addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link);
     LinkPropertySharedPtr addLinkProperty(QTreeWidgetItem* item, urdf::LinkSharedPtr link);
 
-    void addModelJoint(QTreeWidgetItem *parent);
+    void removeModelLink(QString link_name);
+    void removeLinkTreeItem(QTreeWidgetItem *item);
+
+    urdf::JointSharedPtr addModelJoint(QTreeWidgetItem *parent, QString child_link_name);
     QTreeWidgetItem* addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint);
     JointPropertySharedPtr addJointProperty(QTreeWidgetItem *item, urdf::JointSharedPtr joint);
+
+    void removeModelJoint(QString joint_name);
+    void removeJointTreeItem(QTreeWidgetItem *item);
 
     QString getValidName(QString prefix, QList<QString> &current_names);
 
@@ -75,6 +86,11 @@ namespace urdf_editor
 
     boost::shared_ptr<QtTreePropertyBrowser> property_editor_;
     urdf::ModelInterfaceSharedPtr model_;
+
+    // this map urdf::LinkSharedPtr to link-tree-items
+    QMap<urdf::LinkSharedPtr, QTreeWidgetItem *> link_to_ltree_;
+
+    // this map joint child link to chain-tree-items
     QMap<urdf::LinkSharedPtr, QTreeWidgetItem *> joint_child_to_ctree_;
 
     // these map chain-tree-items to joint properties
