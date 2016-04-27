@@ -78,8 +78,8 @@ namespace urdf_editor
 
     connect(this, SIGNAL(linkDeletion()), SLOT(on_unsavedChanges()));
 
-    unsavedChanges=false; // No changes to be saved, yet
-
+    // No changes to be saved, yet
+    unsavedChanges = false;
   }
 
   URDFProperty::~URDFProperty()
@@ -110,6 +110,7 @@ namespace urdf_editor
     link_property_to_ltree_.clear();
     link_names_.clear();
     joint_names_.clear();
+    unsavedChanges = false;
   }
 
   bool URDFProperty::loadURDF(QString file_path)
@@ -207,8 +208,8 @@ namespace urdf_editor
     QTreeWidgetItem* item = addLinkTreeItem(parent, new_link);
     // now add the property
     addLinkProperty(item, new_link);
+
     emit linkAddition();
-    unsavedChanges = true;
   }
 
   QTreeWidgetItem* URDFProperty::addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link)
@@ -249,7 +250,7 @@ namespace urdf_editor
     QTreeWidgetItem* item = addJointTreeItem(parent, new_joint);
     // now add the property
     addJointProperty(item, new_joint);
-    unsavedChanges = true;
+
     emit jointAddition();
   }
 
