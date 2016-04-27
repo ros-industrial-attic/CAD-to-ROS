@@ -28,6 +28,8 @@ namespace urdf_editor
 
     bool clear();
 
+    bool unsavedChanges;
+
   private slots:
     void on_treeWidget_customContextMenuRequested(const QPoint &pos);
 
@@ -40,6 +42,17 @@ namespace urdf_editor
     void on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val);
 
     void on_propertyWidget_valueChanged();
+
+    void on_unsavedChanges();
+
+  signals:
+    void jointAddition();
+
+    void jointDeletion();
+
+    void linkAddition();
+
+    void linkDeletion();
 
   private:
     bool populateTreeWidget();
