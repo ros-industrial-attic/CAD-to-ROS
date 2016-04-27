@@ -3,6 +3,7 @@
 #include <ros/console.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/surface/convex_hull.h>
+#include <cexport.h>
 #include <string>
 
 
@@ -11,15 +12,15 @@ namespace urdf_editor
 namespace utils
 {
 
-ConvexHullGenerator::ConvexHullGenerator()
+ConvexHullGenerator::ConvexHullGenerator():
+    scene_(nullptr)
 {
-  // TODO Auto-generated constructor stub
 
 }
 
 ConvexHullGenerator::~ConvexHullGenerator()
 {
-  // TODO Auto-generated destructor stub
+
 }
 
 bool ConvexHullGenerator::generate(const std::string& file_path)
@@ -43,7 +44,10 @@ bool ConvexHullGenerator::generate(const std::string& file_path)
     return false;
   }
 
-  return generateConvexHull(scene);
+  // copying scene
+  aiCopyScene(scene,&scene_);
+
+  return generateConvexHull(scene_);
 }
 
 bool ConvexHullGenerator::save(const std::string& file_path)
@@ -65,27 +69,44 @@ bool ConvexHullGenerator::save(const std::string& file_path)
     return false;
   }
 
-  // creating scene
-  boost::shared_ptr<aiScene> scene;
-  scene.reset(new aiScene());
-  scene->mRootNode = new aiNode();
+  // finding extension id
+  int ext_count = aiGetExportFormatCount();
+  std::string ext_id;
+  for(auto i = 0u; i < ext_count; i++)
+  {
+    const aiExportFormatDesc* desc = aiGetExportFormatDescription(i);
+    if(std::string(desc->fileExtension).compare(ext) == 0)
+    {
+      ext_id = desc->id;
+      break;
+    }
+  }
 
-  scene->mMaterials = new aiMaterial*[ 1 ];
-  scene->mMaterials[ 0 ] = nullptr;
-  scene->mNumMaterials = 1;
-  scene->mMaterials[ 0 ] = new aiMaterial();
+  if(ext_id.empty())
+  {
+    ROS_ERROR("Assimp exported does not support extension %s",ext.c_str());
+    return false;
+  }
 
-  scene->mMeshes = new aiMesh*[1];
-  scene->mMeshes[0] = chull_mesh_.get();
-  scene->mMeshes[ 0 ]->mMaterialIndex = 0;
-  scene->mNumMeshes = 1;
-
-  scene->mRootNode->mMeshes = new unsigned int[ 1 ];
-  scene->mRootNode->mMeshes[ 0 ] = 0;
-  scene->mRootNode->mNumMeshes = 1;
+  // deleting old scene data
+  delete scene_->mRootNode;
+  delete scene_->mMeshes;
 
 
-  aiReturn res = exporter.Export(scene.get(),"",file_path);
+  // populating scene with new mesh
+  scene_->mRootNode = new aiNode();
+
+  scene_->mMeshes = new aiMesh*[1];
+  scene_->mMeshes[0] = chull_mesh_.get();
+  scene_->mMeshes[ 0 ]->mMaterialIndex = 0;
+  scene_->mNumMeshes = 1;
+
+  scene_->mRootNode->mMeshes = new unsigned int[ 1 ];
+  scene_->mRootNode->mMeshes[ 0 ] = 0;
+  scene_->mRootNode->mNumMeshes = 1;
+
+
+  aiReturn res = exporter.Export(scene_,ext_id,file_path);
   if(res == aiReturn_OUTOFMEMORY)
   {
     ROS_ERROR("Mesh export failed due to out-of-memory error");
