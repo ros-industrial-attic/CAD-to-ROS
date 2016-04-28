@@ -19,16 +19,21 @@ public:
   explicit URDFEditor(QWidget *parent = 0);
   ~URDFEditor();
 
+protected:
+  void closeEvent(QCloseEvent *event);
+
 private slots:
   void on_action_Open_triggered();
 
   void on_action_Save_triggered();
 
+  bool unsaved_changes();
+
   void on_actionSave_As_triggered();
 
   void on_action_New_triggered();
 
-  void on_actionE_xit_triggered();
+  void on_action_Exit_triggered();
 
 private:
   Ui::URDFEditor *ui;
