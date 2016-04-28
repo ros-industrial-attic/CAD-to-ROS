@@ -31,11 +31,6 @@ namespace urdf_editor
     render_panel_->setEnabled(true);
     render_panel_->setBackgroundColor(Ogre::ColourValue(0.25, 0.25, 0.25, 1));
 
-    //QString base_link;
-    //base_link.fromStdString(robot_display_->getRobotModel()->getRootLinkName());
-    //ROS_INFO_STREAM("base link: " << base_link.toStdString());
-    //manager_->setFixedFrame(base_link);
-
     robot_display_ = new moveit_rviz_plugin::RobotStateDisplay();
     robot_display_->setName("RobotModel");
     robot_display_->subProp("Robot Description")->setValue("ros_workbench");

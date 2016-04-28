@@ -41,9 +41,10 @@ void URDFTransformer::worker_thread()
 
     if(tf_copy.transforms.size() > 0)
     {
+      ros::Time t = ros::Time::now();
       for(int i = 0; i < tf_copy.transforms.size(); ++i)
       {
-        tf_copy.transforms[i].header.stamp = ros::Time::now();
+        tf_copy.transforms[i].header.stamp = t;
       }
       broadcaster_.sendTransform(tf_copy.transforms);
     }
@@ -182,8 +183,6 @@ void URDFTransformer::updateLink(JointProperty *property)
     updateLink(property->getParent(), property->getChild(), vect);
     geometry_msgs::Quaternion quat;
     updateLink(property->getParent(), property->getChild(), quat);
-    ROS_WARN_STREAM("Joint for link " << property->getParent() << " to " << property->getChild() << " does not have origin property information.  Setting to zero.");
-
   }
 }
 

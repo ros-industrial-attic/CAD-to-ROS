@@ -35,6 +35,9 @@ public:
    */
   void addLink(const std::string parent, const std::string child);
 
+  /**
+   * @brief clear Deletes all of the transforms in the list to be published
+   */
   void clear();
 
   /**
@@ -73,6 +76,10 @@ public:
    */
   void updateLink(const std::string parent, const std::string child, const geometry_msgs::Transform trans);
 
+  /**
+   * @brief updateLink Adds a link to the existing TF tree
+   * @param property The joint property containing all of the information for adding and publishing the TF frame
+   */
   void updateLink(JointProperty *property);
 
 private:
