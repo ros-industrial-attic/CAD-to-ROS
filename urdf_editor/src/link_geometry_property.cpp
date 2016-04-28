@@ -4,13 +4,14 @@
 
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/common.h>
+#include <urdf_editor/qt_file_browser.h>
 
 #include <urdf_model/link.h>
 
 
 namespace urdf_editor
 {
-  LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new FileBrowserVariantManager()), factory_(new FileBrowserVarianFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -56,7 +57,7 @@ namespace urdf_editor
     else if (geometry_->type == urdf::Geometry::MESH)
     {
       boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
-      item = manager_->addProperty(QVariant::String, tr("File Name"));
+      item = manager_->addProperty(FileBrowserVariantManager::filePathTypeId(), tr("File Name"));
       top_item_->addSubProperty(item);
 
       item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Scale"));
