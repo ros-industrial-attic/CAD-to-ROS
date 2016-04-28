@@ -24,6 +24,10 @@ namespace urdf_editor
     
     bool hasGeometryProperty();
     void createGeometryProperty();
+    LinkGeometryPropertySharedPtr getGeometryProperty()
+    {
+      return geometry_property_;
+    }
     
     bool hasMaterialProperty();
     void createMaterialProperty();
