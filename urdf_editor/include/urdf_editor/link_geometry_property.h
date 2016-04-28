@@ -2,6 +2,7 @@
 #define __LINK_GEOMETRY_PROPERTY_H__
 
 #include <QtCore>
+#include "link_property.h"
 
 #include <urdf_editor/qt_types.h>
 #include <urdf_editor/urdf_types_ext.h>
