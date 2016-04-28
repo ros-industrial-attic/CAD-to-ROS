@@ -16,7 +16,9 @@
 
 static const double DEFAULT_SIDE_LENGHT = 0.1;
 static const std::string PACKAGE_NAME = "urdf_builder";
-static const std::string MESH_FILE_FILTER = "STL, COLLADA, Wavefront (*.stl *.dae *.obj)";
+static const std::string CONVEX_MESH_FILE_FILTER = "STL, COLLADA, Wavefront (*.stl *.dae *.obj)";
+static const std::string LOAD_MESH_FILE_FILTER = "STL, COLLADA(*.stl *.dae )";
+static const std::string OUTPUT_CHULL_EXT = "dae";
 
 struct FilePaths
 {
@@ -124,7 +126,7 @@ namespace urdf_editor
     // open file dialog
     QString qpath = QFileDialog::getOpenFileName(0,QString("Open Mesh"),
                                                    QString::fromStdString(browse_start_dir_),
-                                                   QString::fromStdString(MESH_FILE_FILTER));
+                                                   QString::fromStdString(LOAD_MESH_FILE_FILTER));
 
     if(qpath.isEmpty())
     {
@@ -158,7 +160,7 @@ namespace urdf_editor
     // create formats filter
     QString qpath = QFileDialog::getOpenFileName(0,QString("Generate Convex Hull from Mesh"),
                                                     QString::fromStdString(browse_start_dir_),
-                                                    QString::fromStdString(MESH_FILE_FILTER));
+                                                    QString::fromStdString(CONVEX_MESH_FILE_FILTER));
     if(qpath.isEmpty())
     {
       return;
@@ -170,11 +172,11 @@ namespace urdf_editor
     }
 
     browse_start_dir_ = paths.parent_dir;
-    ROS_INFO_STREAM("ROS mesh path "<<paths.ros_formatted);
 
-    //TODO: Call ConvexHullGenerator here and save mesh
+    // generate convex full and save mesh
     utils::ConvexHullGenerator chull_gen;
     std::string chull_file = "chull-" + paths.file_name;
+    chull_file = chull_file.substr(0,chull_file.find_last_of('.')+1) + OUTPUT_CHULL_EXT;
     std::string chull_path = paths.parent_dir + "/" + chull_file;
     if(chull_gen.generate(paths.full_path))
     {
@@ -198,6 +200,8 @@ namespace urdf_editor
     geometry_ = mesh;
     geometry_->type = urdf::Geometry::MESH;
     type_item_->setValue(urdf::Geometry::MESH);
+
+    loadData();
 
   }
 
