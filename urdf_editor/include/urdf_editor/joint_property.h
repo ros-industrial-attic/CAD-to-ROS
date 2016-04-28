@@ -22,6 +22,9 @@ namespace urdf_editor
 
     void loadData();
 
+    /*! Get the joint name */
+    QString getName();
+
     /*! Get the name of the parent link */
     QString getParentLinkName() const;
 
@@ -29,7 +32,7 @@ namespace urdf_editor
     QString getChildLinkName() const;
 
     /*! Set the parent link name */
-    void setParentLinkName(const QString &link_name);
+    bool setParentLinkName(const QString &link_name);
     
     /*! Check if has origin property */
     bool hasOriginProperty();
@@ -93,8 +96,6 @@ namespace urdf_editor
    
     /*! Get the safety Property */
     JointSafetyPropertySharedPtr getSafetyProperty();
-    
-    
     
 
   private slots:

@@ -35,7 +35,7 @@ const QString ACTION_COLLAPSEALL_TEXT = "Collapse All";
 
 namespace urdf_editor
 {
-  URDFProperty::URDFProperty(QTreeWidget *tree_widget, QWidget *browser_parent, QWidget *rviz_parent)
+  URDFProperty::URDFProperty(URDFPropertyTree *tree_widget, QWidget *browser_parent, QWidget *rviz_parent)
   {
     tree_widget_ = tree_widget;
     browser_parent_ = browser_parent;
@@ -44,14 +44,18 @@ namespace urdf_editor
     root_ = new QTreeWidgetItem(tree_widget_);
     root_->setText(0, "RobotModel");
     root_->setExpanded(true);
+    root_->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     tree_widget_->addTopLevelItem(root_);
 
     link_root_ = new QTreeWidgetItem();
     link_root_->setText(0, "Links");
+    link_root_->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable );
+
     root_->addChild(link_root_);
 
     joint_root_ = new QTreeWidgetItem();
     joint_root_->setText(0,"Joints");
+    joint_root_->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled);
     root_->addChild(joint_root_);
 
     property_editor_.reset(new QtTreePropertyBrowser());
@@ -71,6 +75,9 @@ namespace urdf_editor
 
     connect(tree_widget, SIGNAL(itemClicked(QTreeWidgetItem*,int)),
               this, SLOT(on_treeWidget_itemClicked(QTreeWidgetItem*,int)));
+
+    connect(tree_widget, SIGNAL(dragDropEvent(QTreeWidgetItem*,QTreeWidgetItem*)),
+            this, SLOT(on_treeWidget_itemDragDrop(QTreeWidgetItem*,QTreeWidgetItem*)));
 
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
@@ -190,6 +197,7 @@ namespace urdf_editor
   {
     // first add the tree item
     QTreeWidgetItem* item = addJointTreeItem(parent, joint);
+
     // now add the property
     JointPropertySharedPtr jpptr =  addJointProperty(item, joint);
 
@@ -541,6 +549,29 @@ namespace urdf_editor
     else
     {
       property_editor_->clear();
+    }
+  }
+
+  void URDFProperty::on_treeWidget_itemDragDrop(QTreeWidgetItem *drag, QTreeWidgetItem *drop)
+  {
+    if (isLink(drag) && isLink(drop))
+    {
+      urdf::LinkSharedPtr link;
+      model_->getLink(drag->text(0).toStdString(), link);
+      QTreeWidgetItem *joint = joint_child_to_ctree_[link];
+      JointPropertySharedPtr joint_property = ctree_to_joint_property_[joint];
+      joint_property->setParentLinkName(drop->text(0));
+    }
+    else if (isJoint(drag) && isJoint(drop))
+    {
+      JointPropertySharedPtr drag_joint_property = ctree_to_joint_property_[drag];
+      JointPropertySharedPtr drop_joint_property = ctree_to_joint_property_[drop];
+      drag_joint_property->setParentLinkName(drop_joint_property->getChildLinkName());
+    }
+    else if (isJoint(drag) && drop == joint_root_)
+    {
+      JointPropertySharedPtr drag_joint_property = ctree_to_joint_property_[drag];
+      drag_joint_property->setParentLinkName(link_root_->child(0)->text(0));
     }
   }
 

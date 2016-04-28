@@ -5,7 +5,9 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QMenu>
+
 #include <qttreepropertybrowser.h>
+#include <urdf_editor/urdf_property_tree.h>
 #include <urdf_editor/my_rviz.h>
 
 #include <urdf_editor/urdf_types.h>
@@ -19,7 +21,7 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    URDFProperty(QTreeWidget *tree_widget, QWidget *browser_parent, QWidget *rviz_parent);
+    URDFProperty(URDFPropertyTree *tree_widget, QWidget *browser_parent, QWidget *rviz_parent);
     ~URDFProperty();
 
     bool loadURDF(QString file_path);
@@ -34,6 +36,8 @@ namespace urdf_editor
     void on_treeWidget_customContextMenuRequested(const QPoint &pos);
 
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
+
+    void on_treeWidget_itemDragDrop(QTreeWidgetItem *drag, QTreeWidgetItem *drop);
 
     void on_propertyWidget_customContextMenuRequested(const QPoint &pos);
 
@@ -107,7 +111,7 @@ namespace urdf_editor
     QTreeWidgetItem *root_;
     QTreeWidgetItem *link_root_;
     QTreeWidgetItem *joint_root_;
-    QTreeWidget *tree_widget_;
+    URDFPropertyTree *tree_widget_;
     QWidget *browser_parent_;
     urdf_editor::MyRviz *rviz_widget_;
   };

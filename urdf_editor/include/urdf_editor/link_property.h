@@ -44,7 +44,10 @@ namespace urdf_editor
    
     /*! Get the Collision Property */
     LinkCollisionPropertySharedPtr getCollisionProperty();
-    
+
+    /*! Get the link name */
+    QString getName();
+
     
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);

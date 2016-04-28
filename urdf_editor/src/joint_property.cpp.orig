@@ -36,6 +36,19 @@ namespace urdf_editor
    // add the link list as an enum to the parent drop down menu. pass the first item into the joint data struct, if there is one
     parent_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Parent"));
     parent_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
+<<<<<<< HEAD
+    if(link_names_.size() > 0 && joint_->parent_link_name.empty()) {
+      joint_->parent_link_name = link_names_[0].toStdString();
+    }
+
+    // add the link list as an enum to the child drop down menu. pass the first item into the joint data struct, if there is one
+    child_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Child"));
+    child_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
+    if(link_names_.size() > 0 && joint_->child_link_name.empty()) {
+      joint_->child_link_name = link_names_[0].toStdString();
+    }
+
+=======
     if(link_names_.size() > 0 && joint_->parent_link_name=="") {
       joint_->parent_link_name = link_names_[0].toStdString();
     }
@@ -46,6 +59,7 @@ namespace urdf_editor
       joint_->child_link_name = link_names_[0].toStdString();
     }
     
+>>>>>>> indigo-devel
     origin = joint_->parent_to_joint_origin_transform;
     p_norm = origin.position.x * origin.position.x;
     p_norm += origin.position.y * origin.position.y;
@@ -201,32 +215,6 @@ namespace urdf_editor
     }
 
   }
-  /*! Get the joint name */
-  QString JointProperty::getName()
-  {
-    return QString::fromStdString(joint_->name);
-  }
-
-  QString JointProperty::getParentLinkName() const
-  {
-    return QString::fromStdString(joint_->parent_link_name);
-  }
-
-  QString JointProperty::getChildLinkName() const
-  {
-    return QString::fromStdString(joint_->child_link_name);
-  }
-
-  bool JointProperty::setParentLinkName(const QString &link_name)
-  {
-    if (link_names_.contains(link_name))
-    {
-      parent_item_->setValue(link_names_.indexOf(link_name));
-      emit parentLinkChanged(this, link_name);
-      return true;
-    }
-    return false;
-  }
 
   void JointProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
@@ -270,7 +258,6 @@ namespace urdf_editor
     else if (name == "Parent")
     {
       joint_->parent_link_name = link_names_[val.toInt()].toStdString();
-      emit parentLinkChanged(this, link_names_[val.toInt()]);
     }
     else if (name == "Child")
     {
@@ -518,5 +505,42 @@ namespace urdf_editor
     return safety_property_;
   }
 
+  /*! Get the joint name */
+  QString JointProperty::getName()
+  {
+    return QString::fromStdString(joint_->name);
+  }
+
+  /*! Get the child link name*/
+  QString JointProperty::getChildLinkName()
+  {
+    return QString::fromStdString(joint_->child_link_name);
+  }
+
+  /*! Get the parent link name */
+  QString JointProperty::getParentLinkName()
+  {
+    return QString::fromStdString(joint_->parent_link_name);
+  }
+
+  /*! Set the child link name*/
+  bool JointProperty::setChildLinkName(QString link_name){
+    if(!link_names_.contains(link_name)) {
+      return false;
+    }
+    joint_->child_link_name = link_name.toStdString();
+    child_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->child_link_name)));
+    return true;
+  }
+
+  /*! Set the parent link name */
+  bool JointProperty::setParentLinkName(QString link_name) {
+    if(!link_names_.contains(link_name)) {
+      return false;
+    }
+    joint_->parent_link_name = link_name.toStdString();
+    parent_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->parent_link_name)));
+    return true;
+  }
 
 }
