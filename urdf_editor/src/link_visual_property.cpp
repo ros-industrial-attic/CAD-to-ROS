@@ -203,8 +203,8 @@ namespace urdf_editor
 
     if (property->propertyName() == "Type")
     {
-      // if (hasGeometryProperty())
-      //   emit LinkVisualProperty::geometryChanged();
+      if (hasGeometryProperty())
+        emit LinkVisualProperty::geometryChanged(val.toInt());
     }
     else
     {

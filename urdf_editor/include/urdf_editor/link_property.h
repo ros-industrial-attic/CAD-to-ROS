@@ -49,13 +49,11 @@ namespace urdf_editor
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
     void onChildValueChanged(QtProperty *property, const QVariant &val);
-    // void visualGeometryChanged();
-    // void collisionGeometryChanged();
+    void onVisualGeometryChanged(int);
+    void onCollisionGeometryChanged(int);
 
   signals:
     void linkNameChanged(LinkProperty *property, const QVariant &val);
-    // void visualGeometryChanged(LinkProperty *property);
-    // void collisionGeometryChanged(LinkProperty *property);
     void valueChanged();
 
   private:

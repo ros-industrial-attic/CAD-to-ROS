@@ -228,19 +228,7 @@ namespace urdf_editor
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
     QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
               this, SLOT(on_propertyWidget_valueChanged()));
-    if (tree_link->hasVisualProperty())
-    {
-      std::cout<<"tree link has visual property"<<std::endl;
-      if (tree_link->getVisualProperty()->hasGeometryProperty())
-      {
-        std::cout<<"tree link has geometry property"<<std::endl;
-        QObject::connect(tree_link->getVisualProperty()->getGeometryProperty().get(), SIGNAL(geometryChanged(LinkGeometryProperty *)),
-                  this, SLOT(on_propertyWidget_visualGeometryChanged(LinkGeometryProperty *)));
-      } else std::cout<<"visual property has NO!!! geometry property"<<std::endl;
-    } else std::cout<<"tree link has NO!!! visual property"<<std::endl;
-    // QObject::connect(tree_link.get(), SIGNAL(collisionGeometryChanged(LinkProperty *)),
-    //           this, SLOT(on_propertyWidget_collisionGeometryChanged(LinkProperty *)));
-
+    
     // add mapping from treewidget item to link property
     ltree_to_link_property_[item] = tree_link;
     // add mapping from link property to treewidget item
@@ -727,57 +715,6 @@ namespace urdf_editor
 
   void URDFProperty::on_propertyWidget_valueChanged()
   {
-    rviz_widget_->loadRobot(model_);
-  }
-
-  void URDFProperty::on_propertyWidget_visualGeometryChanged(LinkGeometryProperty* property)
-  {
-    std::cout<<"VISUAL Geometry CHANGED"<<std::endl;
-    // QString orig_name = link_property_to_ltree_[property]->text(0);
-    // std::string link_name = orig_name.toStdString();
-
-    // if (model_->links_.find(link_name) == model_->links_.end()) 
-    // {
-    //   // should never happen
-    //   qDebug() << QString("Link %1 could not be found in model!").arg(orig_name);
-    //   assert (1==0);
-    // }
-    // else
-    // {
-    //   if (model_->links_[link_name]->visual)
-    //   {
-    //     if (model_->links_[link_name]->visual->geometry)
-    //     {  
-    //       model_->links_[link_name]->visual->geometry = property->getVisualProperty()->getGeometryProperty()->getGeometry();
-    //     }
-    //   }
-    // }
-
-    // rviz_widget_->loadRobot(model_);
-  }
-
-  void URDFProperty::on_propertyWidget_collisionGeometryChanged(LinkProperty* property)
-  {
-    QString orig_name = link_property_to_ltree_[property]->text(0);
-    std::string link_name = orig_name.toStdString();
-
-    if (model_->links_.find(link_name) == model_->links_.end()) 
-    {
-      // should never happen
-      qDebug() << QString("Link %1 could not be found in model!").arg(orig_name);
-      assert (1==0);
-    }
-    else
-    {
-      if (model_->links_[link_name]->collision)
-      {
-        if (model_->links_[link_name]->collision->geometry)
-        {  
-          model_->links_[link_name]->collision->geometry = property->getCollisionProperty()->getGeometryProperty()->getGeometry();
-        }
-      }
-    }
-
     rviz_widget_->loadRobot(model_);
   }
 

@@ -21,16 +21,18 @@ namespace urdf_editor
 
     QtProperty *getTopItem() { return top_item_; }
 
-    urdf::GeometrySharedPtr getGeometry() { return geometry_; } 
+    inline urdf::GeometrySharedPtr getGeometry() { return geometry_; } 
+    inline void setGeometry(urdf::GeometrySharedPtr ptr) { geometry_ = ptr; }
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
 
   signals:
     void valueChanged(QtProperty *property, const QVariant &val);
-    void geometryChanged(LinkGeometryProperty *property);
 
   private:
+    void createProperties(int type);
+
     urdf::GeometrySharedPtr geometry_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
