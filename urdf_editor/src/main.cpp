@@ -5,6 +5,7 @@
 
 #include <ros/ros.h>
 
+
 int main(int argc, char *argv[])
 {
   if (!ros::isInitialized())
@@ -15,5 +16,6 @@ int main(int argc, char *argv[])
   QApplication a(argc, argv);
   URDFEditor w;
   w.show();
+
   return a.exec();
 }
