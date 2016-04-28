@@ -15,7 +15,7 @@
   <build_depend>roscpp</build_depend>
   <build_depend>rviz</build_depend>
   <build_depend>qt_property_browser</build_depend>
-  <build_depend>assimp</build_depend>
+  <build_depend>assimp-dev</build_depend>
   <build_depend>moveit_ros_visualization</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>tf</build_depend>
@@ -23,7 +23,7 @@
 
   <run_depend>roscpp</run_depend>
   <run_depend>rviz</run_depend>
-  <run_depend>assimp</run_depend>
+  <run_depend>assimp-dev</run_depend>
   <run_depend>qt_property_browser</run_depend>
   <run_depend>moveit_ros_visualization</run_depend>
   <run_depend>geometry_msgs</run_depend>

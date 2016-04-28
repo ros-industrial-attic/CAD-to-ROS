@@ -4,8 +4,8 @@
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/surface/convex_hull.h>
 #include <cexport.h>
+#include <boost/algorithm/string.hpp>
 #include <string>
-
 
 namespace urdf_editor
 {
@@ -15,7 +15,7 @@ namespace utils
 ConvexHullGenerator::ConvexHullGenerator():
     scene_(nullptr)
 {
-  supported_extensions_={"stl","STL","dae","DAE","obj","OBJ"};
+  output_extensions_={"dae"};
 }
 
 ConvexHullGenerator::~ConvexHullGenerator()
@@ -55,14 +55,21 @@ bool ConvexHullGenerator::save(const std::string& file_path)
   using namespace Assimp;
   Exporter exporter;
 
+  if(!scene_)
+  {
+    ROS_ERROR_STREAM("Mesh file has not been loaded");
+    return false;
+  }
+
   auto check_extension = [this](const std::string e)
   {
-    auto iter = std::find(supported_extensions_.begin(),supported_extensions_.end(),e);
-    return iter != supported_extensions_.end();
+    auto iter = std::find(output_extensions_.begin(),output_extensions_.end(),e);
+    return iter != output_extensions_.end();
   };
 
   // check extensions
   std::string ext = file_path.substr(file_path.find_last_of('.')+1);
+  boost::algorithm::to_lower(ext);
   if(!check_extension(ext))
   {
     ROS_ERROR("Extension %s is not supported",ext.c_str());
@@ -75,7 +82,7 @@ bool ConvexHullGenerator::save(const std::string& file_path)
   for(auto i = 0u; i < ext_count; i++)
   {
     const aiExportFormatDesc* desc = aiGetExportFormatDescription(i);
-    if(std::string(desc->fileExtension).compare(ext) == 0)
+    if(std::string(desc->fileExtension).compare(ext) == 0) // find binary
     {
       ext_id = desc->id;
       break;
@@ -87,24 +94,6 @@ bool ConvexHullGenerator::save(const std::string& file_path)
     ROS_ERROR("Assimp exporter does not support extension %s",ext.c_str());
     return false;
   }
-
-  // deleting old scene data
-  delete scene_->mRootNode;
-  delete scene_->mMeshes;
-
-
-  // populating scene with new mesh
-  scene_->mRootNode = new aiNode();
-
-  scene_->mMeshes = new aiMesh*[1];
-  scene_->mMeshes[0] = chull_mesh_.get();
-  scene_->mMeshes[ 0 ]->mMaterialIndex = 0;
-  scene_->mNumMeshes = 1;
-
-  scene_->mRootNode->mMeshes = new unsigned int[ 1 ];
-  scene_->mRootNode->mMeshes[ 0 ] = 0;
-  scene_->mRootNode->mNumMeshes = 1;
-
 
   aiReturn res = exporter.Export(scene_,ext_id,file_path);
   if(res == aiReturn_OUTOFMEMORY)
@@ -153,6 +142,7 @@ bool ConvexHullGenerator::generateConvexHull(const aiScene* scene)
   chull_mesh_->mNumVertices = num_vertices;
   chull_mesh_->mFaces = new aiFace[faces.size()];
   chull_mesh_->mNumFaces = faces.size();
+  chull_mesh_->mName = "convex-hull";
 
   for(std::size_t f = 0; f < faces.size();f++)
   {
@@ -169,8 +159,24 @@ bool ConvexHullGenerator::generateConvexHull(const aiScene* scene)
       chull_mesh_->mVertices[start_index + v] = aiVector3D(p.x,p.y,p.z);
       face.mIndices[v] = start_index + v;
     }
-
   }
+
+  // deleting old scene data
+  delete scene_->mRootNode;
+  delete scene_->mMeshes;
+
+  // populating scene with new mesh
+  scene_->mRootNode = new aiNode();
+
+  scene_->mMeshes = new aiMesh*[1];
+  scene_->mMeshes[0] = chull_mesh_.get();
+  scene_->mMeshes[ 0 ]->mMaterialIndex = 0;
+  scene_->mNumMeshes = 1;
+  scene_->mNumMaterials = 0;
+
+  scene_->mRootNode->mMeshes = new unsigned int[ 1 ];
+  scene_->mRootNode->mMeshes[ 0 ] = 0;
+  scene_->mRootNode->mNumMeshes = 1;
 
   return !chull_points->points.empty();
 

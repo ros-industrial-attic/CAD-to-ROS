@@ -45,7 +45,7 @@ protected:
   Assimp::Importer importer_;
   aiScene* scene_;
   boost::shared_ptr<aiMesh> chull_mesh_;
-  std::vector<std::string> supported_extensions_;
+  std::vector<std::string> output_extensions_;
 
 
 
