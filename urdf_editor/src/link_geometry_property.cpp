@@ -10,12 +10,11 @@
 
 namespace urdf_editor
 {
-  LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new FileBrowserVariantManager()), factory_(new FileBrowserVarianFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
     QtVariantProperty *sub_item;
-    QtVariantProperty *item_2;
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
               this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
@@ -24,9 +23,6 @@ namespace urdf_editor
     item = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
     item->setAttribute(Common::attributeStr(EnumNames), QStringList() << "SPHERE" << "BOX" << "CYLINDER" << "MESH");
     top_item_->addSubProperty(item);
-    item_2 = manager_->addProperty(QVariant::String, tr("File Name_new"));
-    item_2->setValue("HI");
-    top_item_->addSubProperty(item_2);
 
     if (geometry_->type == urdf::Geometry::BOX)
     {
@@ -60,8 +56,7 @@ namespace urdf_editor
     else if (geometry_->type == urdf::Geometry::MESH)
     {
       boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
-      item = manager_->addProperty(QVariant::String, tr("File Name"));
-//      item = manager_->addProperty(FileBrowserVariantManager::filePathTypeId(), tr("File Name_new"));
+      item = manager_->addProperty(FileBrowserVariantManager::filePathTypeId(), tr("File Name"));
       top_item_->addSubProperty(item);
 
       item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Scale"));
@@ -205,8 +200,6 @@ namespace urdf_editor
           mesh->scale.y = val.toDouble();
         else if (name == "Z")
           mesh->scale.z = val.toDouble();
-        else if (name == "File Name_new")
-          mesh->filename = val.toString().toStdString();
       }
     }
 
