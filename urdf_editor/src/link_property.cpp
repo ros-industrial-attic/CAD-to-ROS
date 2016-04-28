@@ -11,6 +11,8 @@
 #include <urdf_editor/link_new_material_property.h>
 #include <urdf_editor/link_visual_property.h>
 #include <urdf_editor/link_property.h>
+
+
 namespace urdf_editor
 {
   LinkProperty::LinkProperty(urdf::LinkSharedPtr link):link_(link), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
