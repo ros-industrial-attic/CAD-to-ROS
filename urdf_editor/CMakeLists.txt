@@ -48,6 +48,8 @@ set(editor_SRCS
   src/urdf_editor.cpp
   src/urdf_transforms.cpp
   src/utils/convex_hull_generator.cpp
+  src/assimp/stl_exporter.cpp
+  src/assimp/default_io_stream.cpp
 
   # properties
   src/joint_axis_property.cpp
