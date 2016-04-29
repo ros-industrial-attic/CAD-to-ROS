@@ -5,6 +5,10 @@
 #include <pcl_ros/surface/convex_hull.h>
 #include <boost/algorithm/string.hpp>
 #include <string>
+#include <fstream>
+
+static const std::string STL_BIN_FORMAT_ID = "stlb";
+static const std::map<std::string,std::string> OUTPUT_EXTENSION_MAP = {{"stl","stlb"}};
 
 namespace urdf_editor
 {
@@ -12,9 +16,10 @@ namespace utils
 {
 
 ConvexHullGenerator::ConvexHullGenerator():
-    scene_(nullptr)
+    scene_(nullptr),
+    chull_mesh_(nullptr)
 {
-  output_extensions_={"dae"};
+
 }
 
 ConvexHullGenerator::~ConvexHullGenerator()
@@ -54,47 +59,55 @@ bool ConvexHullGenerator::save(const std::string& file_path)
   using namespace Assimp;
   Exporter exporter;
 
-  if(!scene_)
+  // register STL binary exporter
+  auto steps = aiProcess_Triangulate | aiProcess_SortByPType | aiProcess_GenSmoothNormals |
+      aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals | aiProcess_FindInvalidData ;
+
+  Exporter::ExportFormatEntry format_entry(STL_BIN_FORMAT_ID.c_str(),"Stereolithography (binary)",
+                                           "stl",&assimp::STLExporter::ExportSceneSTLBinary,
+                                           steps);
+  if(exporter.RegisterExporter(format_entry)!= aiReturn_SUCCESS)
+  {
+    ROS_ERROR_STREAM("Failed to register Binary STL exporter: "<<exporter.GetErrorString());
+    return false;
+  }
+
+  if(!chull_mesh_)
   {
     ROS_ERROR_STREAM("Mesh file has not been loaded");
     return false;
   }
 
-  auto check_extension = [this](const std::string e)
-  {
-    auto iter = std::find(output_extensions_.begin(),output_extensions_.end(),e);
-    return iter != output_extensions_.end();
-  };
-
   // check extensions
   std::string ext = file_path.substr(file_path.find_last_of('.')+1);
   boost::algorithm::to_lower(ext);
-  if(!check_extension(ext))
+  if(OUTPUT_EXTENSION_MAP.count(ext) <= 0)
   {
     ROS_ERROR("Extension %s is not supported",ext.c_str());
     return false;
   }
 
-  // finding extension id
-  int ext_count = aiGetExportFormatCount();
-  std::string ext_id;
+  // veryfing support for selected format
+  int ext_count = exporter.GetExportFormatCount();
+  std::string ext_id = OUTPUT_EXTENSION_MAP.at(ext);
+  bool supported = false;
   for(auto i = 0u; i < ext_count; i++)
   {
-    const aiExportFormatDesc* desc = aiGetExportFormatDescription(i);
-    if(std::string(desc->fileExtension).compare(ext) == 0) // find binary
+    const aiExportFormatDesc* desc = exporter.GetExportFormatDescription(i);
+    if(std::string(desc->id).compare(ext_id) == 0) // find binary
     {
-      ext_id = desc->id;
+      supported = true;
       break;
     }
   }
 
-  if(ext_id.empty())
+  if(!supported)
   {
     ROS_ERROR("Assimp exporter does not support extension %s",ext.c_str());
     return false;
   }
 
-  aiReturn res = exporter.Export(scene_,ext_id,file_path);
+  aiReturn res = exporter.Export(scene_,ext_id,file_path,steps);
   if(res == aiReturn_OUTOFMEMORY)
   {
     ROS_ERROR("Mesh export failed due to out-of-memory error");
@@ -134,7 +147,7 @@ bool ConvexHullGenerator::generateConvexHull(const aiScene* scene)
 
   // creating assimp mesh from pcl convex-hull
   std::size_t vertices_per_face = 3;
-  std::size_t num_vertices = faces.size()*vertices_per_face;
+  std::size_t num_vertices = chull_points->points.size();
   chull_mesh_.reset(new aiMesh());
   chull_mesh_->mMaterialIndex = 0;
   chull_mesh_->mVertices = new aiVector3D[num_vertices];
@@ -152,11 +165,13 @@ bool ConvexHullGenerator::generateConvexHull(const aiScene* scene)
     face.mNumIndices = vertices_per_face;
 
     std::size_t start_index = f*vertices_per_face;
+    std::size_t vertex_index;
     for(std::size_t v = 0; v < vertices.size() ; v++)
     {
-      PointXYZ& p = chull_points->points[vertices[v]];
-      chull_mesh_->mVertices[start_index + v] = aiVector3D(p.x,p.y,p.z);
-      face.mIndices[v] = start_index + v;
+      vertex_index = vertices[v];
+      PointXYZ& p = chull_points->points[vertex_index];
+      chull_mesh_->mVertices[vertex_index] = aiVector3D(p.x,p.y,p.z);
+      face.mIndices[v] = vertex_index;
     }
   }
 

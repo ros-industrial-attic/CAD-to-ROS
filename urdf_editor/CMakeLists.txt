@@ -47,6 +47,8 @@ set(editor_SRCS
   src/my_rviz.cpp
   src/urdf_editor.cpp
   src/utils/convex_hull_generator.cpp
+  src/assimp/stl_exporter.cpp
+  src/assimp/default_io_stream.cpp
 
   # properties
   src/joint_axis_property.cpp

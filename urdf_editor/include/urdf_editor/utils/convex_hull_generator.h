@@ -7,6 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/material.h>
 #include <boost/shared_ptr.hpp>
+#include <urdf_editor/assimp/stl_exporter.h>
 
 namespace urdf_editor
 {

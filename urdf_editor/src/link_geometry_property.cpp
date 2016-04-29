@@ -8,7 +8,6 @@
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/common.h>
 #include <urdf_model/link.h>
-
 #include <urdf_editor/utils/convex_hull_generator.h>
 
 #include <ros/package.h>
@@ -18,7 +17,7 @@ static const double DEFAULT_SIDE_LENGHT = 0.1;
 static const std::string PACKAGE_NAME = "urdf_builder";
 static const std::string CONVEX_MESH_FILE_FILTER = "STL, COLLADA, Wavefront (*.stl *.dae *.obj)";
 static const std::string LOAD_MESH_FILE_FILTER = "STL, COLLADA(*.stl *.dae )";
-static const std::string OUTPUT_CHULL_EXT = "dae";
+static const std::string OUTPUT_CHULL_EXT = "stl";
 
 struct FilePaths
 {
