@@ -88,6 +88,97 @@ namespace urdf_editor
     bool isJoint(QTreeWidgetItem *item);
     bool isLink(QTreeWidgetItem *item);
 
+    /**
+     * @brief Add a map between a urdf::LinkSharedPtr and its link QTreeWidgetItem
+     * @param link as urdf::LinkSharedPtr
+     * @param item as *QTreeWidgetItem
+     */
+    void mapLinkToLinkTreeItem(urdf::LinkSharedPtr link, QTreeWidgetItem *item);
+
+    /**
+     * @brief Get the link QTreeWidgetItem for a given urdf::LinkSharedPtr
+     * @param link as a urdf::LinkSharedPtr
+     * @return a *QTreeWidgetItem
+     */
+    QTreeWidgetItem * getLinkTreeItemForLink(urdf::LinkSharedPtr link);
+
+    /**
+     * @brief Add a map between a urdf::LinkSharedPtr and its joint QTreeWidgetItem
+     * @param link as urdf::LinkSharedPtr
+     * @param item as *QTreeWidgetItem
+     */
+    void mapLinkToJointTreeItem(urdf::LinkSharedPtr link, QTreeWidgetItem *item);
+
+    /**
+     * @brief Get the joint QTreeWidgetItem for a given urdf::LinkSharedPtr
+     * @param link as a urdf::LinkSharedPtr
+     * @return a *QTreeWidgetItem
+     */
+    QTreeWidgetItem * getJointTreeItemForLink(urdf::LinkSharedPtr link);
+
+    /**
+     * @brief Add a map between a joint QTreeWidgetItem and its JointProperty.
+     * @param item as *QTreeWidgetItem
+     * @param property as JointPropertySharedPtr
+     */
+    void mapJointTreeItemToProperty(QTreeWidgetItem *item, JointPropertySharedPtr property);
+
+    /**
+     * @brief Get the JointPropertySharedPtr for a given QTreeWidgetItem.
+     * @param item as a *QTreeWidgetItem
+     * @return a JointPropertySharedPtr
+     */
+    JointPropertySharedPtr getJointPropertyForTreeItem(QTreeWidgetItem *item);
+
+    /**
+     * @brief Add a map between a link QTreeWidgetItem and its LinkProperty
+     * @param item as *QTreeWidgetItem
+     * @param property as JointPropertySharedPtr
+     */
+    void mapLinkTreeItemToProperty(QTreeWidgetItem *item, LinkPropertySharedPtr property);
+
+    /**
+     * @brief Get the LinkPropertySharedPtr for a given QTreeWidgetItem.
+     * @param item as a *QTreeWidgetItem
+     * @return a LinkPropertySharedPtr
+     */
+    LinkPropertySharedPtr getLinkPropertyForTreeItem(QTreeWidgetItem *item);
+
+    /**
+     * @brief Add a map between a JointProperty and its joint QTreeWidgetItem.
+     * @param property as a *JointProperty
+     * @param item as a *QTreeWidgetItem
+     */
+    void mapJointPropertyToTreeItem(JointProperty *property, QTreeWidgetItem *item);
+
+    /**
+     * @brief Get the joint QTreeWidgetItem for a given JointProperty.
+     * @param property as a *JointProperty
+     * @return a *QTreeWidgetItem
+     */
+    QTreeWidgetItem * getJointTreeItemForProperty(JointProperty *property);
+
+    /**
+     * @brief Add a map between a LinkProperty and its link QTreeWidgetItem.
+     * @param property as a *LinkProperty
+     * @param item as a *QTreeWidgetItem
+     */
+    void mapLinkPropertyToTreeItem(LinkProperty *property, QTreeWidgetItem *item);
+
+    /**
+     * @brief Get the link QTreeWidgetItem for a given LinkProperty.
+     * @param property as a *JointProperty
+     * @return a *QTreeWidgetItem
+     */
+    QTreeWidgetItem * getLinkTreeItemForProperty(LinkProperty *property);
+
+    /**
+     * @brief This moves all of a QTreeWidgetItem's children to another QTreeWidgetItem.
+     * @param parent as a *QTreeWidgetItem
+     * @param new_parent as a *QTreeWidgetItem
+     */
+    void moveTreeChildren(QTreeWidgetItem *parent, QTreeWidgetItem *new_parent);
+
     boost::shared_ptr<QtTreePropertyBrowser> property_editor_;
     urdf::ModelInterfaceSharedPtr model_;
 
