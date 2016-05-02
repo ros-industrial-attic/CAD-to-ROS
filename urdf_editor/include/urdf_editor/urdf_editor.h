@@ -5,7 +5,6 @@
 
 #include <urdf_editor/property_types.h>
 
-
 namespace Ui
 {
 class URDFEditor;

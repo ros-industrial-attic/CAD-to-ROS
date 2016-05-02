@@ -24,7 +24,7 @@
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <widget class="URDFPropertyTree" name="robotTreeWidget">
+       <widget class="urdf_editor::URDFPropertyTree" name="robotTreeWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -204,7 +204,8 @@
   </action>
   <action name="action_Exit">
    <property name="icon">
-    <iconset theme="application-exit"/>
+    <iconset theme="application-exit">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Exit</string>
@@ -217,9 +218,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>URDFPropertyTree</class>
+   <class>urdf_editor::URDFPropertyTree</class>
    <extends>QTreeWidget</extends>
-   <header>urdf_editor/urdf_property_tree.h</header>
+   <header location="global">urdf_editor/urdf_property_tree.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

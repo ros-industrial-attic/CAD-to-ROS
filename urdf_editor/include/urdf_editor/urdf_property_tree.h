@@ -5,31 +5,117 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QDropEvent>
+#include <QAction>
+#include <QMenu>
+#include <QMap>
 
 #include "urdf_editor/link_property.h"
 #include "urdf_editor/joint_property.h"
+#include "urdf_editor/urdf_property_tree_link_item.h"
+#include "urdf_editor/urdf_property_tree_joint_item.h"
 
-class URDFPropertyTree: public QTreeWidget
+namespace urdf_editor
 {
 
-  Q_OBJECT
+  class URDFPropertyTree: public QTreeWidget
+  {
 
-public:
-  URDFPropertyTree(QWidget *parent);
-  ~URDFPropertyTree() {}
+    Q_OBJECT
 
-private slots:
-  void on_itemPressed(QTreeWidgetItem *item, int column);
+  public:
+    enum ItemType {LinkRoot = 1001, JointRoot =1002, Link=1003, Joint=1004};
 
-signals:
-   void itemDropped(QTreeWidgetItem *);
-   void dragDropEvent(QTreeWidgetItem *drag, QTreeWidgetItem *drop);
+    URDFPropertyTree(QWidget *parent);
+    ~URDFPropertyTree();
 
-private:
-  virtual void dropEvent(QDropEvent * event);
+    bool loadRobotModel(urdf::ModelInterfaceSharedPtr model);
 
-  QTreeWidgetItem *drag_item;
-};
+    urdf::ModelInterfaceSharedPtr getRobotModel();
 
+    QTreeWidgetItem *getSelectedItem();
+
+    bool isJoint(QTreeWidgetItem *item);
+
+    bool isLink(QTreeWidgetItem *item);
+
+    bool isJointRoot(QTreeWidgetItem *item);
+
+    bool isLinkRoot(QTreeWidgetItem *item);
+
+    URDFPropertyTreeLinkItem *asLinkTreeItem(QTreeWidgetItem *item);
+
+    URDFPropertyTreeJointItem *asJointTreeItem(QTreeWidgetItem *item);
+
+    void clear();
+
+  private slots:
+    void on_itemPressed(QTreeWidgetItem *item, int column);
+    void on_addActionTriggered();
+    void on_removeActionTriggered();
+    void on_expandActionTriggered();
+    void on_collapseActionTriggered();
+    void on_contextMenuRequested(const QPoint &pos);
+    void on_jointNameChanged(URDFPropertyTreeJointItem *joint);
+    void on_jointParentLinkChanged(URDFPropertyTreeJointItem *joint);
+    void on_linkNameChanged(URDFPropertyTreeLinkItem *link);
+
+  signals:
+    void propertyValueChanged();
+    void linkAddition();
+    void linkDeletion();
+    void jointAddition();
+    void jointDeletion();
+
+  private:
+    virtual void dropEvent(QDropEvent * event);
+    void initialize();
+    void createActions();
+    void createMenus();
+
+    bool populateFromRobotModel();
+    void addItemRecursively(urdf::LinkSharedPtr link, QTreeWidgetItem* parent);
+    void addItemRecursively(urdf::JointSharedPtr joint, QTreeWidgetItem* parent);
+
+    urdf::LinkSharedPtr addModelLink();
+    URDFPropertyTreeLinkItem* addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link);
+    void removeModelLink(urdf::LinkSharedPtr link);
+    void removeLinkTreeItem(QTreeWidgetItem *item);
+
+    urdf::JointSharedPtr addModelJoint(QString child_link_name);
+    URDFPropertyTreeJointItem* addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint);
+    void removeModelJoint(urdf::JointSharedPtr joint);
+    void removeJointTreeItem(QTreeWidgetItem *item);
+
+    QString getValidName(QString prefix, QStringList &current_names);
+
+    /*! Set expanded value for item and all its children (recursively) */
+    void setExpandedRecursive(QTreeWidgetItem *item, bool expanded);
+
+    /**
+     * @brief This moves all of a QTreeWidgetItem's children to another QTreeWidgetItem.
+     * @param parent as a *QTreeWidgetItem
+     * @param new_parent as a *QTreeWidgetItem
+     */
+    void moveTreeChildren(QTreeWidgetItem *parent, QTreeWidgetItem *new_parent);
+
+    urdf::ModelInterfaceSharedPtr model_;
+
+    QTreeWidgetItem *root_;
+    QTreeWidgetItem *link_root_;
+    QTreeWidgetItem *joint_root_;
+    QTreeWidgetItem *drag_item_;
+
+    QStringList joint_names_;
+    QStringList link_names_;
+    QMap<QString, URDFPropertyTreeLinkItem*> links_;
+    QMap<QString, URDFPropertyTreeJointItem*> joints_;
+
+    QMenu *context_menu_;
+    QAction *add_action_;
+    QAction *remove_action_;
+    QAction *expand_action_;
+    QAction *collapse_action_;
+  };
+}
 
 #endif // URDF_PROPERTY_TREE_H

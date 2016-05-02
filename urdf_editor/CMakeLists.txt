@@ -37,6 +37,8 @@ set(editor_SRCS
   src/origin_property.cpp
   src/urdf_property.cpp
   src/urdf_property_tree.cpp
+  src/urdf_property_tree_link_item.cpp
+  src/urdf_property_tree_joint_item.cpp
 )
 
 set(editor_HDRS
@@ -60,6 +62,8 @@ set(editor_HDRS
   include/urdf_editor/origin_property.h
   include/urdf_editor/urdf_property.h
   include/urdf_editor/urdf_property_tree.h
+  include/urdf_editor/urdf_property_tree_link_item.h
+  include/urdf_editor/urdf_property_tree_joint_item.h
 )
 
 set(editor_UIS
