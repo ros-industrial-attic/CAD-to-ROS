@@ -55,9 +55,9 @@ namespace urdf_editor
     void on_expandActionTriggered();
     void on_collapseActionTriggered();
     void on_contextMenuRequested(const QPoint &pos);
-    void on_jointNameChanged(URDFPropertyTreeJointItem *joint);
+    void on_jointNameChanged(URDFPropertyTreeJointItem *joint, QString current_name, QString new_name);
     void on_jointParentLinkChanged(URDFPropertyTreeJointItem *joint);
-    void on_linkNameChanged(URDFPropertyTreeLinkItem *link);
+    void on_linkNameChanged(URDFPropertyTreeLinkItem *link, QString current_name, QString new_name);
 
   signals:
     void propertyValueChanged();
@@ -97,6 +97,12 @@ namespace urdf_editor
      * @param new_parent as a *QTreeWidgetItem
      */
     void moveTreeChildren(QTreeWidgetItem *parent, QTreeWidgetItem *new_parent);
+
+    void addMapping(URDFPropertyTreeLinkItem *item);
+    void addMapping(URDFPropertyTreeJointItem *item);
+    void removeMapping(URDFPropertyTreeLinkItem *item);
+    void removeMapping(URDFPropertyTreeJointItem *item);
+
 
     urdf::ModelInterfaceSharedPtr model_;
 

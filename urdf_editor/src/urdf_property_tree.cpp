@@ -247,13 +247,13 @@ namespace urdf_editor
   URDFPropertyTreeLinkItem* URDFPropertyTree::addLinkTreeItem(QTreeWidgetItem *parent, urdf::LinkSharedPtr link)
   {
     URDFPropertyTreeLinkItem* item = new URDFPropertyTreeLinkItem(link, link_names_);
-    connect(item, SIGNAL(linkNameChanged(URDFPropertyTreeLinkItem*)),
-            this, SLOT(on_linkNameChanged(URDFPropertyTreeLinkItem*)));
+    connect(item, SIGNAL(linkNameChanged(URDFPropertyTreeLinkItem*, QString, QString)),
+            this, SLOT(on_linkNameChanged(URDFPropertyTreeLinkItem*, QString, QString)));
     connect(item, SIGNAL(valueChanged()), this, SIGNAL(propertyValueChanged()));
 
     // Map link name to tree widget item
-    links_.insert(QString::fromStdString(link->name), item);
-    link_names_.append(QString::fromStdString(link->name));
+    addMapping(item);
+    link_names_.append(item->getName());
 
     parent->addChild(item);
     parent->setExpanded(true);
@@ -269,8 +269,8 @@ namespace urdf_editor
   {
     URDFPropertyTreeLinkItem *link = asLinkTreeItem(item);
     // Remove mapping between link name and tree widget item.
-    links_.remove(QString::fromStdString(link->getData()->name));
-    link_names_.removeOne(QString::fromStdString(link->getData()->name));
+    removeMapping(link);
+    link_names_.removeOne(link->getName());
 
     QTreeWidgetItem *parent = link->parent();
     moveTreeChildren(item, parent);
@@ -294,20 +294,20 @@ namespace urdf_editor
     if (isJointRoot(parent))
       joint->parent_link_name = model_->getRoot()->name;
     else
-      joint->parent_link_name = asJointTreeItem(parent)->getPropertyData()->getChildLinkName().toStdString();
+      joint->parent_link_name = asJointTreeItem(parent)->getChildLinkName().toStdString();
 
     URDFPropertyTreeJointItem* item = new URDFPropertyTreeJointItem(joint, link_names_, joint_names_);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    connect(item, SIGNAL(jointNameChanged(URDFPropertyTreeJointItem*)),
-            this, SLOT(on_jointNameChanged(URDFPropertyTreeJointItem*)));
+    connect(item, SIGNAL(jointNameChanged(URDFPropertyTreeJointItem*, QString, QString)),
+            this, SLOT(on_jointNameChanged(URDFPropertyTreeJointItem*, QString, QString)));
     connect(item, SIGNAL(parentLinkChanged(URDFPropertyTreeJointItem*)),
             this, SLOT(on_jointParentLinkChanged(URDFPropertyTreeJointItem*)));
     connect(item, SIGNAL(valueChanged()), this, SIGNAL(propertyValueChanged()));
 
     // Map link name to tree widget item
-    joints_.insert(QString::fromStdString(joint->name), item);
-    joint_names_.append(QString::fromStdString(joint->name));
+    addMapping(item);
+    joint_names_.append(item->getName());
 
     parent->addChild(item);
     parent->setExpanded(true);
@@ -322,11 +322,11 @@ namespace urdf_editor
   void URDFPropertyTree::removeJointTreeItem(QTreeWidgetItem *item)
   {
     URDFPropertyTreeJointItem* joint = asJointTreeItem(item);
-    QString newParentName = joint->getPropertyData()->getParentLinkName();
+    QString newParentName = joint->getParentLinkName();
 
     // Remove mapping between joint name and tree widget item.
-    links_.remove(QString::fromStdString(joint->getData()->name));
-    joint_names_.removeOne(QString::fromStdString(joint->getData()->name));
+    removeMapping(joint);
+    joint_names_.removeOne(joint->getName());
 
     // If it is trying to set the parent to a link that does not exits,
     // set the parent to the firts link in the chain. This should only
@@ -338,7 +338,7 @@ namespace urdf_editor
 
     for (int i=0; i < item->childCount(); i++)
     {
-      asJointTreeItem(item->child(i))->getPropertyData()->setParentLinkName(newParentName);
+      asJointTreeItem(item->child(i))->setParentLinkName(newParentName);
     }
 
     parent->removeChild(item);
@@ -377,8 +377,7 @@ namespace urdf_editor
   void URDFPropertyTree::on_addActionTriggered()
   {
     QTreeWidgetItem *sel = getSelectedItem();
-    urdf::LinkSharedPtr link = addModelLink();
-    URDFPropertyTreeLinkItem *new_link = addLinkTreeItem(sel, link);
+    URDFPropertyTreeLinkItem *new_link = addLinkTreeItem(sel, addModelLink());
     emit linkAddition();
 
     if (link_names_.count() > 2 && !isLinkRoot(sel->parent()))
@@ -386,14 +385,14 @@ namespace urdf_editor
       URDFPropertyTreeLinkItem *sel_link = asLinkTreeItem(sel);
       URDFPropertyTreeJointItem *parent = sel_link->getAssignedJoint();
 
-      urdf::JointSharedPtr joint = addModelJoint(QString::fromStdString(link->name));
+      urdf::JointSharedPtr joint = addModelJoint(new_link->getName());
       URDFPropertyTreeJointItem *new_joint = addJointTreeItem(parent, joint);
       new_link->assignJoint(new_joint);
       emit jointAddition();
     }
     else if (link_names_.count() == 2 || isLinkRoot(sel->parent()))
     {
-      urdf::JointSharedPtr joint = addModelJoint(QString::fromStdString(link->name));
+      urdf::JointSharedPtr joint = addModelJoint(new_link->getName());
       URDFPropertyTreeJointItem *new_joint = addJointTreeItem(joint_root_, joint);
       new_link->assignJoint(new_joint);
       emit jointAddition();
@@ -450,15 +449,19 @@ namespace urdf_editor
     context_menu_->exec(mapToGlobal(pos));
   }
 
-  void URDFPropertyTree::on_jointNameChanged(URDFPropertyTreeJointItem *joint)
+  void URDFPropertyTree::on_jointNameChanged(URDFPropertyTreeJointItem *joint, QString current_name, QString new_name)
   {
-    Q_UNUSED(joint)
+    joints_.remove(current_name);
+    addMapping(joint);
+
+    int idx = joint_names_.indexOf(current_name);
+    joint_names_.replace(idx, new_name);
   }
 
   void URDFPropertyTree::on_jointParentLinkChanged(URDFPropertyTreeJointItem *joint)
   {
-    URDFPropertyTreeLinkItem *parent_link = links_[joint->getPropertyData()->getParentLinkName()];
-    URDFPropertyTreeLinkItem *child_link = links_[joint->getPropertyData()->getChildLinkName()];
+    URDFPropertyTreeLinkItem *parent_link = links_[joint->getParentLinkName()];
+    URDFPropertyTreeLinkItem *child_link = links_[joint->getChildLinkName()];
     QTreeWidgetItem *newParent;
 
     // if a parent joint does not exist (in the case of the first link),
@@ -476,9 +479,13 @@ namespace urdf_editor
     parent_link->addChild(take);
   }
 
-  void URDFPropertyTree::on_linkNameChanged(URDFPropertyTreeLinkItem *link)
+  void URDFPropertyTree::on_linkNameChanged(URDFPropertyTreeLinkItem *link, QString current_name, QString new_name)
   {
-    Q_UNUSED(link)
+    links_.remove(current_name);
+    addMapping(link);
+
+    int idx = link_names_.indexOf(current_name);
+    link_names_.replace(idx, new_name);
   }
 
   void URDFPropertyTree::dropEvent(QDropEvent * event)
@@ -504,8 +511,28 @@ namespace urdf_editor
     }
 
     if (isLink(drag_item_) && isLink(drop_item))
-      asLinkTreeItem(drag_item_)->getAssignedJoint()->getPropertyData()->setParentLinkName(drop_item->text(0));
+      asLinkTreeItem(drag_item_)->getAssignedJoint()->setParentLinkName(asLinkTreeItem(drop_item)->getName());
 
     drop_item->setExpanded(true);
+  }
+
+  void URDFPropertyTree::addMapping(URDFPropertyTreeLinkItem *item)
+  {
+    links_.insert(item->getName(), item);
+  }
+
+  void URDFPropertyTree::addMapping(URDFPropertyTreeJointItem *item)
+  {
+    joints_.insert(item->getName(), item);
+  }
+
+  void URDFPropertyTree::removeMapping(URDFPropertyTreeLinkItem *item)
+  {
+    links_.remove(item->getName());
+  }
+
+  void URDFPropertyTree::removeMapping(URDFPropertyTreeJointItem *item)
+  {
+    joints_.remove(item->getName());
   }
 }

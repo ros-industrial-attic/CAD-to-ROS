@@ -19,8 +19,15 @@ namespace urdf_editor
     ~URDFPropertyTreeJointItem() {}
 
     QTreeWidgetItem *parent() const;
-    JointPropertySharedPtr getPropertyData();
+
+    QString getName();
+    QString getParentLinkName();
+    QString getChildLinkName();
+    void setParentLinkName(QString name);
+    void setChildLinkName(QString name);
     urdf::JointSharedPtr getData();
+    JointPropertySharedPtr getProperty(); // this method should be removed once the property menu is moved to their respected propery class.
+    void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
   private slots:
     void on_jointNameChanged(JointProperty *joint, const QVariant &val);
@@ -29,10 +36,13 @@ namespace urdf_editor
 
   signals:
     void valueChanged();
-    void jointNameChanged(URDFPropertyTreeJointItem *joint);
+    void jointNameChanged(URDFPropertyTreeJointItem *joint, QString current_name, QString new_name);
     void parentLinkChanged(URDFPropertyTreeJointItem *joint);
 
   private:
+    void updateDisplayText();
+
+    QString name_;
     urdf::JointSharedPtr joint_;
     QStringList &link_names_;
     QStringList &joint_names_;

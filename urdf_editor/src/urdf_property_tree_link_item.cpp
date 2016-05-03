@@ -12,11 +12,12 @@ namespace urdf_editor
     link_(link),
     link_names_(link_names),
     property_(new LinkProperty(link)),
-    assigned_joint_(NULL)
+    assigned_joint_(NULL),
+    name_(QString::fromStdString(link->name))
   {
-    setText(0, QString::fromStdString(link_->name));
-    LinkProperty *test = new LinkProperty(link);
-    QObject::connect(test, SIGNAL(linkNameChanged(LinkProperty*,QVariant)),
+    updateDisplayText();
+
+    QObject::connect(property_.get(), SIGNAL(linkNameChanged(LinkProperty*,QVariant)),
               this, SLOT(on_linkNameChanged(LinkProperty*,QVariant)));
 
     QObject::connect(property_.get(), SIGNAL(valueChanged()),
@@ -28,9 +29,9 @@ namespace urdf_editor
     QTreeWidgetItem::parent();
   }
 
-  LinkPropertySharedPtr URDFPropertyTreeLinkItem::getPropertyData()
+  QString URDFPropertyTreeLinkItem::getName()
   {
-    return property_;
+    return name_;
   }
 
   urdf::LinkSharedPtr URDFPropertyTreeLinkItem::getData()
@@ -38,9 +39,22 @@ namespace urdf_editor
     return link_;
   }
 
+  LinkPropertySharedPtr URDFPropertyTreeLinkItem::getProperty()
+  {
+    return property_;
+  }
+
+  void URDFPropertyTreeLinkItem::loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor)
+  {
+    property_->loadProperty(property_editor);
+  }
+
   void URDFPropertyTreeLinkItem::assignJoint(URDFPropertyTreeJointItem *joint)
   {
     assigned_joint_ = joint;
+
+    //Should we be keeping all data within the urdf::Link up to date?
+    link_->parent_joint = assigned_joint_->getData();
   }
 
   URDFPropertyTreeJointItem *URDFPropertyTreeLinkItem::getAssignedJoint()
@@ -56,16 +70,20 @@ namespace urdf_editor
     return (assigned_joint_ == NULL ? false : true);
   }
 
+  void URDFPropertyTreeLinkItem::updateDisplayText()
+  {
+    setText(0, name_);
+  }
+
   void URDFPropertyTreeLinkItem::on_linkNameChanged(LinkProperty *link, const QVariant &val)
   {
     Q_UNUSED(link)
-    QString current_name = text(0);
-    QString new_name = val.toString();
-    setText(0, new_name);
+    QString current_name = name_;
+    name_ = val.toString();
 
-    int idx = link_names_.indexOf(current_name);
-    link_names_.replace(idx, new_name);
-    emit linkNameChanged(this);
+    updateDisplayText();
+
+    emit linkNameChanged(this, current_name, name_);
   }
 
   void URDFPropertyTreeLinkItem::on_valueChanged()

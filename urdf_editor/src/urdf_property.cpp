@@ -56,12 +56,16 @@ namespace urdf_editor
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
 
     connect(tree_widget_, SIGNAL(jointAddition()), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(jointAddition()), SLOT(on_propertyWidget_valueChanged()));
 
     connect(tree_widget_, SIGNAL(jointDeletion()), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(jointDeletion()), SLOT(on_propertyWidget_valueChanged()));
 
     connect(tree_widget_, SIGNAL(linkAddition()), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(linkAddition()), SLOT(on_propertyWidget_valueChanged()));
 
     connect(tree_widget_, SIGNAL(linkDeletion()), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(linkDeletion()), SLOT(on_propertyWidget_valueChanged()));
 
     // No changes to be saved, yet
     unsavedChanges = false;
@@ -104,12 +108,12 @@ namespace urdf_editor
   {
     if (tree_widget_->isLink(item))
     {
-      dynamic_cast<URDFPropertyTreeLinkItem *>(item)->getPropertyData()->loadProperty(property_editor_);
+      tree_widget_->asLinkTreeItem(item)->loadProperty(property_editor_);
     }
     else if (tree_widget_->isJoint(item))
     {
       //need to pass a list of available child links
-      dynamic_cast<URDFPropertyTreeJointItem *>(item)->getPropertyData()->loadProperty(property_editor_);
+      tree_widget_->asJointTreeItem(item)->loadProperty(property_editor_);
     }
     else
     {
@@ -130,7 +134,7 @@ namespace urdf_editor
     {
        qDebug() << QString("The member ctree_to_joint_property_  contains the link %1").arg(selt->text(0));
        
-       JointPropertySharedPtr activeJoint = dynamic_cast<URDFPropertyTreeJointItem*>(selt)->getPropertyData();
+       JointPropertySharedPtr activeJoint = tree_widget_->asJointTreeItem(selt)->getProperty();
        QMenu menu(property_editor_.get());
        
        
@@ -251,7 +255,7 @@ namespace urdf_editor
     
     if (tree_widget_->isLink(selt))
     {
-      LinkPropertySharedPtr activeLink = dynamic_cast<URDFPropertyTreeLinkItem*>(selt)->getPropertyData();
+      LinkPropertySharedPtr activeLink = tree_widget_->asLinkTreeItem(selt)->getProperty();
       QMenu menu(property_editor_.get());
   
       // user right-clicked a 'Name' property entry: show 'Inertial', 'Visual'
