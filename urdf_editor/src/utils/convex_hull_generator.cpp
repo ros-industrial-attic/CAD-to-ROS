@@ -3,7 +3,6 @@
 #include <ros/console.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/surface/convex_hull.h>
-#include <cexport.h>
 #include <boost/algorithm/string.hpp>
 #include <string>
 
