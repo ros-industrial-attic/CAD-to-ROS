@@ -741,9 +741,21 @@ namespace urdf_editor
 
   void URDFProperty::on_propertyWidget_jointValueChanged(JointProperty *property)
   {
-    rviz_widget_->loadRobot(model_);
+    if (!rviz_widget_->loadRobot(model_))
+    {
+        ROS_WARN("Model is invalid, skipping TF transformer and fixed frame update.");
+        return;
+    }
+
+    // make sure we only update if the model has an actual root link
+    if (model_->getRoot() == NULL)
+    {
+        ROS_WARN("Model has no root link, skipping TF transformer and fixed frame update.");
+        return;
+    }
 
     tf_transformer_->updateLink(property);
+
     // update Rviz base link in the event that root has changed
     rviz_widget_->updateBaseLink(model_->getRoot()->name);
   }
