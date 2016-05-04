@@ -1,12 +1,10 @@
-#ifndef URDF_PROPERTY_TREE_JOINT_ITEM_H
-#define URDF_PROPERTY_TREE_JOINT_ITEM_H
+#ifndef __URDF_PROPERTY_TREE_JOINT_ITEM_H__
+#define __URDF_PROPERTY_TREE_JOINT_ITEM_H__
 
 #include <QTreeWidgetItem>
-#include <QVariant>
-
-#include "urdf_editor/urdf_types.h"
-#include "urdf_editor/property_types.h"
-#include "urdf_editor/joint_property.h"
+#include <urdf_editor/urdf_types.h>
+#include <urdf_editor/property_types.h>
+#include <urdf_editor/joint_property.h>
 
 namespace urdf_editor
 {
@@ -16,7 +14,7 @@ namespace urdf_editor
     Q_OBJECT
   public:
     explicit URDFPropertyTreeJointItem(urdf::JointSharedPtr joint, QStringList &link_names, QStringList &joint_names);
-    ~URDFPropertyTreeJointItem() {}
+    virtual ~URDFPropertyTreeJointItem() {}
 
     QTreeWidgetItem *parent() const;
 
@@ -51,4 +49,4 @@ namespace urdf_editor
   };
 }
 
-#endif // URDF_PROPERTY_TREE_JOINT_ITEM_H
+#endif // __URDF_PROPERTY_TREE_JOINT_ITEM_H__

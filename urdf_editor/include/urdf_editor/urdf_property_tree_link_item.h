@@ -1,13 +1,11 @@
-#ifndef URDF_PROPERTY_TREE_LINK_ITEM_H
-#define URDF_PROPERTY_TREE_LINK_ITEM_H
+#ifndef __URDF_PROPERTY_TREE_LINK_ITEM_H__
+#define __URDF_PROPERTY_TREE_LINK_ITEM_H__
 
 #include <QTreeWidgetItem>
-#include <QVariant>
-
-#include "urdf_editor/urdf_types.h"
-#include "urdf_editor/property_types.h"
-#include "urdf_editor/link_property.h"
-#include "urdf_editor/urdf_property_tree_joint_item.h"
+#include <urdf_editor/urdf_types.h>
+#include <urdf_editor/property_types.h>
+#include <urdf_editor/link_property.h>
+#include <urdf_editor/urdf_property_tree_joint_item.h>
 
 namespace urdf_editor
 {
@@ -16,7 +14,7 @@ namespace urdf_editor
     Q_OBJECT
   public:
     explicit URDFPropertyTreeLinkItem(urdf::LinkSharedPtr link, QStringList &link_names);
-    ~URDFPropertyTreeLinkItem() {}
+    virtual ~URDFPropertyTreeLinkItem() {}
 
     QTreeWidgetItem *parent() const;
 
@@ -26,6 +24,7 @@ namespace urdf_editor
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
     void assignJoint(URDFPropertyTreeJointItem *joint);
+    void unassignJoint();
     URDFPropertyTreeJointItem *getAssignedJoint();
     bool hasAssignedJoint();
 
@@ -49,4 +48,4 @@ namespace urdf_editor
   };
 }
 
-#endif // URDF_PROPERTY_TREE_LINK_ITEM_H
+#endif // __URDF_PROPERTY_TREE_LINK_ITEM_H__

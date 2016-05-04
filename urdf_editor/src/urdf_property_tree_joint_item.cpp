@@ -1,7 +1,9 @@
-#include "urdf_editor/urdf_property_tree_joint_item.h"
-#include "urdf_editor/joint_property.h"
-#include "urdf/model.h"
-#include "urdf_editor/urdf_property_tree.h"
+#include <QVariant>
+
+#include <urdf_editor/urdf_property_tree_joint_item.h>
+#include <urdf_editor/joint_property.h>
+#include <urdf/model.h>
+#include <urdf_editor/urdf_property_tree.h>
 
 namespace urdf_editor
 {

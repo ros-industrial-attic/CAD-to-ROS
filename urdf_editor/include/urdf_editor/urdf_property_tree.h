@@ -1,18 +1,10 @@
-#ifndef URDF_PROPERTY_TREE_H
-#define URDF_PROPERTY_TREE_H
+#ifndef __URDF_PROPERTY_TREE_H__
+#define __URDF_PROPERTY_TREE_H__
 
-#include <QApplication>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QDropEvent>
-#include <QAction>
-#include <QMenu>
-#include <QMap>
-
-#include "urdf_editor/link_property.h"
-#include "urdf_editor/joint_property.h"
-#include "urdf_editor/urdf_property_tree_link_item.h"
-#include "urdf_editor/urdf_property_tree_joint_item.h"
+#include <urdf_editor/link_property.h>
+#include <urdf_editor/joint_property.h>
+#include <urdf_editor/urdf_property_tree_link_item.h>
+#include <urdf_editor/urdf_property_tree_joint_item.h>
 
 namespace urdf_editor
 {
@@ -23,10 +15,10 @@ namespace urdf_editor
     Q_OBJECT
 
   public:
-    enum ItemType {LinkRoot = 1001, JointRoot =1002, Link=1003, Joint=1004};
+    enum ItemType {LinkRoot = 1001, JointRoot = 1002, Link = 1003, Joint = 1004};
 
     URDFPropertyTree(QWidget *parent);
-    ~URDFPropertyTree();
+    virtual ~URDFPropertyTree();
 
     bool loadRobotModel(urdf::ModelInterfaceSharedPtr model);
 
@@ -86,7 +78,7 @@ namespace urdf_editor
     void removeModelJoint(urdf::JointSharedPtr joint);
     void removeJointTreeItem(QTreeWidgetItem *item);
 
-    QString getValidName(QString prefix, QStringList &current_names);
+    QString getValidName(QString prefix, QStringList &current_names, unsigned int &counter);
 
     /*! Set expanded value for item and all its children (recursively) */
     void setExpandedRecursive(QTreeWidgetItem *item, bool expanded);
@@ -113,6 +105,8 @@ namespace urdf_editor
 
     QStringList joint_names_;
     QStringList link_names_;
+    unsigned int joint_counter_;
+    unsigned int link_counter_;
     QMap<QString, URDFPropertyTreeLinkItem*> links_;
     QMap<QString, URDFPropertyTreeJointItem*> joints_;
 
@@ -124,4 +118,4 @@ namespace urdf_editor
   };
 }
 
-#endif // URDF_PROPERTY_TREE_H
+#endif // __URDF_PROPERTY_TREE_H__

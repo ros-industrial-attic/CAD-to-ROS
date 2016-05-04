@@ -1,8 +1,10 @@
-#include "urdf_editor/urdf_property_tree_link_item.h"
-#include "urdf_editor/link_property.h"
-#include "urdf/model.h"
-#include "urdf_editor/urdf_property_tree.h"
-#include "ros/ros.h"
+#include <QVariant>
+
+#include <urdf_editor/urdf_property_tree_link_item.h>
+#include <urdf_editor/link_property.h>
+#include <urdf/model.h>
+#include <urdf_editor/urdf_property_tree.h>
+#include <ros/ros.h>
 
 namespace urdf_editor
 {
@@ -55,6 +57,12 @@ namespace urdf_editor
 
     //Should we be keeping all data within the urdf::Link up to date?
     link_->parent_joint = assigned_joint_->getData();
+  }
+
+  void URDFPropertyTreeLinkItem::unassignJoint()
+  {
+    assigned_joint_ = NULL;
+    link_->parent_joint.reset();
   }
 
   URDFPropertyTreeJointItem *URDFPropertyTreeLinkItem::getAssignedJoint()
