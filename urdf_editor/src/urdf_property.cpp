@@ -246,8 +246,7 @@ namespace urdf_editor
       {
           bool base_exist = link_names_.contains("base", Qt::CaseSensitive);
           bool tool0_exist = link_names_.contains("tool0", Qt::CaseSensitive);
-          bool TCP_exist = link_names_.contains("TCP", Qt::CaseSensitive);
-          if (!base_exist || !tool0_exist || !TCP_exist)
+          if (!base_exist || !tool0_exist)
           {
               menu->addSeparator();
               QMenu *convertMenu = menu->addMenu("Convert to");
@@ -258,10 +257,6 @@ namespace urdf_editor
               if (!tool0_exist)
               {
                   convertMenu->addAction("tool0");
-              }
-              if (!TCP_exist)
-              {
-                  convertMenu->addAction("TCP");
               }
           }
       }
@@ -299,21 +294,6 @@ namespace urdf_editor
             new_link->name = "base";
             model_->links_.insert(std::make_pair("base", new_link));
             addLinkProperty(new_link);
-        }
-        else if (selected_item->text() == "TCP")
-        {
-            // Add TCP link
-            link_names_.removeOne(sel->text(0));
-            link_root_->removeChild(sel);
-            boost::shared_ptr<urdf::Link> new_link(new urdf::Link());
-            new_link->name = "TCP";
-            model_->links_.insert(std::make_pair("TCP", new_link));
-            addLinkProperty(new_link);
-            // Add Joint which has TCP as a child and has origin property
-            addJoint(joint_root_);
-            JointPropertyPtr targetJoint = ctree_to_joint_property_[joint_root_->child(0)];
-            targetJoint->createOriginProperty();
-            targetJoint->loadProperty(property_editor_);
         }
         else
         {
@@ -363,7 +343,7 @@ namespace urdf_editor
     if (ctree_to_joint_property_.contains(selt))
     {
        qDebug() << QString("The member ctree_to_joint_property_  contains the link %1").arg(selt->text(0));
-
+       
        JointPropertyPtr activeJoint = ctree_to_joint_property_[selt];
        QMenu menu(property_editor_.get());
        
