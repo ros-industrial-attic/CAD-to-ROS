@@ -3,6 +3,7 @@
 
 #include <qttreepropertybrowser.h>
 #include <qtvariantproperty.h>
+
 #include <urdf_model/link.h>
 
 #include <urdf_editor/link_collision_property.h>

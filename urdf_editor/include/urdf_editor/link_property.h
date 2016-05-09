@@ -2,6 +2,7 @@
 #define __LINK_PROPERTY_H__
 
 #include <QtCore>
+
 #include <urdf_editor/common.h>
 #include <urdf_editor/property_types.h>
 #include <urdf_editor/qt_types.h>
