@@ -58,6 +58,7 @@ namespace urdf_editor
   signals:
     void linkNameChanged(LinkProperty *property, const QVariant &val);
     void valueChanged(LinkProperty *property);
+    void linkVisibilityChanged(const QString &link_name, const bool &val);
 
   private:
     urdf::LinkSharedPtr link_;
@@ -69,6 +70,7 @@ namespace urdf_editor
     LinkVisualPropertySharedPtr visual_property_; // this needs to be array since multiple visuals models are allowed.
     LinkCollisionPropertySharedPtr collision_property_; // this needs to be array since multiple collisions models are allowed.
     QtVariantProperty *name_item_;
+    QtVariantProperty *visibility_item_;
   };
 }
 

@@ -274,6 +274,8 @@ namespace urdf_editor
             this, SLOT(on_linkNameChanged(LinkProperty*, QString, QString)));
     connect(item, SIGNAL(valueChanged(LinkProperty*)), this, SIGNAL(linkValueChanged(LinkProperty*)));
     connect(item, SIGNAL(valueChanged(LinkProperty*)), this, SIGNAL(valueChanged()));
+    connect(item, SIGNAL(linkVisibilityChanged(const QString&, const bool&)),
+              this, SIGNAL(linkVisibilityChanged(const QString&, const bool&)));
 
     // Map link name to tree widget item
     addMapping(item);

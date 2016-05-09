@@ -25,6 +25,9 @@ namespace urdf_editor
     //top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Link Properties"));
 
     name_item_ = manager_->addProperty(QVariant::String, tr("Name"));
+    visibility_item_ = manager_->addProperty(QVariant::Bool, tr("Show in Editor"));
+    // all links start visible
+    visibility_item_->setValue(true);
 
     if (link_->inertial)
     {
@@ -64,6 +67,8 @@ namespace urdf_editor
   {
     loading_ = true;
     name_item_->setValue(QString::fromStdString(link_->name));
+    // link visibility checkbox state is already persisted for us, no need
+    // to update it manually
 
     if (inertial_property_)
       inertial_property_->loadData();
@@ -83,6 +88,7 @@ namespace urdf_editor
     property_editor->clear();
     property_editor->setFactoryForManager(manager_, factory_);
     property_editor->addProperty(name_item_);
+    property_editor->addProperty(visibility_item_);
 
     if (inertial_property_)
     {
@@ -224,6 +230,16 @@ namespace urdf_editor
 
       emit LinkProperty::linkNameChanged(this, val);
     }
+
+    if (name == "Show in Editor")
+    {
+      // broadcast state change
+      emit LinkProperty::linkVisibilityChanged(QString(link_->name.c_str()), val.toBool());
+
+      // stop event: not a real property, so don't need to bubble up.
+      return;
+    }
+
     emit LinkProperty::valueChanged(this);
   }
 

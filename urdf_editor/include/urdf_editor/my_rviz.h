@@ -35,7 +35,7 @@ namespace urdf_editor
 
     bool clear();
 
-  public Q_SLOTS:
+  public slots:
     /**
      * @brief Turns the robot model visual-model components on/off
      * @param If True, turns visual display on. If False, turns visual display off.
@@ -47,6 +47,8 @@ namespace urdf_editor
      * @param If True, turns collision display on. If False, turns collision display off.
      */
     void enableCollisionVisualization(bool b);
+
+    void onLinkVisibilityChanged(const QString &, const bool &);
 
   private:
     rviz::VisualizationManager *manager_;

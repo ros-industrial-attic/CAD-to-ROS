@@ -64,6 +64,9 @@ namespace urdf_editor
     connect(tree_widget_, SIGNAL(linkValueChanged(LinkProperty*)),
             this, SLOT(on_propertyWidget_linkValueChanged(LinkProperty*)));
 
+    connect(tree_widget_, SIGNAL(linkVisibilityChanged(const QString&, const bool&)),
+              rviz_widget_, SLOT(onLinkVisibilityChanged(const QString&, const bool&)));
+
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
 

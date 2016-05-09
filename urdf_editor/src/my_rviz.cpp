@@ -92,4 +92,12 @@ namespace urdf_editor
     robot_display_->subProp("Collision Enabled")->setValue (b ? "true" : "false");
   }
 
+  void MyRviz::onLinkVisibilityChanged(const QString& link_name, const bool& value)
+  {
+    // TODO: this assumes that 'link_name' exists and is a sub property of the
+    //       robot_display. rviz::Property::subProp(..) cannot fail (it returns
+    //       the FailureProperty instance if a property doesn't exist), but
+    //       doing our own checking is probably nicer.
+    robot_display_->subProp("Links")->subProp(link_name)->setValue(value);
+  }
 }

@@ -35,6 +35,7 @@ namespace urdf_editor
   signals:
     void valueChanged(LinkProperty *property);
     void linkNameChanged(LinkProperty *property, QString current_name, QString new_name);
+    void linkVisibilityChanged(const QString &link_name, const bool &val);
 
   private:
     void updateDisplayText();

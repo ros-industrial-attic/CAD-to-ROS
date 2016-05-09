@@ -62,6 +62,7 @@ namespace urdf_editor
     void linkAddition(LinkProperty *property);
     void linkDeletion();
     void linkValueChanged(LinkProperty *property);
+    void linkVisibilityChanged(const QString &link_name, const bool &val);
 
     // Joint SIGNALS
     void jointAddition(JointProperty *property);

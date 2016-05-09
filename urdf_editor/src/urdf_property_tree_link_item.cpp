@@ -24,6 +24,9 @@ namespace urdf_editor
 
     QObject::connect(property_.get(), SIGNAL(valueChanged(LinkProperty*)),
               this, SLOT(on_valueChanged(LinkProperty*)));
+
+    QObject::connect(property_.get(), SIGNAL(linkVisibilityChanged(const QString&, const bool&)),
+              this, SIGNAL(linkVisibilityChanged(const QString&, const bool&)));
   }
 
   QTreeWidgetItem *URDFPropertyTreeLinkItem::parent() const
