@@ -110,6 +110,7 @@ void URDFTransformer::updateLink(const std::string parent, const std::string chi
   else
   {
     geometry_msgs::TransformStamped new_frame;
+
     new_frame.header.frame_id = parent;
     new_frame.child_frame_id = child;
     frames_.transforms.push_back(new_frame);
@@ -124,17 +125,36 @@ void URDFTransformer::updateLink(const std::string parent, const std::string chi
 
 void URDFTransformer::updateLink(const std::string parent, const std::string child, const geometry_msgs::Quaternion quat)
 {
+  // check for NaN's
+  if(isnan(quat.x) || isnan(quat.y) || isnan(quat.z) || isnan(quat.w) )
+  {
+    return;
+  }
+
+  // Normalize quaternion to make sure tranform is valid
+  tf::Quaternion test;
+  geometry_msgs::Quaternion quat_norm = quat;
+  if(quat_norm.x == 0 && quat_norm.y == 0 && quat_norm.z == 0 && quat_norm.w == 0)
+  {
+    quat_norm.w = 1;
+  }
+
+  tf::quaternionMsgToTF(quat_norm, test);
+  test.normalize();
+  tf::quaternionTFToMsg(test, quat_norm);
+
+  // Find and set transform data
   boost::lock_guard<boost::mutex> lock(data_lock_);
   int index = findLink(parent, child);
 
   if (index >= 0 && index < frames_.transforms.size())
   {
-    frames_.transforms[index].transform.rotation = quat;
+    frames_.transforms[index].transform.rotation = quat_norm;
   }
   else
   {
     geometry_msgs::TransformStamped new_frame;
-    new_frame.transform.rotation = quat;
+    new_frame.transform.rotation = quat_norm;
     new_frame.header.frame_id = parent;
     new_frame.child_frame_id = child;
     frames_.transforms.push_back(new_frame);
@@ -143,6 +163,11 @@ void URDFTransformer::updateLink(const std::string parent, const std::string chi
 
 void URDFTransformer::updateLink(const std::string parent, const std::string child, const geometry_msgs::Vector3 origin)
 {
+  if( isnan(origin.x) || isnan(origin.y) ||isnan(origin.z) )
+  {
+    return;
+  }
+
   boost::lock_guard<boost::mutex> lock(data_lock_);
   int index = findLink(parent, child);
 
