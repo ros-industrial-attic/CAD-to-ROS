@@ -16,6 +16,34 @@
 
 namespace urdf_editor
 {
+  typedef std::vector<std::pair<QString, bool> > link_vis_list_t;
+  typedef std::map<std::string, urdf::LinkSharedPtr> map_str_link_t;
+
+  void save_link_vis_state(map_str_link_t& link_map, rviz::Property* prop_links, link_vis_list_t& lvis_list)
+  {
+    map_str_link_t::const_iterator it;
+    for (it = link_map.begin(); it != link_map.end(); ++it)
+    {
+      QString lname = QString::fromStdString(it->first);
+      rviz::Property* link_prop = prop_links->subProp(lname);
+
+      // only store state of hidden links: this results in significantly
+      // shorter lists when models are large (as the nr of hidden links is
+      // most likely small, compared to total nr of links in model)
+      if (link_prop->getValue().toBool() == false)
+        lvis_list.push_back(std::make_pair(lname, false));
+    }
+  }
+
+  void restore_link_vis_state(rviz::Property* prop_links, link_vis_list_t& lvis_list)
+  {
+    link_vis_list_t::iterator it;
+    // restore state for all links in the list
+    for (it = lvis_list.begin(); it != lvis_list.end(); ++it)
+      prop_links->subProp(it->first)->setValue(it->second);
+  }
+
+
   MyRviz::MyRviz(QWidget *parent): QWidget(parent), nh_("~")
   {
     // Construct and layout render panel
@@ -53,6 +81,12 @@ namespace urdf_editor
 
   bool MyRviz::loadRobot(urdf::ModelInterfaceSharedPtr robot_model)
   {
+    link_vis_list_t lvis_list;
+    // we only need to save state if a model is loaded
+    if (nh_.hasParam("ros_workbench"))
+      save_link_vis_state(robot_model->links_, robot_display_->subProp("Links"), lvis_list);
+
+    // update visualiser
     robot_display_->setEnabled(false);
     TiXmlDocument *robot_document = urdf::exportURDF(robot_model);
     TiXmlPrinter printer;
@@ -60,6 +94,9 @@ namespace urdf_editor
     nh_.setParam("ros_workbench", printer.CStr());
     robot_display_->reset();
     robot_display_->setEnabled(true);
+
+    // restore link state (if any was saved)
+    restore_link_vis_state(robot_display_->subProp("Links"), lvis_list);
 
     // TODO: return result of serialisation
     return true;

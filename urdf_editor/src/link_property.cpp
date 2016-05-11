@@ -234,7 +234,7 @@ namespace urdf_editor
     if (name == "Show in Editor")
     {
       // broadcast state change
-      emit LinkProperty::linkVisibilityChanged(QString(link_->name.c_str()), val.toBool());
+      emit LinkProperty::linkVisibilityChanged(QString::fromStdString(link_->name), val.toBool());
 
       // stop event: not a real property, so don't need to bubble up.
       return;
