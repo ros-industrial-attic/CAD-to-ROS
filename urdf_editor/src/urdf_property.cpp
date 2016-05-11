@@ -5,6 +5,7 @@
 
 #include <urdf_editor/urdf_property.h>
 
+#include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/link_collision_property.h>
 #include <urdf_editor/link_inertial_property.h>
 #include <urdf_editor/link_new_material_property.h>
@@ -226,7 +227,7 @@ namespace urdf_editor
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
     QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
               this, SLOT(on_propertyWidget_valueChanged()));
-
+    
     // add mapping from treewidget item to link property
     ltree_to_link_property_[item] = tree_link;
     // add mapping from link property to treewidget item

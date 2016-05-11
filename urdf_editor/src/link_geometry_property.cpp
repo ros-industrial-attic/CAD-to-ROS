@@ -7,67 +7,25 @@
 
 #include <urdf_model/link.h>
 
-
 namespace urdf_editor
 {
   LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
-    QtVariantProperty *sub_item;
+    // QtVariantProperty *sub_item;
 
     QObject::connect(manager_, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
               this, SLOT(onValueChanged(QtProperty *, const QVariant &)));
+
     //{SPHERE, BOX, CYLINDER, MESH}
     top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Geometry"));
     item = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
     item->setAttribute(Common::attributeStr(EnumNames), QStringList() << "SPHERE" << "BOX" << "CYLINDER" << "MESH");
     top_item_->addSubProperty(item);
 
-    if (geometry_->type == urdf::Geometry::BOX)
-    {
-      boost::shared_ptr<urdf::Box> box = boost::static_pointer_cast<urdf::Box>(geometry_);
-      item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Size"));
-      sub_item = manager_->addProperty(QVariant::Double, tr("Length X (m)"));
-      item->addSubProperty(sub_item);
-
-      sub_item = manager_->addProperty(QVariant::Double, tr("Length Y (m)"));
-      item->addSubProperty(sub_item);
-
-      sub_item = manager_->addProperty(QVariant::Double, tr("Length Z (m)"));
-      item->addSubProperty(sub_item);
-      top_item_->addSubProperty(item);
-    }
-    else if (geometry_->type == urdf::Geometry::CYLINDER)
-    {
-      boost::shared_ptr<urdf::Cylinder> cylinder = boost::static_pointer_cast<urdf::Cylinder>(geometry_);
-      item = manager_->addProperty(QVariant::Double, tr("Radius (m)"));
-      top_item_->addSubProperty(item);
-
-      item = manager_->addProperty(QVariant::Double, tr("Length (m)"));
-      top_item_->addSubProperty(item);
-    }
-    else if (geometry_->type == urdf::Geometry::SPHERE)
-    {
-      boost::shared_ptr<urdf::Sphere> sphere = boost::static_pointer_cast<urdf::Sphere>(geometry_);
-      item = manager_->addProperty(QVariant::Double, tr("Radius (m)"));
-      top_item_->addSubProperty(item);
-    }
-    else if (geometry_->type == urdf::Geometry::MESH)
-    {
-      boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
-      item = manager_->addProperty(QVariant::String, tr("File Name"));
-      top_item_->addSubProperty(item);
-
-      item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Scale"));
-      sub_item = manager_->addProperty(QVariant::Double, tr("X"));
-      item->addSubProperty(sub_item);
-      sub_item = manager_->addProperty(QVariant::Double, tr("Y"));
-      item->addSubProperty(sub_item);
-      sub_item = manager_->addProperty(QVariant::Double, tr("Z"));
-      item->addSubProperty(sub_item);
-      top_item_->addSubProperty(item);
-    }
+    createProperties(geometry_->type);
+    
     loading_ = false;
   }
 
@@ -89,7 +47,9 @@ namespace urdf_editor
       name = item->propertyName();
 
       if (name == "Type")
+      {
         item->setValue(geometry_->type);
+      }
       else
       {
         if (geometry_->type == urdf::Geometry::BOX)
@@ -158,22 +118,17 @@ namespace urdf_editor
     QString name = property->propertyName();
     if (name == "Type")
     {
-      // if type is changed need to add functionality to remove current geometry and add new one
-      switch (val.toInt()) //{SPHERE, BOX, CYLINDER, MESH}
-      {
-      case 0:
-        geometry_->type = urdf::Geometry::SPHERE;
-        break;
-      case 1:
-        geometry_->type = urdf::Geometry::BOX;
-        break;
-      case 2:
-        geometry_->type = urdf::Geometry::CYLINDER;
-        break;
-      case 3:
-        geometry_->type = urdf::Geometry::MESH;
-        break;
-      }
+      loading_ = true;
+      
+      // remove all the subproperties
+      QList<QtProperty *> sub_items = top_item_->subProperties();
+      for (int i = 0; i < sub_items.length(); ++i) 
+        if (sub_items[i]->propertyName() != "Type")
+          top_item_->removeSubProperty(sub_items[i]);
+
+      createProperties(val.toInt());
+
+      loading_ = false;
     }
     else
     {
@@ -216,5 +171,59 @@ namespace urdf_editor
     }
 
     emit LinkGeometryProperty::valueChanged(property, val);
+  }
+
+  void LinkGeometryProperty::createProperties(int type)
+  {
+    QtVariantProperty *item;
+    QtVariantProperty *sub_item;
+    
+    switch (type) //{SPHERE, BOX, CYLINDER, MESH}
+    {
+    case 0:
+      {
+      item = manager_->addProperty(QVariant::Double, tr("Radius (m)"));
+      top_item_->addSubProperty(item);
+      break;
+      }
+    case 1:
+      {        
+      item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Size"));
+      sub_item = manager_->addProperty(QVariant::Double, tr("Length X (m)"));
+      item->addSubProperty(sub_item);
+
+      sub_item = manager_->addProperty(QVariant::Double, tr("Length Y (m)"));
+      item->addSubProperty(sub_item);
+
+      sub_item = manager_->addProperty(QVariant::Double, tr("Length Z (m)"));
+      item->addSubProperty(sub_item);
+      top_item_->addSubProperty(item);
+      break;
+      }
+    case 2:
+      {
+      item = manager_->addProperty(QVariant::Double, tr("Radius (m)"));
+      top_item_->addSubProperty(item);
+
+      item = manager_->addProperty(QVariant::Double, tr("Length (m)"));
+      top_item_->addSubProperty(item);
+      break;
+      }
+    case 3:
+      {
+      item = manager_->addProperty(QVariant::String, tr("File Name"));
+      top_item_->addSubProperty(item);
+
+      item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Scale"));
+      sub_item = manager_->addProperty(QVariant::Double, tr("X"));
+      item->addSubProperty(sub_item);
+      sub_item = manager_->addProperty(QVariant::Double, tr("Y"));
+      item->addSubProperty(sub_item);
+      sub_item = manager_->addProperty(QVariant::Double, tr("Z"));
+      item->addSubProperty(sub_item);
+      top_item_->addSubProperty(item);
+      break;
+      }
+    }
   }
 }
