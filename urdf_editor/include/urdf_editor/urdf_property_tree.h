@@ -34,9 +34,9 @@ namespace urdf_editor
 
     bool isLinkRoot(QTreeWidgetItem *item);
 
-    URDFPropertyTreeLinkItem *asLinkTreeItem(QTreeWidgetItem *item);
+    URDFPropertyTreeLinkItemSharedPtr asLinkTreeItem(QTreeWidgetItem *item);
 
-    URDFPropertyTreeJointItem *asJointTreeItem(QTreeWidgetItem *item);
+    URDFPropertyTreeJointItemSharedPtr asJointTreeItem(QTreeWidgetItem *item);
 
     void clear();
 
@@ -47,9 +47,9 @@ namespace urdf_editor
     void on_expandActionTriggered();
     void on_collapseActionTriggered();
     void on_contextMenuRequested(const QPoint &pos);
-    void on_jointNameChanged(URDFPropertyTreeJointItem *joint, QString current_name, QString new_name);
-    void on_jointParentLinkChanged(URDFPropertyTreeJointItem *joint);
-    void on_linkNameChanged(URDFPropertyTreeLinkItem *link, QString current_name, QString new_name);
+    void on_jointNameChanged(URDFPropertyTreeJointItemSharedPtr joint, QString current_name, QString new_name);
+    void on_jointParentLinkChanged(URDFPropertyTreeJointItemSharedPtr joint);
+    void on_linkNameChanged(URDFPropertyTreeLinkItemSharedPtr link, QString current_name, QString new_name);
 
   signals:
     void propertyValueChanged();
@@ -69,14 +69,14 @@ namespace urdf_editor
     void addItemRecursively(urdf::JointSharedPtr joint, QTreeWidgetItem* parent);
 
     urdf::LinkSharedPtr addModelLink();
-    URDFPropertyTreeLinkItem* addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link);
+    URDFPropertyTreeLinkItemSharedPtr addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link);
     void removeModelLink(urdf::LinkSharedPtr link);
-    void removeLinkTreeItem(QTreeWidgetItem *item);
+    void removeLinkTreeItem(URDFPropertyTreeLinkItemSharedPtr link);
 
     urdf::JointSharedPtr addModelJoint(QString child_link_name);
-    URDFPropertyTreeJointItem* addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint);
+    URDFPropertyTreeJointItemSharedPtr addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint);
     void removeModelJoint(urdf::JointSharedPtr joint);
-    void removeJointTreeItem(QTreeWidgetItem *item);
+    void removeJointTreeItem(URDFPropertyTreeJointItemSharedPtr joint);
 
     QString getValidName(QString prefix, QStringList &current_names, unsigned int &counter);
 
@@ -90,10 +90,10 @@ namespace urdf_editor
      */
     void moveTreeChildren(QTreeWidgetItem *parent, QTreeWidgetItem *new_parent);
 
-    void addMapping(URDFPropertyTreeLinkItem *item);
-    void addMapping(URDFPropertyTreeJointItem *item);
-    void removeMapping(URDFPropertyTreeLinkItem *item);
-    void removeMapping(URDFPropertyTreeJointItem *item);
+    void addMapping(URDFPropertyTreeLinkItemSharedPtr item);
+    void addMapping(URDFPropertyTreeJointItemSharedPtr item);
+    void removeMapping(URDFPropertyTreeLinkItemSharedPtr item);
+    void removeMapping(URDFPropertyTreeJointItemSharedPtr item);
 
 
     urdf::ModelInterfaceSharedPtr model_;
@@ -107,8 +107,8 @@ namespace urdf_editor
     QStringList link_names_;
     unsigned int joint_counter_;
     unsigned int link_counter_;
-    QMap<QString, URDFPropertyTreeLinkItem*> links_;
-    QMap<QString, URDFPropertyTreeJointItem*> joints_;
+    QMap<QString, URDFPropertyTreeLinkItemSharedPtr> links_;
+    QMap<QString, URDFPropertyTreeJointItemSharedPtr> joints_;
 
     QMenu *context_menu_;
     QAction *add_action_;

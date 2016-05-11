@@ -34,8 +34,8 @@ namespace urdf_editor
 
   signals:
     void valueChanged();
-    void jointNameChanged(URDFPropertyTreeJointItem *joint, QString current_name, QString new_name);
-    void parentLinkChanged(URDFPropertyTreeJointItem *joint);
+    void jointNameChanged(URDFPropertyTreeJointItemSharedPtr joint, QString current_name, QString new_name);
+    void parentLinkChanged(URDFPropertyTreeJointItemSharedPtr joint);
 
   private:
     void updateDisplayText();

@@ -23,9 +23,9 @@ namespace urdf_editor
     LinkPropertySharedPtr getProperty(); // this method should be removed once the property menu is moved to their respected propery class.
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
-    void assignJoint(URDFPropertyTreeJointItem *joint);
+    void assignJoint(URDFPropertyTreeJointItemSharedPtr joint);
     void unassignJoint();
-    URDFPropertyTreeJointItem *getAssignedJoint();
+    URDFPropertyTreeJointItemSharedPtr getAssignedJoint();
     bool hasAssignedJoint();
 
   private slots:
@@ -34,7 +34,7 @@ namespace urdf_editor
 
   signals:
     void valueChanged();
-    void linkNameChanged(URDFPropertyTreeLinkItem *link, QString current_name, QString new_name);
+    void linkNameChanged(URDFPropertyTreeLinkItemSharedPtr link, QString current_name, QString new_name);
 
   private:
     void updateDisplayText();
@@ -43,7 +43,7 @@ namespace urdf_editor
     urdf::LinkSharedPtr link_;
     LinkPropertySharedPtr property_;
     QStringList &link_names_;
-    URDFPropertyTreeJointItem* assigned_joint_;
+    URDFPropertyTreeJointItemSharedPtr assigned_joint_;
 
   };
 }
