@@ -39,14 +39,18 @@ namespace urdf_editor
     root_ = new QTreeWidgetItem(tree_widget_);
     root_->setText(0, "RobotModel");
     root_->setExpanded(true);
+    root_->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     tree_widget_->addTopLevelItem(root_);
 
     link_root_ = new QTreeWidgetItem();
     link_root_->setText(0, "Links");
+    link_root_->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled);
+
     root_->addChild(link_root_);
 
     joint_root_ = new QTreeWidgetItem();
     joint_root_->setText(0,"Joints");
+    joint_root_->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     root_->addChild(joint_root_);
 
     property_editor_.reset(new QtTreePropertyBrowser());
@@ -66,6 +70,12 @@ namespace urdf_editor
 
     connect(tree_widget, SIGNAL(itemClicked(QTreeWidgetItem*,int)),
               this, SLOT(on_treeWidget_itemClicked(QTreeWidgetItem*,int)));
+
+    connect(tree_widget, SIGNAL(itemPressed(QTreeWidgetItem*,int)), 
+              this, SLOT(on_treeWidget_itemPressed(QTreeWidgetItem*,int)));
+
+    connect(tree_widget, SIGNAL(itemDropped(QTreeWidgetItem*)),
+              this, SLOT(on_treeWidget_itemDropped(QTreeWidgetItem*)));
 
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
@@ -111,6 +121,28 @@ namespace urdf_editor
     link_names_.clear();
     joint_names_.clear();
     unsavedChanges = false;
+  }
+
+  void URDFProperty::redrawJointTree()
+  {
+
+    // Clear Joints from tree
+    while (joint_root_->childCount() > 0)
+    {
+      joint_root_->removeChild(joint_root_->child(0));
+    }
+
+    // add all links to the tree, starting with the root
+    urdf::LinkSharedPtr rlink;
+    model_->getLink(model_->getRoot()->name, rlink);
+
+    // add all joints, starting with those that have the root as parent
+    std::vector<urdf::JointSharedPtr>& child_joints = rlink->child_joints;
+    std::vector<urdf::JointSharedPtr>::iterator joint_it;
+
+    for (joint_it = child_joints.begin(); joint_it != child_joints.end(); ++joint_it)
+      addToTreeWidget(*joint_it, joint_root_);
+
   }
 
   bool URDFProperty::loadURDF(QString file_path)
@@ -173,6 +205,8 @@ namespace urdf_editor
   {
     // first add the tree item
     QTreeWidgetItem* item = addJointTreeItem(parent, joint);
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+
     // now add the property
     JointPropertySharedPtr jpptr =  addJointProperty(item, joint);
 
@@ -282,6 +316,57 @@ namespace urdf_editor
     return tree_joint;
   }
 
+  bool URDFProperty::processLinkDrop(QString drag_link, QString drop_link){
+
+    QMap<LinkProperty *, QTreeWidgetItem *>::iterator lit;
+    urdf::LinkSharedPtr link, clink, plink;
+
+    QMap<JointProperty *, QTreeWidgetItem *>::iterator it, itp;
+    // find the joint that has the dragged link as the child
+    for (it = joint_property_to_ctree_.begin(); it != joint_property_to_ctree_.end(); ++it) {
+      // set its parent as the link dropped on
+      if(it.key()->getChildLinkName()==drag_link) {    
+
+        if(drop_link!=link_root_->text(0)) {
+          it.key()->setParentLinkName(drop_link);
+          // get link* from property drop_link
+          model_->getLink(drop_link.toStdString(), link);
+        } else {
+          model_->getLink(model_->getRoot()->name, link);
+          it.key()->setParentLinkName("");
+        }
+
+        // get joint* from property it
+        boost::shared_ptr<urdf::Joint> joint(boost::const_pointer_cast<urdf::Joint>(model_->getJoint(it.key()->getName().toStdString())));
+
+        for (lit = link_property_to_ltree_.begin(); lit != link_property_to_ltree_.end(); ++lit) {
+          // add all joints, starting with those that have the root as parent
+          model_->getLink(lit.key()->getName().toStdString(), clink);
+          std::vector<urdf::JointSharedPtr>& child_joints = clink->child_joints;
+          std::vector<urdf::JointSharedPtr>::iterator cit;
+          // remove link from where it was before
+          for (cit = child_joints.begin(); cit != child_joints.end();) {
+            if(*cit == joint) {
+              child_joints.erase(cit); 
+            } else {
+              ++cit;
+            }
+          }
+
+        }        
+
+        // if(drop_link!=link_root_->text(0)) {
+          std::vector<urdf::JointSharedPtr >& child_joints = link->child_joints;
+          child_joints.push_back(joint);
+        // } else P
+
+        redrawJointTree();
+        return true;
+      } 
+    }
+    return false;
+  }
+
   QString URDFProperty::getValidName(QString prefix, QList<QString> &current_names)
   {
     int i = 0;
@@ -362,6 +447,40 @@ namespace urdf_editor
     else
     {
       property_editor_->clear();
+    }
+  }
+
+  void URDFProperty::on_treeWidget_itemPressed(QTreeWidgetItem *item, int col)
+  {
+    item_dragged = item; // don't like this, but not sure how else to "know" what object we are dragging and dropping -- @swhart115
+  }
+
+  void URDFProperty::on_treeWidget_itemDropped(QTreeWidgetItem *item)
+  {
+    item_dropped = item;
+    if(item==link_root_) {
+      if(ltree_to_link_property_.contains(item_dragged)) {
+        if(link_root_->child(0)) {
+          qWarning() << QString("URDF has multiple root links, fix for proper operation.");
+        }
+        if(!processLinkDrop(item_dragged->text(0), item_dropped->text(0))){
+          qWarning() << QString("Problem dragging link %1 to (root) %2").arg(item_dropped->text(0), item_dragged->text(0));
+          return;
+        }
+      } else {
+        qCritical() << QString("Link %1 not found in map storage").arg(item_dragged->text(0));
+      }
+      return;
+    } 
+    if(ltree_to_link_property_.contains(item_dragged)) {
+      if(ltree_to_link_property_.contains(item_dropped)) {
+        LinkPropertySharedPtr link_dragged = ltree_to_link_property_[item_dragged];
+        LinkPropertySharedPtr link_dropped = ltree_to_link_property_[item_dropped];
+        if(!processLinkDrop(item_dragged->text(0), item_dropped->text(0))){
+          qDebug() << QString("Problem dragging link %1 to %2").arg(item_dropped->text(0), item_dragged->text(0));
+          return;
+        }
+      }
     }
   }
 

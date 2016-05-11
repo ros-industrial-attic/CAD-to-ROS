@@ -6,6 +6,7 @@
 #include <QTreeWidgetItem>
 #include <QMenu>
 #include <qttreepropertybrowser.h>
+#include <urdf_editor/urdf_property_tree.h>
 #include <urdf_editor/my_rviz.h>
 
 #include <urdf_editor/urdf_types.h>
@@ -35,6 +36,10 @@ namespace urdf_editor
 
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 
+    void on_treeWidget_itemPressed(QTreeWidgetItem *item, int column);
+
+    void on_treeWidget_itemDropped(QTreeWidgetItem *item);
+
     void on_propertyWidget_customContextMenuRequested(const QPoint &pos);
 
     void on_propertyWidget_linkNameChanged(LinkProperty *property, const QVariant &val);
@@ -56,6 +61,7 @@ namespace urdf_editor
 
   private:
     bool populateTreeWidget();
+    void redrawJointTree();
 
     void addToTreeWidget(urdf::LinkSharedPtr link, QTreeWidgetItem* parent);
     void addToTreeWidget(urdf::JointSharedPtr joint, QTreeWidgetItem* parent);
@@ -67,6 +73,8 @@ namespace urdf_editor
     void addModelJoint(QTreeWidgetItem *parent);
     QTreeWidgetItem* addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint);
     JointPropertySharedPtr addJointProperty(QTreeWidgetItem *item, urdf::JointSharedPtr joint);
+
+    bool processLinkDrop(QString drag_link, QString drop_link);
 
     QString getValidName(QString prefix, QList<QString> &current_names);
 
@@ -91,6 +99,8 @@ namespace urdf_editor
     QTreeWidgetItem *root_;
     QTreeWidgetItem *link_root_;
     QTreeWidgetItem *joint_root_;
+    QTreeWidgetItem *item_dragged;
+    QTreeWidgetItem *item_dropped;
     QTreeWidget *tree_widget_;
     QWidget *browser_parent_;
     urdf_editor::MyRviz *rviz_widget_;

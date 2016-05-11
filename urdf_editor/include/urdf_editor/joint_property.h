@@ -85,7 +85,20 @@ namespace urdf_editor
     /*! Get the safety Property */
     JointSafetyPropertySharedPtr getSafetyProperty();
     
+    /*! Get the joint name */
+    QString getName();
+
+    /*! Get the child link name*/
+    QString getChildLinkName();
+
+    /*! Get the parent link name */
+    QString getParentLinkName();
     
+    /*! Set the child link name*/
+    bool setChildLinkName(QString link_name);
+
+    /*! Set the parent link name */
+    bool setParentLinkName(QString link_name);
     
 
   private slots:
