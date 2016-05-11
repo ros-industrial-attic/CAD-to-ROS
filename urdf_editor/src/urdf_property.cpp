@@ -312,6 +312,27 @@ namespace urdf_editor
       QMenu *menu = new QMenu(tree_widget_);
       menu->addAction("Add");
       menu->addAction("Remove");
+
+      // Add menu for converting the link to base/tool0 if there are no base/tool0 before
+      if (sel->parent() == link_root_)
+      {
+          bool base_exist = link_names_.contains("base", Qt::CaseSensitive);
+          bool tool0_exist = link_names_.contains("tool0", Qt::CaseSensitive);
+          if (!base_exist || !tool0_exist)
+          {
+              menu->addSeparator();
+              QMenu *convertMenu = menu->addMenu("Convert to");
+              if (!base_exist)
+              {
+                  convertMenu->addAction("base");
+              }
+              if (!tool0_exist)
+              {
+                  convertMenu->addAction("tool0");
+              }
+          }
+      }
+
       QAction *selected_item = menu->exec(tree_widget_->mapToGlobal(pos));
       if (selected_item)
       {
@@ -327,6 +348,26 @@ namespace urdf_editor
           {
             addModelJoint(sel);
           }
+        }
+        else if (selected_item->text() == "tool0")
+        {
+            // Firstly remove the link, then add new link named "tool0"
+            // on_propertyWidget_linkNameChanged(ltree_to_link_property_[sel].get(), "tool0");
+            link_names_.removeOne(sel->text(0));
+            link_root_->removeChild(sel);
+            boost::shared_ptr<urdf::Link> new_link(new urdf::Link());
+            new_link->name = "tool0";
+            model_->links_.insert(std::make_pair("tool0", new_link));
+            addLinkProperty(new_link);
+        }
+        else if (selected_item->text() == "base")
+        {
+            link_names_.removeOne(sel->text(0));
+            link_root_->removeChild(sel);
+            boost::shared_ptr<urdf::Link> new_link(new urdf::Link());
+            new_link->name = "base";
+            model_->links_.insert(std::make_pair("base", new_link));
+            addLinkProperty(new_link);
         }
         else
         {
