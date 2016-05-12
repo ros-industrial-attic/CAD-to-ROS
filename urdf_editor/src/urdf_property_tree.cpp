@@ -20,7 +20,9 @@ namespace urdf_editor
 
   URDFPropertyTree::URDFPropertyTree(QWidget *parent) :
     drag_item_(NULL),
-    model_(new urdf::ModelInterface())
+    model_(new urdf::ModelInterface()),
+    joint_counter_(0),
+    link_counter_(0)
   {
     setSelectionMode(QAbstractItemView::SingleSelection);
     setDragEnabled(true);
