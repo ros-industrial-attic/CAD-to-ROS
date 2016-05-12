@@ -49,6 +49,7 @@ namespace urdf_editor
 
   bool URDFPropertyTree::loadRobotModel(urdf::ModelInterfaceSharedPtr model)
   {
+    clear();
 
     if (!model)
       return false;
@@ -142,6 +143,7 @@ namespace urdf_editor
     joint_counter_ = 0;
     links_.clear();
     joints_.clear();
+    model_->clear();
   }
 
   void URDFPropertyTree::initialize()
@@ -195,8 +197,6 @@ namespace urdf_editor
 
   bool URDFPropertyTree::populateFromRobotModel()
   {
-    clear();
-
     // add all links to the tree, starting with the root
     urdf::LinkSharedPtr rlink;
     model_->getLink(model_->getRoot()->name, rlink);
