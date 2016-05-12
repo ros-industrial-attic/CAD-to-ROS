@@ -79,12 +79,12 @@ namespace urdf_editor
 
     updateDisplayText();
 
-    emit jointNameChanged(URDFPropertyTreeJointItemSharedPtr(this), current_name, name_);
+    emit jointNameChanged(this, current_name, name_);
   }
 
   void URDFPropertyTreeJointItem::on_jointParentLinkChanged(JointProperty *joint, const QVariant &val)
   {
-    emit parentLinkChanged(URDFPropertyTreeJointItemSharedPtr(this));
+    emit parentLinkChanged(this);
   }
 
   void URDFPropertyTreeJointItem::on_valueChanged()

@@ -14,6 +14,7 @@ namespace urdf_editor
     link_(link),
     link_names_(link_names),
     property_(new LinkProperty(link)),
+    assigned_joint_(NULL),
     name_(QString::fromStdString(link->name))
   {
     updateDisplayText();
@@ -50,7 +51,7 @@ namespace urdf_editor
     property_->loadProperty(property_editor);
   }
 
-  void URDFPropertyTreeLinkItem::assignJoint(URDFPropertyTreeJointItemSharedPtr joint)
+  void URDFPropertyTreeLinkItem::assignJoint(URDFPropertyTreeJointItem *joint)
   {
     assigned_joint_ = joint;
 
@@ -60,11 +61,11 @@ namespace urdf_editor
 
   void URDFPropertyTreeLinkItem::unassignJoint()
   {
-    assigned_joint_.reset();
+    assigned_joint_ = NULL;
     link_->parent_joint.reset();
   }
 
-  URDFPropertyTreeJointItemSharedPtr URDFPropertyTreeLinkItem::getAssignedJoint()
+  URDFPropertyTreeJointItem *URDFPropertyTreeLinkItem::getAssignedJoint()
   {
     if (!assigned_joint_)
       ROS_ERROR("A joint has not been assigned to Link(%s).", link_->name.c_str());
@@ -90,7 +91,7 @@ namespace urdf_editor
 
     updateDisplayText();
 
-    emit linkNameChanged(URDFPropertyTreeLinkItemSharedPtr(this), current_name, name_);
+    emit linkNameChanged(this, current_name, name_);
   }
 
   void URDFPropertyTreeLinkItem::on_valueChanged()
