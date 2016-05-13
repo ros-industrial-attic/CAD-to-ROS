@@ -5,6 +5,7 @@
 
 #include <urdf_editor/urdf_property.h>
 
+#include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/link_collision_property.h>
 #include <urdf_editor/link_inertial_property.h>
 #include <urdf_editor/link_new_material_property.h>
@@ -12,6 +13,8 @@
 #include <urdf_editor/link_property.h>
 
 #include <urdf_editor/joint_property.h>
+
+#include <urdf_editor/urdf_transforms.h>
 
 
 const QString PROPERTY_NAME_TEXT = "Name";
@@ -60,6 +63,8 @@ namespace urdf_editor
     vlayout->addWidget(property_editor_.get());
 
     rviz_widget_ = new urdf_editor::MyRviz(rviz_parent);
+
+    tf_transformer_.reset(new URDFTransformer());
 
     connect(tree_widget, SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_treeWidget_customContextMenuRequested(QPoint)));
@@ -110,6 +115,7 @@ namespace urdf_editor
     link_property_to_ltree_.clear();
     link_names_.clear();
     joint_names_.clear();
+    tf_transformer_->clear();
     unsavedChanges = false;
   }
 
@@ -123,7 +129,12 @@ namespace urdf_editor
     if (!populateTreeWidget())
       return false;
 
-    return rviz_widget_->loadRobot(model_);
+    if (!rviz_widget_->loadRobot(model_))
+      return false;
+
+    rviz_widget_->updateBaseLink(model_->getRoot()->name);
+
+    return true;
   }
 
   bool URDFProperty::saveURDF(QString file_path)
@@ -225,7 +236,7 @@ namespace urdf_editor
     QObject::connect(tree_link.get(), SIGNAL(linkNameChanged(LinkProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_linkNameChanged(LinkProperty*,QVariant)));
     QObject::connect(tree_link.get(), SIGNAL(valueChanged()),
-              this, SLOT(on_propertyWidget_valueChanged()));
+              this, SLOT(on_propertyWidget_linkValueChanged()));
 
     // add mapping from treewidget item to link property
     ltree_to_link_property_[item] = tree_link;
@@ -266,11 +277,11 @@ namespace urdf_editor
     // TODO :document
     joint_child_to_ctree_[model_->links_.find(joint->child_link_name)->second] = item;
 
-    JointPropertySharedPtr tree_joint(new JointProperty(joint, link_names_, joint_names_));
+    JointPropertySharedPtr tree_joint(new JointProperty(joint, link_names_, joint_names_, tf_transformer_));
     QObject::connect(tree_joint.get(), SIGNAL(jointNameChanged(JointProperty *, const QVariant &)),
               this, SLOT(on_propertyWidget_jointNameChanged(JointProperty*,QVariant)));
-    QObject::connect(tree_joint.get(), SIGNAL(valueChanged()),
-              this, SLOT(on_propertyWidget_valueChanged()));
+    QObject::connect(tree_joint.get(), SIGNAL(valueChanged(JointProperty *)),
+              this, SLOT(on_propertyWidget_jointValueChanged(JointProperty *)));
 
     // add mapping from treewidget item to joint property
     ctree_to_joint_property_[item] = tree_joint;
@@ -278,6 +289,8 @@ namespace urdf_editor
     joint_property_to_ctree_[tree_joint.get()] = item;
 
     joint_names_.append(QString::fromStdString(joint->name));
+
+    tf_transformer_->updateLink(tree_joint.get());
 
     return tree_joint;
   }
@@ -715,7 +728,7 @@ namespace urdf_editor
     joint_property_to_ctree_[property]->setText(0, val.toString());
   }
 
-  void URDFProperty::on_propertyWidget_valueChanged()
+  void URDFProperty::on_propertyWidget_linkValueChanged()
   {
     rviz_widget_->loadRobot(model_);
     unsavedChanges = true;
@@ -724,6 +737,27 @@ namespace urdf_editor
   void URDFProperty::on_unsavedChanges()
   {
     unsavedChanges = true;
+  }
+
+  void URDFProperty::on_propertyWidget_jointValueChanged(JointProperty *property)
+  {
+    if (!rviz_widget_->loadRobot(model_))
+    {
+        ROS_WARN("Model is invalid, skipping TF transformer and fixed frame update.");
+        return;
+    }
+
+    // make sure we only update if the model has an actual root link
+    if (model_->getRoot() == NULL)
+    {
+        ROS_WARN("Model has no root link, skipping TF transformer and fixed frame update.");
+        return;
+    }
+
+    tf_transformer_->updateLink(property);
+
+    // update Rviz base link in the event that root has changed
+    rviz_widget_->updateBaseLink(model_->getRoot()->name);
   }
 
 }

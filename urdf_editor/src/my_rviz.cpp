@@ -2,6 +2,7 @@
 #include <urdf_editor/my_rviz.h>
 
 #include <QVBoxLayout>
+#include <QtCore>
 
 #include <rviz/visualization_manager.h>
 #include <rviz/render_panel.h>
@@ -36,6 +37,12 @@ namespace urdf_editor
     manager_->addDisplay(robot_display_, false);
 
     grid_display_ = manager_->createDisplay("rviz/Grid", "MyGrid", true);
+
+    tf_display_ = manager_->createDisplay("rviz/TF", "TF", true);
+    tf_display_->subProp("Show Arrows")->setValue("true");
+    tf_display_->subProp("Show Names")->setValue("true");
+    tf_display_->subProp("Show Axes")->setValue("true");
+    tf_display_->subProp("Frame Timeout")->setValue("1");
   }
 
   // Destructor
@@ -56,6 +63,12 @@ namespace urdf_editor
 
     // TODO: return result of serialisation
     return true;
+  }
+
+  void MyRviz::updateBaseLink(std::string base)
+  {
+    QString base_link = QString::fromStdString(base);
+    manager_->setFixedFrame(base_link);
   }
 
   bool MyRviz::clear()
