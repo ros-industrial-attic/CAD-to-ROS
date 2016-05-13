@@ -11,7 +11,7 @@
 
 namespace urdf_editor
 {
-  LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new FileBrowserVariantManager()), factory_(new FileBrowserVarianFactory())
+  LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new FileBrowserVariantManager()), factory_(new FileBrowserVariantFactory())
   {
     loading_ = true;
     QtVariantProperty *item;

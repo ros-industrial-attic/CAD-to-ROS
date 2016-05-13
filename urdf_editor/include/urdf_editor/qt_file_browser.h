@@ -62,15 +62,15 @@ class FileBrowserVariantManager : public QtVariantPropertyManager
       QString theFilter;
   };
   
-  class FileBrowserVarianFactory : public QtVariantEditorFactory
+  class FileBrowserVariantFactory : public QtVariantEditorFactory
   {
       Q_OBJECT
   public:
-      FileBrowserVarianFactory(QObject *parent = 0)
+      FileBrowserVariantFactory(QObject *parent = 0)
           : QtVariantEditorFactory(parent)
               { }
   
-      virtual ~FileBrowserVarianFactory();
+      virtual ~FileBrowserVariantFactory();
   protected:
       virtual void connectPropertyManager(QtVariantPropertyManager *manager);
       virtual QWidget *createEditor(QtVariantPropertyManager *manager, QtProperty *property,

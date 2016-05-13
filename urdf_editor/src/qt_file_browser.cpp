@@ -184,7 +184,7 @@ namespace urdf_editor {
       theLineEdit->event(e);
   }
   
-  FileBrowserVarianFactory::~FileBrowserVarianFactory()
+  FileBrowserVariantFactory::~FileBrowserVariantFactory()
   {
       QList<FileEdit *> editors = theEditorToProperty.keys();
       QListIterator<FileEdit *> it(editors);
@@ -192,7 +192,7 @@ namespace urdf_editor {
           delete it.next();
   }
   
-  void FileBrowserVarianFactory::connectPropertyManager(QtVariantPropertyManager *manager)
+  void FileBrowserVariantFactory::connectPropertyManager(QtVariantPropertyManager *manager)
   {
       connect(manager, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                   this, SLOT(slotPropertyChanged(QtProperty *, const QVariant &)));
@@ -201,7 +201,7 @@ namespace urdf_editor {
       QtVariantEditorFactory::connectPropertyManager(manager);
   }
   
-  QWidget *FileBrowserVarianFactory::createEditor(QtVariantPropertyManager *manager,
+  QWidget *FileBrowserVariantFactory::createEditor(QtVariantPropertyManager *manager,
           QtProperty *property, QWidget *parent)
   {
       if (manager->propertyType(property) == FileBrowserVariantManager::filePathTypeId()) {
@@ -220,7 +220,7 @@ namespace urdf_editor {
       return QtVariantEditorFactory::createEditor(manager, property, parent);
   }
   
-  void FileBrowserVarianFactory::disconnectPropertyManager(QtVariantPropertyManager *manager)
+  void FileBrowserVariantFactory::disconnectPropertyManager(QtVariantPropertyManager *manager)
   {
       disconnect(manager, SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                   this, SLOT(slotPropertyChanged(QtProperty *, const QVariant &)));
@@ -229,7 +229,7 @@ namespace urdf_editor {
       QtVariantEditorFactory::disconnectPropertyManager(manager);
   }
   
-  void FileBrowserVarianFactory::slotPropertyChanged(QtProperty *property,
+  void FileBrowserVariantFactory::slotPropertyChanged(QtProperty *property,
                   const QVariant &value)
   {
       if (!theCreatedEditors.contains(property))
@@ -241,7 +241,7 @@ namespace urdf_editor {
           itEditor.next()->setFilePath(value.toString());
   }
   
-  void FileBrowserVarianFactory::slotPropertyAttributeChanged(QtProperty *property,
+  void FileBrowserVariantFactory::slotPropertyAttributeChanged(QtProperty *property,
               const QString &attribute, const QVariant &value)
   {
       if (!theCreatedEditors.contains(property))
@@ -256,7 +256,7 @@ namespace urdf_editor {
           itEditor.next()->setFilter(value.toString());
   }
   
-  void FileBrowserVarianFactory::slotSetValue(const QString &value)
+  void FileBrowserVariantFactory::slotSetValue(const QString &value)
   {
       QObject *object = sender();
       QMap<FileEdit *, QtProperty *>::ConstIterator itEditor =
@@ -274,7 +274,7 @@ namespace urdf_editor {
       }
   }
   
-  void FileBrowserVarianFactory::slotEditorDestroyed(QObject *object)
+  void FileBrowserVariantFactory::slotEditorDestroyed(QObject *object)
   {
       QMap<FileEdit *, QtProperty *>::ConstIterator itEditor =
                   theEditorToProperty.constBegin();
