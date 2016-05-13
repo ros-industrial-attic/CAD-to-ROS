@@ -8,6 +8,63 @@
 
 #include <urdf_model/link.h>
 
+
+#include <QFileInfo>
+#include <QFileDialog>
+#include "codecs/step_to_stl.h"
+
+namespace
+{
+
+  bool isStepFile(const QString& file)
+  {
+    QFileInfo info (file);
+
+    if (!info.exists() || !info.isFile())
+      return false;
+
+    QString ext = info.suffix().toLower();
+
+    if (ext.isEmpty())
+      return false;
+
+    if (ext == QString("step") || ext == QString("stp"))
+      return true;
+    else
+      return false;
+  }
+
+  bool stepToStl(const QString& step_file, QString& stl_file)
+  {
+    if (!isStepFile(step_file))
+    {
+      return false;
+    }
+
+
+    QString out_file = QFileDialog::getSaveFileName(NULL, "STEP will be converted to STL; Please choose the name for the STL file");
+    std::string step = step_file.toStdString();
+    std::string stl = out_file.toStdString();
+
+    if (!urdf_editor::codecs::convertStepToStl(step, stl))
+    {
+      return false;
+    }
+
+    QFileInfo stl_info (QString::fromStdString(stl));
+
+    if (!stl_info.exists() || !stl_info.isFile())
+    {
+      return false;
+    }
+
+    stl_file = QString("file://") + stl_info.absoluteFilePath();
+
+    return true;
+  }
+
+}
+
 namespace urdf_editor
 {
   LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new FileBrowserVariantManager()), factory_(new FileBrowserVariantFactory())
@@ -163,9 +220,25 @@ namespace urdf_editor
         if (name == "File Name")
         {
           // TODO: convert absolute URI to a ROS pkg relative one
-          QString bare_path = val.toString();
-          QString abs_file_uri = QString("file://%1").arg(bare_path);
-          mesh->filename = abs_file_uri.toStdString();
+          QString path = val.toString();
+
+          if (isStepFile(path))
+          {
+            QString new_stl_file;
+            if (stepToStl(path, new_stl_file))
+            {
+              path = new_stl_file;
+            }
+          }
+
+          if (!path.startsWith("package://") && !path.startsWith("file://"))
+          {
+            path = QString("file://%1").arg(path);
+          }
+
+          QtVariantProperty* item = static_cast<QtVariantProperty *>(property);
+          item->setValue(path);
+          mesh->filename = path.toStdString();
         }
         else if (name == "X")
           mesh->scale.x = val.toDouble();

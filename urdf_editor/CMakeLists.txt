@@ -14,12 +14,16 @@ include(${QT_USE_FILE})
 find_package(urdfdom REQUIRED)
 find_package(urdfdom_headers REQUIRED)
 
+find_package(OCE REQUIRED)
+include_directories(${OCE_INCLUDE_DIRS})
+
 set(editor_SRCS
   src/common.cpp
   src/main.cpp
   src/my_rviz.cpp
   src/urdf_editor.cpp
   src/urdf_transforms.cpp
+  src/codecs/step_to_stl.cpp
 
   # properties
   src/joint_axis_property.cpp
@@ -107,7 +111,8 @@ target_link_libraries(${PROJECT_NAME}
   ${urdfdom_headers_LIBRARIES}
   ${QT_LIBRARIES}
   ${QT_QTCORE_LIBRARY}
-  ${QT_QTGUI_LIBRARY})
+  ${QT_QTGUI_LIBRARY}
+  TKPrim TKSTEP TKSTL)
 
 ## Install
 install(TARGETS ${PROJECT_NAME}
