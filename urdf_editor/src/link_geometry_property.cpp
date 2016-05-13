@@ -4,12 +4,13 @@
 
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/common.h>
+#include <urdf_editor/qt_file_browser.h>
 
 #include <urdf_model/link.h>
 
 namespace urdf_editor
 {
-  LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new QtVariantPropertyManager()), factory_(new QtVariantEditorFactory())
+  LinkGeometryProperty::LinkGeometryProperty(urdf::GeometrySharedPtr geometry): geometry_(geometry), manager_(new FileBrowserVariantManager()), factory_(new FileBrowserVariantFactory())
   {
     loading_ = true;
     QtVariantProperty *item;
@@ -25,7 +26,7 @@ namespace urdf_editor
     top_item_->addSubProperty(item);
 
     createProperties(geometry_->type);
-    
+
     loading_ = false;
   }
 
@@ -160,7 +161,12 @@ namespace urdf_editor
       {
         boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
         if (name == "File Name")
-          mesh->filename = val.toString().toStdString();
+        {
+          // TODO: convert absolute URI to a ROS pkg relative one
+          QString bare_path = val.toString();
+          QString abs_file_uri = QString("file://%1").arg(bare_path);
+          mesh->filename = abs_file_uri.toStdString();
+        }
         else if (name == "X")
           mesh->scale.x = val.toDouble();
         else if (name == "Y")
@@ -211,7 +217,7 @@ namespace urdf_editor
       }
     case 3:
       {
-      item = manager_->addProperty(QVariant::String, tr("File Name"));
+      item = manager_->addProperty(FileBrowserVariantManager::filePathTypeId(), tr("File Name"));
       top_item_->addSubProperty(item);
 
       item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Scale"));
