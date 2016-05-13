@@ -38,6 +38,8 @@ namespace urdf_editor
       visual_property_.reset(new LinkVisualProperty(link_->visual));
       QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      QObject::connect(visual_property_.get(), SIGNAL(geometryChanged(int)),
+                this, SLOT(onVisualGeometryChanged(int)));
     }
 
     if (link_->collision)
@@ -45,6 +47,8 @@ namespace urdf_editor
       collision_property_.reset(new LinkCollisionProperty(link_->collision));
       QObject::connect(collision_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      QObject::connect(collision_property_.get(), SIGNAL(geometryChanged(int)),
+                this, SLOT(onCollisionGeometryChanged(int)));
     }
 
     loading_ = true;
@@ -217,6 +221,108 @@ namespace urdf_editor
   {
     if (loading_)
       return;
+
+    emit LinkProperty::valueChanged();
+  }
+
+  void LinkProperty::onVisualGeometryChanged(int type)
+  {
+    if (loading_)
+      return;
+
+    switch (type) //{SPHERE, BOX, CYLINDER, MESH}
+    {
+    case 0:
+      {
+      link_->visual->geometry.reset(new urdf::Sphere);
+      link_->visual->geometry->type = urdf::Geometry::SPHERE;
+      boost::shared_ptr<urdf::Sphere> sphere = boost::static_pointer_cast<urdf::Sphere>(link_->visual->geometry);
+      sphere->radius = 0.01; 
+      break;
+      }
+    case 1:
+      {
+      link_->visual->geometry.reset(new urdf::Box);
+      link_->visual->geometry->type = urdf::Geometry::BOX;
+      boost::shared_ptr<urdf::Box> box = boost::static_pointer_cast<urdf::Box>(link_->visual->geometry);
+      box->dim.x = 0.01;
+      box->dim.y = 0.01;
+      box->dim.z = 0.01;      
+      break;
+      }
+    case 2:
+      {
+      link_->visual->geometry.reset(new urdf::Cylinder);
+      link_->visual->geometry->type = urdf::Geometry::CYLINDER;
+      boost::shared_ptr<urdf::Cylinder> cylinder = boost::static_pointer_cast<urdf::Cylinder>(link_->visual->geometry);
+      cylinder->radius = 0.01;
+      cylinder->length = 0.01;
+      break;
+      }
+    case 3:
+      {
+      link_->visual->geometry.reset(new urdf::Mesh);
+      link_->visual->geometry->type = urdf::Geometry::MESH;    
+      boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(link_->visual->geometry);
+      mesh->scale.x = 1.0;
+      mesh->scale.y = 1.0;
+      mesh->scale.z = 1.0;
+      break;
+      }
+    }
+
+    visual_property_->getGeometryProperty()->setGeometry(link_->visual->geometry); 
+
+    emit LinkProperty::valueChanged();
+  }
+
+  void LinkProperty::onCollisionGeometryChanged(int type)
+  {
+    if (loading_)
+      return;
+
+    switch (type) //{SPHERE, BOX, CYLINDER, MESH}
+    {
+    case 0:
+      {
+      link_->collision->geometry.reset(new urdf::Sphere);
+      link_->collision->geometry->type = urdf::Geometry::SPHERE;
+      boost::shared_ptr<urdf::Sphere> sphere = boost::static_pointer_cast<urdf::Sphere>(link_->collision->geometry);
+      sphere->radius = 0.01; 
+      break;
+      }
+    case 1:
+      {
+      link_->collision->geometry.reset(new urdf::Box);
+      link_->collision->geometry->type = urdf::Geometry::BOX;
+      boost::shared_ptr<urdf::Box> box = boost::static_pointer_cast<urdf::Box>(link_->collision->geometry);
+      box->dim.x = 0.01;
+      box->dim.y = 0.01;
+      box->dim.z = 0.01;      
+      break;
+      }
+    case 2:
+      {
+      link_->collision->geometry.reset(new urdf::Cylinder);
+      link_->collision->geometry->type = urdf::Geometry::CYLINDER;
+      boost::shared_ptr<urdf::Cylinder> cylinder = boost::static_pointer_cast<urdf::Cylinder>(link_->collision->geometry);
+      cylinder->radius = 0.01;
+      cylinder->length = 0.01;
+      break;
+      }
+    case 3:
+      {
+      link_->collision->geometry.reset(new urdf::Mesh);
+      link_->collision->geometry->type = urdf::Geometry::MESH;    
+      boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(link_->collision->geometry);
+      mesh->scale.x = 1.0;
+      mesh->scale.y = 1.0;
+      mesh->scale.z = 1.0;
+      break;
+      }
+    }
+
+    collision_property_->getGeometryProperty()->setGeometry(link_->collision->geometry); 
 
     emit LinkProperty::valueChanged();
   }
