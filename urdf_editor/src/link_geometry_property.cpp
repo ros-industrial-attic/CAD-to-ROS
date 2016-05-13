@@ -206,7 +206,12 @@ namespace urdf_editor
       {
         boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
         if (name == "File Name")
-          mesh->filename = val.toString().toStdString();
+        {
+          // TODO: convert absolute URI to a ROS pkg relative one
+          QString bare_path = val.toString();
+          QString abs_file_uri = QString("file://%1").arg(bare_path);
+          mesh->filename = abs_file_uri.toStdString();
+        }
         else if (name == "X")
           mesh->scale.x = val.toDouble();
         else if (name == "Y")
