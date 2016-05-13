@@ -19,6 +19,7 @@ set(editor_SRCS
   src/main.cpp
   src/my_rviz.cpp
   src/urdf_editor.cpp
+  src/urdf_transforms.cpp
 
   # properties
   src/joint_axis_property.cpp
