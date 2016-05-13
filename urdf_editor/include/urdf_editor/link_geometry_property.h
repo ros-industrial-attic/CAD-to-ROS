@@ -20,7 +20,7 @@ namespace urdf_editor
 
     void loadData();
     void loadMesh();
-    void generateConvexMesh();
+    bool generateConvexMesh();
 
     QtProperty *getTopItem() { return top_item_; }
 

@@ -29,6 +29,39 @@ struct FilePaths
   std::string local_path;
 };
 
+static FilePaths getPathFromROSFormatted(const std::string& ros_formatted_path)
+{
+  FilePaths paths;
+
+  // get package
+  std::string pkg = ros_formatted_path.substr(std::string("package://").size());
+  pkg = pkg.substr(0,pkg.find_first_of('/')+1);
+
+  // get file name
+  std::size_t pos = ros_formatted_path.find_last_of('/');
+  std::string filename = ros_formatted_path.substr(pos);
+
+  // get local path
+  std::string local_path = ros_formatted_path.substr(std::string("package://").size());
+  local_path = local_path.substr(0,pos);
+
+  // create full path
+  paths.full_path = ros::package::getPath(pkg) + "/" + local_path + "/" + filename;
+  paths.file_name = filename;
+  paths.local_path = local_path;
+  paths.ros_formatted = ros_formatted_path;
+  paths.ros_pkg = pkg;
+
+
+  ROS_DEBUG("full path %s",paths.full_path.c_str());
+  ROS_DEBUG("file_name %s",paths.file_name.c_str());
+  ROS_DEBUG("local path %s",paths.local_path.c_str());
+  ROS_DEBUG("ros path %s",paths.ros_formatted.c_str());
+  ROS_DEBUG("ros package %s",paths.ros_pkg.c_str());
+
+  return paths;
+}
+
 
 static FilePaths getROSFormattedPath(const std::string& full_path)
 {
@@ -154,7 +187,7 @@ namespace urdf_editor
 
   }
 
-  void LinkGeometryProperty::generateConvexMesh()
+  bool LinkGeometryProperty::generateConvexMesh()
   {
     // create formats filter
     QString qpath = QFileDialog::getOpenFileName(0,QString("Generate Convex Hull from Mesh"),
@@ -162,13 +195,18 @@ namespace urdf_editor
                                                     QString::fromStdString(CONVEX_MESH_FILE_FILTER));
     if(qpath.isEmpty())
     {
-      return;
+      return false;
     }
     FilePaths paths = getROSFormattedPath(qpath.toStdString());
     if(paths.ros_formatted.empty())
     {
-      return;
+      return false;
     }
+
+    // getting currently designated mesh path
+/*    boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(
+        geometries_map_[int(urdf::Geometry::MESH)]);
+    mesh->filename;*/
 
     browse_start_dir_ = paths.parent_dir;
 
@@ -182,13 +220,13 @@ namespace urdf_editor
       if(!chull_gen.save(chull_path))
       {
         ROS_ERROR_STREAM("Failed to save convex hull mesh file at location"<<chull_path);
-        return;
+        return false;
       }
     }
     else
     {
       ROS_ERROR_STREAM("Failed to generate convex hull from file "<<paths.full_path);
-      return;
+      return false;
     }
 
     // updating mesh info
@@ -200,7 +238,11 @@ namespace urdf_editor
     geometry_->type = urdf::Geometry::MESH;
     type_item_->setValue(urdf::Geometry::MESH);
 
+    getPathFromROSFormatted(mesh->filename);
+
     loadData();
+
+    return true;
 
   }
 
