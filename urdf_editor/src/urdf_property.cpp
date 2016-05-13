@@ -13,6 +13,7 @@
 #include <urdf_editor/link_property.h>
 
 #include <urdf_editor/joint_property.h>
+#include <qmessagebox.h>
 
 
 const QString PROPERTY_NAME_TEXT = "Name";
@@ -658,17 +659,15 @@ namespace urdf_editor
         QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
         // if this link already has an 'origin' element, don't allow user to
         // add another
-        if (activeCollision->hasOriginProperty())
+        if(activeCollision->hasOriginProperty())
         {
           origin->setDisabled(true);
         }
         
-        if (activeCollision->hasGeometryProperty())
+        if(activeCollision->hasGeometryProperty())
         {
           geometry->setDisabled(true);
         }
-        
-        
   
         QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
         // don't do anything if user didn't select something
@@ -701,22 +700,28 @@ namespace urdf_editor
         {
           LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperty();
           LinkGeometryPropertySharedPtr geometry =  activeCollision->getGeometryProperty();
-          QAction *load_mesh = menu.addAction(QString("Load Mesh"));
+
           QAction *generate_chull = menu.addAction(QString("Generate Convex"));
 
-
           QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
           // don't do anything if user didn't select something
           if (selected_item == NULL)
             return;
 
-          if (selected_item == load_mesh)
+          if(selected_item == generate_chull)
           {
-            geometry->loadMesh();
-          }
-          else if (selected_item == generate_chull)
-          {
-            geometry->generateConvexMesh();
+            std::string message;
+            if(!geometry->generateConvexMesh(message))
+            {
+              QMessageBox::warning(NULL,"Convex Hull Failure",QString::fromStdString(message),QMessageBox::Ok);
+            }
+            else
+            {
+              QMessageBox msgBox;
+              msgBox.setText("Convex Hull Generation Succeeded");
+              msgBox.exec();
+            }
+
           }
           else
           {
@@ -725,29 +730,6 @@ namespace urdf_editor
             assert (1==0);
           }
         }
-        else if(selb->parent()->property()->propertyName().compare("Visual")==0)
-        {
-          LinkVisualPropertySharedPtr active_visual = activeLink->getVisualProperty();
-          LinkGeometryPropertySharedPtr geometry =  active_visual->getGeometryProperty();
-          QAction *load_mesh = menu.addAction(QString("Load Mesh"));
-
-          QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
-          // don't do anything if user didn't select something
-          if (selected_item == NULL)
-            return;
-
-          if (selected_item == load_mesh)
-          {
-            geometry->loadMesh();
-          }
-          else
-          {
-            // should never happen
-            qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
-            assert (1==0);
-          }
-        }
-
 
       }
 

@@ -19,8 +19,7 @@ namespace urdf_editor
     void loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor);
 
     void loadData();
-    void loadMesh();
-    bool generateConvexMesh();
+    bool generateConvexMesh(std::string& error_message);
 
     QtProperty *getTopItem() { return top_item_; }
 
