@@ -44,13 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <urdf_editor/assimp/stl_exporter.h>
 #include <assimp/version.h>
-
-
-//#include "../include/assimp/version.h"
-//#include "../include/assimp/IOSystem.hpp"
-//#include "../include/assimp/scene.h"
-//#include "../include/assimp/Exporter.hpp"
-
 #include <boost/scoped_ptr.hpp>
 #include <urdf_editor/assimp/exceptional.h>
 #include <urdf_editor/assimp/byte_swapper.h>
