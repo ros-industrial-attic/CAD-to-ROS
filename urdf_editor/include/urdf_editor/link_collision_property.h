@@ -31,10 +31,6 @@ namespace urdf_editor
 
     QtProperty *getTopItem() { return top_item_; }
 
-    LinkGeometryPropertySharedPtr getGeometryProperty()
-    {
-      return geometry_property_;
-    }
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);

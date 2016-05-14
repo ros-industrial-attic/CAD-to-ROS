@@ -4,7 +4,6 @@
 #include <urdf_parser/urdf_parser.h>
 
 #include <urdf_editor/urdf_property.h>
-
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/link_collision_property.h>
 #include <urdf_editor/link_geometry_property.h>
@@ -12,11 +11,9 @@
 #include <urdf_editor/link_new_material_property.h>
 #include <urdf_editor/link_visual_property.h>
 #include <urdf_editor/link_property.h>
-
 #include <urdf_editor/joint_property.h>
-#include <qmessagebox.h>
-
 #include <urdf_editor/urdf_transforms.h>
+#include <qmessagebox.h>
 
 
 const QString PROPERTY_NAME_TEXT = "Name";

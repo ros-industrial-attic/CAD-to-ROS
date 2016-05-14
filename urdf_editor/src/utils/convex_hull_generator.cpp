@@ -186,7 +186,6 @@ bool ConvexHullGenerator::generateConvexHull(const aiScene* scene)
   scene_->mMeshes[0] = chull_mesh_.get();
   scene_->mMeshes[ 0 ]->mMaterialIndex = 0;
   scene_->mNumMeshes = 1;
-  scene_->mNumMaterials = 0;
 
   scene_->mRootNode->mMeshes = new unsigned int[ 1 ];
   scene_->mRootNode->mMeshes[ 0 ] = 0;
