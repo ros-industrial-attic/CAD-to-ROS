@@ -6,11 +6,8 @@
 #include <urdf_editor/link_new_material_property.h>
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/origin_property.h>
-
 #include <urdf_editor/common.h>
-
 #include <urdf_model/link.h>
-
 
 namespace urdf_editor
 {
@@ -94,15 +91,35 @@ namespace urdf_editor
   }
 
   /*!
+   *@brief Get the geometry property Object
+   * 
+   *@return LinkGeometryPropertySharedPtr
+   */
+  LinkGeometryPropertySharedPtr LinkVisualProperty::getGeometryProperty()
+  {
+    return geometry_property_;
+  }
+
+  /*!
    * @brief Creates the geometry property 
    */
   void LinkVisualProperty::createGeometryProperty()
   {
     if (!geometry_property_)
     {
-      visual_->geometry.reset(new urdf::Geometry());  //Create the URDF Geometry element 
+      urdf::SphereSharedPtr geometry(new urdf::Sphere());
+      geometry->radius = 0.1;
+      visual_->geometry = geometry;  //Create the URDF Geometry element
+      visual_->geometry->type = visual_->geometry->SPHERE;
+
       geometry_property_.reset(new LinkGeometryProperty(visual_->geometry));
       top_item_->addSubProperty(geometry_property_->getTopItem());
+
+      QObject::connect(geometry_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
+      onChildValueChanged(geometry_property_->getTopItem(),QVariant::fromValue(0));
+
     }
   }
   
@@ -191,6 +208,14 @@ namespace urdf_editor
     if (loading_)
       return;
 
+    if (property->propertyName() == "Type")
+    {
+        visual_->geometry = geometry_property_->getGeometry();
+        emit LinkVisualProperty::geometryChanged(val.toInt());
+    }
+
     emit LinkVisualProperty::valueChanged(property, val);
+
+
   }
 }
