@@ -195,19 +195,19 @@ void URDFTransformer::updateLink(JointProperty *property)
     vect.x = pose.position.x;
     vect.y = pose.position.y;
     vect.z = pose.position.z;
-    updateLink(property->getParent(), property->getChild(), vect);
+    updateLink(property->getParent().toStdString(), property->getChild().toStdString(), vect);
 
     // Update rotation
     geometry_msgs::Quaternion quat;
     pose.rotation.getQuaternion(quat.x, quat.y, quat.z, quat.w);
-    updateLink(property->getParent(), property->getChild(), quat);
+    updateLink(property->getParent().toStdString(), property->getChild().toStdString(), quat);
   }
   else
   {
     geometry_msgs::Vector3 vect;
-    updateLink(property->getParent(), property->getChild(), vect);
+    updateLink(property->getParent().toStdString(), property->getChild().toStdString(), vect);
     geometry_msgs::Quaternion quat;
-    updateLink(property->getParent(), property->getChild(), quat);
+    updateLink(property->getParent().toStdString(), property->getChild().toStdString(), quat);
   }
 }
 

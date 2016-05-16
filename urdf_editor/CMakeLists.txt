@@ -71,6 +71,9 @@ set(editor_SRCS
   src/link_visual_property.cpp
   src/origin_property.cpp
   src/urdf_property.cpp
+  src/urdf_property_tree.cpp
+  src/urdf_property_tree_link_item.cpp
+  src/urdf_property_tree_joint_item.cpp
 
   # qt extensions
   src/qt_file_browser.cpp
@@ -96,6 +99,9 @@ set(editor_HDRS
   include/urdf_editor/link_visual_property.h
   include/urdf_editor/origin_property.h
   include/urdf_editor/urdf_property.h
+  include/urdf_editor/urdf_property_tree.h
+  include/urdf_editor/urdf_property_tree_link_item.h
+  include/urdf_editor/urdf_property_tree_joint_item.h
   
   # qt extensions
   include/urdf_editor/qt_file_browser.h

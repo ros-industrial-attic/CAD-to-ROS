@@ -224,7 +224,7 @@ namespace urdf_editor
 
       emit LinkProperty::linkNameChanged(this, val);
     }
-    emit LinkProperty::valueChanged();
+    emit LinkProperty::valueChanged(this);
   }
 
   void LinkProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
@@ -232,7 +232,13 @@ namespace urdf_editor
     if (loading_)
       return;
 
-    emit LinkProperty::valueChanged();
+    emit LinkProperty::valueChanged(this);
+  }
+
+  /*! Get the link name */
+  QString LinkProperty::getName()
+  {
+    return QString::fromStdString(link_->name);
   }
 
   void LinkProperty::onVisualGeometryChanged(int type)
@@ -240,7 +246,7 @@ namespace urdf_editor
     if (loading_)
       return;
 
-    emit LinkProperty::valueChanged();
+    emit LinkProperty::valueChanged(this);
   }
 
   void LinkProperty::onCollisionGeometryChanged(int type)
@@ -248,6 +254,6 @@ namespace urdf_editor
     if (loading_)
       return;
 
-    emit LinkProperty::valueChanged();
+    emit LinkProperty::valueChanged(this);
   }
 }

@@ -5,7 +5,9 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QMenu>
+
 #include <qttreepropertybrowser.h>
+#include <urdf_editor/urdf_property_tree.h>
 #include <urdf_editor/my_rviz.h>
 
 #include <urdf_editor/urdf_types.h>
@@ -21,7 +23,7 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
-    URDFProperty(QTreeWidget *tree_widget, QWidget *browser_parent, QWidget *rviz_parent);
+    URDFProperty(URDFPropertyTree *tree_widget, QWidget *browser_parent, QWidget *rviz_parent);
     ~URDFProperty();
 
     bool loadURDF(QString file_path);
@@ -33,68 +35,22 @@ namespace urdf_editor
     bool unsavedChanges;
 
   private slots:
-    void on_treeWidget_customContextMenuRequested(const QPoint &pos);
-
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 
     void on_propertyWidget_customContextMenuRequested(const QPoint &pos);
+    void on_propertyWidget_jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name);
+    void on_propertyWidget_jointOriginChanged(JointProperty *property);
+    void on_propertyWidget_jointAxisChanged(JointProperty *property);
 
-    void on_propertyWidget_linkNameChanged(LinkProperty *property, const QVariant &val);
-
-    void on_propertyWidget_jointNameChanged(JointProperty *property, const QVariant &val);
-
-    void on_propertyWidget_linkValueChanged();
-    void on_propertyWidget_jointValueChanged(JointProperty *property);
+    void on_propertyWidget_linkValueChanged(LinkProperty *property);
 
     void on_unsavedChanges();
 
-  signals:
-    void jointAddition();
-
-    void jointDeletion();
-
-    void linkAddition();
-
-    void linkDeletion();
-
   private:
-    bool populateTreeWidget();
-
-    void addToTreeWidget(urdf::LinkSharedPtr link, QTreeWidgetItem* parent);
-    void addToTreeWidget(urdf::JointSharedPtr joint, QTreeWidgetItem* parent);
-
-    void addModelLink(QTreeWidgetItem* parent);
-    QTreeWidgetItem* addLinkTreeItem(QTreeWidgetItem* parent, urdf::LinkSharedPtr link);
-    LinkPropertySharedPtr addLinkProperty(QTreeWidgetItem* item, urdf::LinkSharedPtr link);
-
-    void addModelJoint(QTreeWidgetItem *parent);
-    QTreeWidgetItem* addJointTreeItem(QTreeWidgetItem* parent, urdf::JointSharedPtr joint);
-    JointPropertySharedPtr addJointProperty(QTreeWidgetItem *item, urdf::JointSharedPtr joint);
-
-    QString getValidName(QString prefix, QList<QString> &current_names);
-
-    bool isJoint(QTreeWidgetItem *item);
-    bool isLink(QTreeWidgetItem *item);
+    bool redrawRobotModel();
 
     boost::shared_ptr<QtTreePropertyBrowser> property_editor_;
-    urdf::ModelInterfaceSharedPtr model_;
-    QMap<urdf::LinkSharedPtr, QTreeWidgetItem *> joint_child_to_ctree_;
-
-    // these map chain-tree-items to joint properties
-    QMap<QTreeWidgetItem *, JointPropertySharedPtr> ctree_to_joint_property_;
-    // and joint properties to chain-tree-items
-    QMap<JointProperty *, QTreeWidgetItem *> joint_property_to_ctree_;
-
-    // these map link-tree-items to link properties
-    QMap<QTreeWidgetItem *, LinkPropertySharedPtr> ltree_to_link_property_;
-    // and link properties to link-tree-items
-    QMap<LinkProperty *, QTreeWidgetItem *> link_property_to_ltree_;
-
-    QStringList link_names_, joint_names_;
-    QTreeWidgetItem *root_;
-    QTreeWidgetItem *link_root_;
-    QTreeWidgetItem *joint_root_;
-    QTreeWidget *tree_widget_;
+    URDFPropertyTree *tree_widget_;
     QWidget *browser_parent_;
     urdf_editor::MyRviz *rviz_widget_;
     boost::shared_ptr<URDFTransformer> tf_transformer_;
