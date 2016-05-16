@@ -4,17 +4,16 @@
 #include <urdf_parser/urdf_parser.h>
 
 #include <urdf_editor/urdf_property.h>
-
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/link_collision_property.h>
+#include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/link_inertial_property.h>
 #include <urdf_editor/link_new_material_property.h>
 #include <urdf_editor/link_visual_property.h>
 #include <urdf_editor/link_property.h>
-
 #include <urdf_editor/joint_property.h>
-
 #include <urdf_editor/urdf_transforms.h>
+#include <qmessagebox.h>
 
 
 const QString PROPERTY_NAME_TEXT = "Name";
@@ -661,7 +660,7 @@ namespace urdf_editor
           assert (1==0);
         }
       }
-        // user right-clicked on 'Collsion' property entry: show  option
+        // user right-clicked on 'Collision' property entry: show  option
       // only.
       else if (selb->property()->propertyName() == PROPERTY_COLLISION_TEXT)
       {
@@ -670,17 +669,15 @@ namespace urdf_editor
         QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
         // if this link already has an 'origin' element, don't allow user to
         // add another
-        if (activeCollision->hasOriginProperty())
+        if(activeCollision->hasOriginProperty())
         {
           origin->setDisabled(true);
         }
         
-        if (activeCollision->hasGeometryProperty())
+        if(activeCollision->hasGeometryProperty())
         {
           geometry->setDisabled(true);
         }
-        
-        
   
         QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
         // don't do anything if user didn't select something
@@ -706,6 +703,46 @@ namespace urdf_editor
           assert (1==0);
         }
       }
+
+      else if (selb->property()->propertyName() == PROPERTY_GEOMETRY_TEXT)
+      {
+        if(selb->parent()->property()->propertyName().compare("Collision")==0)
+        {
+          LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperty();
+          LinkGeometryPropertySharedPtr geometry =  activeCollision->getGeometryProperty();
+
+          QAction *generate_chull = menu.addAction(QString("Generate Convex"));
+
+          QAction *selected_item = menu.exec(property_editor_->mapToGlobal(pos));
+          // don't do anything if user didn't select something
+          if (selected_item == NULL)
+            return;
+
+          if(selected_item == generate_chull)
+          {
+            std::string message;
+            if(!geometry->generateConvexMesh(message))
+            {
+              QMessageBox::warning(NULL,"Convex Hull Failure",QString::fromStdString(message),QMessageBox::Ok);
+            }
+            else
+            {
+              QMessageBox msgBox;
+              msgBox.setText("Convex Hull Generation Succeeded");
+              msgBox.exec();
+            }
+
+          }
+          else
+          {
+            // should never happen
+            qDebug() << QString("The selected right click member %1 is not being handled!").arg(selected_item->text());
+            assert (1==0);
+          }
+        }
+
+      }
+
      return;
     }//Link
 
