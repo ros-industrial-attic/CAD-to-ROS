@@ -20,6 +20,8 @@ namespace urdf_editor
 
     void loadData();
 
+    urdf::Pose& getOriginData();
+
     QtProperty *getTopItem() { return top_item_; }
 
   private slots:
