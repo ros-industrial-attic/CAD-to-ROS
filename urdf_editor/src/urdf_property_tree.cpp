@@ -280,6 +280,9 @@ namespace urdf_editor
     link_names_.append(item->getName());
 
     parent->addChild(item);
+
+    emit linkAddition(item->getProperty().get());
+
     return item;
   }
 
@@ -347,6 +350,9 @@ namespace urdf_editor
     joint_names_.append(item->getName());
 
     parent->addChild(item);
+
+    emit jointAddition(item->getProperty().get());
+
     return item;
   }
 
@@ -418,7 +424,6 @@ namespace urdf_editor
     QTreeWidgetItem *sel = getSelectedItem();
     URDFPropertyTreeLinkItem *new_link = addLinkTreeItem(sel, addModelLink());
     sel->setExpanded(true);
-    emit linkAddition();
 
     if (link_names_.count() > 2 && !isLinkRoot(sel->parent()))
     {
@@ -429,7 +434,6 @@ namespace urdf_editor
       URDFPropertyTreeJointItem *new_joint = addJointTreeItem(parent, joint);
       parent->setExpanded(true);
       new_link->assignJoint(new_joint);
-      emit jointAddition();
     }
     else if (link_names_.count() == 2 || isLinkRoot(sel->parent()))
     {
@@ -437,7 +441,6 @@ namespace urdf_editor
       URDFPropertyTreeJointItem *new_joint = addJointTreeItem(joint_root_, joint);
       joint_root_->setExpanded(true);
       new_link->assignJoint(new_joint);
-      emit jointAddition();
     }
   }
 

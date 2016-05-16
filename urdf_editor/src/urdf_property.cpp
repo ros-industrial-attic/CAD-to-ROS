@@ -66,11 +66,11 @@ namespace urdf_editor
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
 
-    connect(tree_widget_, SIGNAL(jointAddition()), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(jointAddition(JointProperty*)), SLOT(on_unsavedChanges(JointProperty*)));
 
     connect(tree_widget_, SIGNAL(jointDeletion()), SLOT(on_unsavedChanges()));
 
-    connect(tree_widget_, SIGNAL(linkAddition()), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(linkAddition(LinkProperty*)), SLOT(on_unsavedChanges()));
 
     connect(tree_widget_, SIGNAL(linkDeletion()), SLOT(on_unsavedChanges()));
 
@@ -93,6 +93,7 @@ namespace urdf_editor
 
   bool URDFProperty::loadURDF(QString file_path)
   {
+    loading_ = true;
     urdf::ModelInterfaceSharedPtr model = urdf::parseURDFFile(file_path.toStdString());
 
     if (!tree_widget_->loadRobotModel(model))
@@ -102,6 +103,8 @@ namespace urdf_editor
       return false;
 
     rviz_widget_->updateBaseLink(model->getRoot()->name);
+
+    loading_ = false;
 
     return true;
   }
@@ -477,9 +480,18 @@ namespace urdf_editor
   }
 
 
+  void URDFProperty::on_unsavedChanges(JointProperty *property)
+  {
+    if (!loading_)
+      unsavedChanges = true;
+
+    tf_transformer_->updateLink(property);
+  }
+
   void URDFProperty::on_unsavedChanges()
   {
-    unsavedChanges = true;
+    if (!loading_)
+      unsavedChanges = true;
   }
 
   void URDFProperty::on_propertyWidget_jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name)
