@@ -29,12 +29,12 @@ namespace urdf_editor
     bool hasAssignedJoint();
 
   private slots:
-    void on_linkNameChanged(LinkProperty *link, const QVariant &val);
-    void on_valueChanged();
+    void on_linkNameChanged(LinkProperty *property, const QVariant &val);
+    void on_valueChanged(LinkProperty *property);
 
   signals:
-    void valueChanged();
-    void linkNameChanged(URDFPropertyTreeLinkItem *link, QString current_name, QString new_name);
+    void valueChanged(LinkProperty *property);
+    void linkNameChanged(LinkProperty *property, QString current_name, QString new_name);
 
   private:
     void updateDisplayText();

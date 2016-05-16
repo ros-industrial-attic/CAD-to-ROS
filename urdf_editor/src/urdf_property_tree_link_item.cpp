@@ -22,8 +22,8 @@ namespace urdf_editor
     QObject::connect(property_.get(), SIGNAL(linkNameChanged(LinkProperty*,QVariant)),
               this, SLOT(on_linkNameChanged(LinkProperty*,QVariant)));
 
-    QObject::connect(property_.get(), SIGNAL(valueChanged()),
-              this, SLOT(on_valueChanged()));
+    QObject::connect(property_.get(), SIGNAL(valueChanged(LinkProperty*)),
+              this, SLOT(on_valueChanged(LinkProperty*)));
   }
 
   QTreeWidgetItem *URDFPropertyTreeLinkItem::parent() const
@@ -83,20 +83,20 @@ namespace urdf_editor
     setText(0, name_);
   }
 
-  void URDFPropertyTreeLinkItem::on_linkNameChanged(LinkProperty *link, const QVariant &val)
+  void URDFPropertyTreeLinkItem::on_linkNameChanged(LinkProperty *property, const QVariant &val)
   {
-    Q_UNUSED(link)
+    Q_UNUSED(property)
     QString current_name = name_;
     name_ = val.toString();
 
     updateDisplayText();
 
-    emit linkNameChanged(this, current_name, name_);
+    emit linkNameChanged(property, current_name, name_);
   }
 
-  void URDFPropertyTreeLinkItem::on_valueChanged()
+  void URDFPropertyTreeLinkItem::on_valueChanged(LinkProperty *property)
   {
-    emit valueChanged();
+    emit valueChanged(property);
   }
 }
 

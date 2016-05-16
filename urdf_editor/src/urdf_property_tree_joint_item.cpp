@@ -14,7 +14,9 @@ namespace urdf_editor
     link_names_(link_names),
     joint_names_(joint_names),
     property_(new urdf_editor::JointProperty(joint, link_names, joint_names)),
-    name_(QString::fromStdString(joint->name))
+    name_(QString::fromStdString(joint->name)),
+    parent_link_name_(QString::fromStdString(joint->parent_link_name)),
+    child_link_name_(QString::fromStdString(joint->child_link_name))
   {
     updateDisplayText();
 
@@ -22,8 +24,22 @@ namespace urdf_editor
               this, SLOT(on_jointNameChanged(JointProperty*,const QVariant &)));
     QObject::connect(property_.get(), SIGNAL(parentLinkChanged(JointProperty *, const QVariant &)),
               this, SLOT(on_jointParentLinkChanged(JointProperty*,QVariant)));
-    QObject::connect(property_.get(), SIGNAL(valueChanged()),
-              this, SLOT(on_valueChanged()));
+    QObject::connect(property_.get(), SIGNAL(originChanged(JointProperty*)),
+              this, SIGNAL(originChanged(JointProperty*)));
+    QObject::connect(property_.get(), SIGNAL(axisChanged(JointProperty*)),
+              this, SIGNAL(axisChanged(JointProperty*)));
+    QObject::connect(property_.get(), SIGNAL(calibrationChanged(JointProperty*)),
+              this, SIGNAL(calibrationChanged(JointProperty*)));
+    QObject::connect(property_.get(), SIGNAL(dynamicsChanged(JointProperty*)),
+              this, SIGNAL(dynamicsChanged(JointProperty*)));
+    QObject::connect(property_.get(), SIGNAL(limitsChanged(JointProperty*)),
+              this, SIGNAL(limitsChanged(JointProperty*)));
+    QObject::connect(property_.get(), SIGNAL(mimicChanged(JointProperty*)),
+              this, SIGNAL(mimicChanged(JointProperty*)));
+    QObject::connect(property_.get(), SIGNAL(safetyChanged(JointProperty*)),
+              this, SIGNAL(safetyChanged(JointProperty*)));
+    QObject::connect(property_.get(), SIGNAL(valueChanged(JointProperty*)),
+              this, SIGNAL(valueChanged(JointProperty*)));
   }
 
   QTreeWidgetItem *URDFPropertyTreeJointItem::parent() const
@@ -48,7 +64,7 @@ namespace urdf_editor
 
   void URDFPropertyTreeJointItem::setParentLinkName(QString name)
   {
-    property_->setParentLinkName(name);
+    property_->setParent(name);
   }
 
   urdf::JointSharedPtr URDFPropertyTreeJointItem::getData()
@@ -71,24 +87,23 @@ namespace urdf_editor
     setText(0, name_);
   }
 
-  void URDFPropertyTreeJointItem::on_jointNameChanged(JointProperty *joint, const QVariant &val)
+  void URDFPropertyTreeJointItem::on_jointNameChanged(JointProperty *property, const QVariant &val)
   {
-    Q_UNUSED(joint)
+    Q_UNUSED(property)
     QString current_name = name_;
     name_ = val.toString();
 
     updateDisplayText();
 
-    emit jointNameChanged(this, current_name, name_);
+    emit jointNameChanged(property, current_name, name_);
   }
 
-  void URDFPropertyTreeJointItem::on_jointParentLinkChanged(JointProperty *joint, const QVariant &val)
+  void URDFPropertyTreeJointItem::on_jointParentLinkChanged(JointProperty *property, const QVariant &val)
   {
-    emit parentLinkChanged(this);
-  }
+    Q_UNUSED(property)
+    QString current_name = parent_link_name_;
+    parent_link_name_ = val.toString();
 
-  void URDFPropertyTreeJointItem::on_valueChanged()
-  {
-    emit valueChanged();
+    emit parentLinkChanged(property, current_name, parent_link_name_);
   }
 }

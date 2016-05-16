@@ -79,6 +79,16 @@ namespace urdf_editor
   }
 
   /*!
+   *@brief Get the geometry property Object
+   * 
+   *@return LinkGeometryPropertySharedPtr
+   */
+  LinkGeometryPropertySharedPtr LinkCollisionProperty::getGeometryProperty()
+  {
+    return geometry_property_;
+  }
+
+  /*!
    * @brief Creates the geometry property 
    */
   void LinkCollisionProperty::createGeometryProperty()
@@ -89,9 +99,7 @@ namespace urdf_editor
       geometry_property_.reset(new LinkGeometryProperty(collision_->geometry));
       top_item_->addSubProperty(geometry_property_->getTopItem());
     }
-  }
-  
-  
+  } 
   
   LinkCollisionProperty::~LinkCollisionProperty()
   {
@@ -150,7 +158,15 @@ namespace urdf_editor
   {
     if (loading_)
       return;
-
-    emit LinkCollisionProperty::valueChanged(property, val);
+    
+    if (property->propertyName() == "Type")
+    {
+      if (hasGeometryProperty())
+        emit LinkCollisionProperty::geometryChanged(val.toInt());
+    }
+    else
+    {
+      emit LinkCollisionProperty::valueChanged(property, val);
+    }
   }
 }

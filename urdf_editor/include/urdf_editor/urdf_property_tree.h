@@ -47,16 +47,35 @@ namespace urdf_editor
     void on_expandActionTriggered();
     void on_collapseActionTriggered();
     void on_contextMenuRequested(const QPoint &pos);
-    void on_jointNameChanged(URDFPropertyTreeJointItem *joint, QString current_name, QString new_name);
-    void on_jointParentLinkChanged(URDFPropertyTreeJointItem *joint);
-    void on_linkNameChanged(URDFPropertyTreeLinkItem *link, QString current_name, QString new_name);
+
+    // Joint SLOTS
+    void on_jointNameChanged(JointProperty *property, QString current_name, QString new_name);
+    void on_jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name);
+
+    // Link SLOTS
+    void on_linkNameChanged(LinkProperty *property, QString current_name, QString new_name);
 
   signals:
-    void propertyValueChanged();
+    void valueChanged();
+
+    // Link SIGNALS
     void linkAddition();
     void linkDeletion();
+    void linkValueChanged(LinkProperty *property);
+
+    // Joint SIGNALS
     void jointAddition();
     void jointDeletion();
+    void jointNameChanged(JointProperty *property, QString current_name, QString new_name);
+    void jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name);
+    void jointOriginChanged(JointProperty *property);
+    void jointAxisChanged(JointProperty *property);
+    void jointCalibrationChanged(JointProperty *property);
+    void jointDynamicsChanged(JointProperty *property);
+    void jointLimitsChanged(JointProperty *property);
+    void jointMimicChanged(JointProperty *property);
+    void jointSafetyChanged(JointProperty *property);
+    void jointValueChanged(JointProperty *property);
 
   private:
     virtual void dropEvent(QDropEvent * event);

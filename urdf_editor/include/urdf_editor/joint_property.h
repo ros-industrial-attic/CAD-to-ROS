@@ -11,6 +11,8 @@
 
 namespace urdf_editor
 {
+  class URDFTransformer;
+
   class JointProperty : public QObject
   {
     Q_OBJECT
@@ -26,13 +28,13 @@ namespace urdf_editor
     QString getName();
 
     /*! Get the name of the parent link */
-    QString getParentLinkName() const;
+    QString getParent() const;
 
     /*! Get the name of the child link */
-    QString getChildLinkName() const;
+    QString getChild() const;
 
     /*! Set the parent link name */
-    bool setParentLinkName(const QString &link_name);
+    bool setParent(const QString &link_name);
     
     /*! Check if has origin property */
     bool hasOriginProperty();
@@ -96,16 +98,28 @@ namespace urdf_editor
    
     /*! Get the safety Property */
     JointSafetyPropertySharedPtr getSafetyProperty();
-    
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
-    void onChildValueChanged(QtProperty *property, const QVariant &val);
+    void onOriginChanged(QtProperty *property, const QVariant &val);
+    void onAxisChanged(QtProperty *property, const QVariant &val);
+    void onCalibrationChanged(QtProperty *property, const QVariant &val);
+    void onDynamicsChanged(QtProperty *property, const QVariant &val);
+    void onLimitsChanged(QtProperty *property, const QVariant &val);
+    void onMimicChanged(QtProperty *property, const QVariant &val);
+    void onSafetyChanged(QtProperty *property, const QVariant &val);
 
   signals:
     void jointNameChanged(JointProperty *property, const QVariant &val);
     void parentLinkChanged(JointProperty *property, const QVariant &val);
-    void valueChanged();
+    void originChanged(JointProperty *property);
+    void axisChanged(JointProperty *property);
+    void calibrationChanged(JointProperty *property);
+    void dynamicsChanged(JointProperty *property);
+    void limitsChanged(JointProperty *property);
+    void mimicChanged(JointProperty *property);
+    void safetyChanged(JointProperty *property);
+    void valueChanged(JointProperty *property);
 
   private:
     urdf::JointSharedPtr joint_;
@@ -125,6 +139,7 @@ namespace urdf_editor
     QtVariantProperty *type_item_;
     QtVariantProperty *parent_item_;
     QtVariantProperty *child_item_;
+    boost::shared_ptr<URDFTransformer> tf_;
   };
 }
 

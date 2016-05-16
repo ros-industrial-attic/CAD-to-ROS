@@ -19,6 +19,7 @@ set(editor_SRCS
   src/main.cpp
   src/my_rviz.cpp
   src/urdf_editor.cpp
+  src/urdf_transforms.cpp
 
   # properties
   src/joint_axis_property.cpp
@@ -39,6 +40,9 @@ set(editor_SRCS
   src/urdf_property_tree.cpp
   src/urdf_property_tree_link_item.cpp
   src/urdf_property_tree_joint_item.cpp
+
+  # qt extensions
+  src/qt_file_browser.cpp
 )
 
 set(editor_HDRS
@@ -64,6 +68,9 @@ set(editor_HDRS
   include/urdf_editor/urdf_property_tree.h
   include/urdf_editor/urdf_property_tree_link_item.h
   include/urdf_editor/urdf_property_tree_joint_item.h
+  
+  # qt extensions
+  include/urdf_editor/qt_file_browser.h
 )
 
 set(editor_UIS

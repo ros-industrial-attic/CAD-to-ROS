@@ -28,19 +28,27 @@ namespace urdf_editor
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
   private slots:
-    void on_jointNameChanged(JointProperty *joint, const QVariant &val);
-    void on_jointParentLinkChanged(JointProperty *joint, const QVariant &val);
-    void on_valueChanged();
+    void on_jointNameChanged(JointProperty *property, const QVariant &val);
+    void on_jointParentLinkChanged(JointProperty *property, const QVariant &val);
 
   signals:
-    void valueChanged();
-    void jointNameChanged(URDFPropertyTreeJointItem *joint, QString current_name, QString new_name);
-    void parentLinkChanged(URDFPropertyTreeJointItem *joint);
+    void jointNameChanged(JointProperty *property, QString current_name, QString new_name);
+    void parentLinkChanged(JointProperty *property, QString current_name, QString new_name);
+    void originChanged(JointProperty *property);
+    void axisChanged(JointProperty *property);
+    void calibrationChanged(JointProperty *property);
+    void dynamicsChanged(JointProperty *property);
+    void limitsChanged(JointProperty *property);
+    void mimicChanged(JointProperty *property);
+    void safetyChanged(JointProperty *property);
+    void valueChanged(JointProperty *property);
 
   private:
     void updateDisplayText();
 
     QString name_;
+    QString parent_link_name_;
+    QString child_link_name_;
     urdf::JointSharedPtr joint_;
     QStringList &link_names_;
     QStringList &joint_names_;

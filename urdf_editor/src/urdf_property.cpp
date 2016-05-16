@@ -5,6 +5,7 @@
 
 #include <urdf_editor/urdf_property.h>
 
+#include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/link_collision_property.h>
 #include <urdf_editor/link_inertial_property.h>
 #include <urdf_editor/link_new_material_property.h>
@@ -12,6 +13,7 @@
 #include <urdf_editor/link_property.h>
 #include <urdf_editor/urdf_property_tree_link_item.h>
 #include <urdf_editor/joint_property.h>
+#include <urdf_editor/urdf_transforms.h>
 
 const QString PROPERTY_NAME_TEXT = "Name";
 const QString PROPERTY_COLLISION_TEXT = "Collision";
@@ -46,26 +48,31 @@ namespace urdf_editor
 
     rviz_widget_ = new urdf_editor::MyRviz(rviz_parent);
 
-    connect(tree_widget_, SIGNAL(itemClicked(QTreeWidgetItem*,int)),
-              this, SLOT(on_treeWidget_itemClicked(QTreeWidgetItem*,int)));
+    tf_transformer_.reset(new URDFTransformer());
 
-    connect(tree_widget_, SIGNAL(propertyValueChanged()),
-            this, SLOT(on_propertyWidget_valueChanged()));
+    connect(tree_widget_, SIGNAL(itemClicked(QTreeWidgetItem*,int)),
+            this, SLOT(on_treeWidget_itemClicked(QTreeWidgetItem*,int)));
+
+    connect(tree_widget_, SIGNAL(jointParentLinkChanged(JointProperty*,QString,QString)),
+            this, SLOT(on_propertyWidget_jointParentLinkChanged(JointProperty*,QString,QString)));
+    connect(tree_widget_, SIGNAL(jointOriginChanged(JointProperty*)),
+            this, SLOT(on_propertyWidget_jointOriginChanged(JointProperty*)));
+    connect(tree_widget_, SIGNAL(jointAxisChanged(JointProperty*)),
+            this, SLOT(on_propertyWidget_jointAxisChanged(JointProperty*)));
+
+    connect(tree_widget_, SIGNAL(linkValueChanged(LinkProperty*)),
+            this, SLOT(on_propertyWidget_linkValueChanged(LinkProperty*)));
 
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
 
     connect(tree_widget_, SIGNAL(jointAddition()), SLOT(on_unsavedChanges()));
-    connect(tree_widget_, SIGNAL(jointAddition()), SLOT(on_propertyWidget_valueChanged()));
 
     connect(tree_widget_, SIGNAL(jointDeletion()), SLOT(on_unsavedChanges()));
-    connect(tree_widget_, SIGNAL(jointDeletion()), SLOT(on_propertyWidget_valueChanged()));
 
     connect(tree_widget_, SIGNAL(linkAddition()), SLOT(on_unsavedChanges()));
-    connect(tree_widget_, SIGNAL(linkAddition()), SLOT(on_propertyWidget_valueChanged()));
 
     connect(tree_widget_, SIGNAL(linkDeletion()), SLOT(on_unsavedChanges()));
-    connect(tree_widget_, SIGNAL(linkDeletion()), SLOT(on_propertyWidget_valueChanged()));
 
     // No changes to be saved, yet
     unsavedChanges = false;
@@ -80,6 +87,7 @@ namespace urdf_editor
     tree_widget_->clear();
     rviz_widget_->clear();
     property_editor_->clear();
+    tf_transformer_->clear();
     unsavedChanges = false;
   }
 
@@ -90,7 +98,12 @@ namespace urdf_editor
     if (!tree_widget_->loadRobotModel(model))
       return false;
 
-    return rviz_widget_->loadRobot(model);
+    if (!rviz_widget_->loadRobot(model))
+      return false;
+
+    rviz_widget_->updateBaseLink(model->getRoot()->name);
+
+    return true;
   }
 
   bool URDFProperty::saveURDF(QString file_path)
@@ -102,6 +115,11 @@ namespace urdf_editor
     savedCorrectly = doc->SaveFile(file_path.toStdString());
 
     return savedCorrectly;
+  }
+
+  bool URDFProperty::redrawRobotModel()
+  {
+    return rviz_widget_->loadRobot(tree_widget_->getRobotModel());
   }
 
   void URDFProperty::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
@@ -451,15 +469,52 @@ namespace urdf_editor
     }//Link 
   }
 
-  void URDFProperty::on_propertyWidget_valueChanged()
+  void URDFProperty::on_propertyWidget_linkValueChanged(LinkProperty *property)
   {
-    rviz_widget_->loadRobot(tree_widget_->getRobotModel());
+    Q_UNUSED(property)
+    redrawRobotModel();
     unsavedChanges = true;
   }
+
 
   void URDFProperty::on_unsavedChanges()
   {
     unsavedChanges = true;
+  }
+
+  void URDFProperty::on_propertyWidget_jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name)
+  {
+    tf_transformer_->updateLink(current_name.toStdString(), property->getChild().toStdString(), new_name.toStdString(), property->getChild().toStdString());
+
+    if (!redrawRobotModel())
+    {
+        ROS_WARN("Model is invalid, skipping TF transformer and fixed frame update.");
+        return;
+    }
+
+    // make sure we only update if the model has an actual root link
+    if (tree_widget_->getRobotModel()->getRoot() == NULL)
+    {
+        ROS_WARN("Model has no root link, skipping TF transformer and fixed frame update.");
+        return;
+    }
+
+    tf_transformer_->updateLink(property);
+
+    // update Rviz base link in the event that root has changed
+    rviz_widget_->updateBaseLink(tree_widget_->getRobotModel()->getRoot()->name);
+  }
+
+  void URDFProperty::on_propertyWidget_jointOriginChanged(JointProperty *property)
+  {
+    redrawRobotModel();
+    tf_transformer_->updateLink(property);
+  }
+
+  void URDFProperty::on_propertyWidget_jointAxisChanged(JointProperty *property)
+  {
+    redrawRobotModel();
+    tf_transformer_->updateLink(property);
   }
 
 }
