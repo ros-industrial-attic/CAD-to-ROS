@@ -45,6 +45,7 @@ namespace urdf_editor
     void on_propertyWidget_linkValueChanged(LinkProperty *property);
 
     void on_unsavedChanges();
+    void on_unsavedChanges(JointProperty *property);
 
   private:
     bool redrawRobotModel();
@@ -54,6 +55,7 @@ namespace urdf_editor
     QWidget *browser_parent_;
     urdf_editor::MyRviz *rviz_widget_;
     boost::shared_ptr<URDFTransformer> tf_transformer_;
+    bool loading_;
   };
 }
 

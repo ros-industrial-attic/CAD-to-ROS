@@ -59,12 +59,12 @@ namespace urdf_editor
     void valueChanged();
 
     // Link SIGNALS
-    void linkAddition();
+    void linkAddition(LinkProperty *property);
     void linkDeletion();
     void linkValueChanged(LinkProperty *property);
 
     // Joint SIGNALS
-    void jointAddition();
+    void jointAddition(JointProperty *property);
     void jointDeletion();
     void jointNameChanged(JointProperty *property, QString current_name, QString new_name);
     void jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name);
