@@ -95,7 +95,41 @@ namespace urdf_editor
   bool URDFProperty::loadURDF(QString file_path)
   {
     loading_ = true;
-    urdf::ModelInterfaceSharedPtr model = urdf::parseURDFFile(file_path.toStdString());
+
+    urdf::ModelInterfaceSharedPtr model;
+
+    if (file_path.toStdString().find(".xacro") != std::string::npos)
+    {
+      std::string urdf_string;
+      std::string cmd("rosrun xacro xacro.py ");
+      cmd += file_path.toStdString();
+      ROS_INFO( "Running '%s'...", cmd.c_str() );
+
+      FILE* pipe = popen(cmd.c_str(), "r");
+      if (!pipe)
+      {
+        ROS_ERROR("Error Loading Files: XACRO file or parser not found " );
+        return false;
+      }
+      char buffer[128] = {0};
+      while (!feof(pipe))
+      {
+        if (fgets(buffer, sizeof(buffer), pipe) != NULL)
+          urdf_string += buffer;
+      }
+      pclose(pipe);
+      
+      if (urdf_string.empty())
+      {
+        ROS_ERROR("Error Loading Files: Unable to parse XACRO file " );
+        return false;
+      }
+      model = urdf::parseURDF(urdf_string);
+    }
+    else
+    {
+      model = urdf::parseURDFFile(file_path.toStdString());
+    }
 
     if (!tree_widget_->loadRobotModel(model))
       return false;
