@@ -6,9 +6,10 @@
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <fstream>
+#include <boost/assign.hpp>
 
 static const std::string STL_BIN_FORMAT_ID = "stlb";
-static const std::map<std::string,std::string> OUTPUT_EXTENSION_MAP = {{"stl","stlb"}};
+static const std::map<std::string,std::string> OUTPUT_EXTENSION_MAP = boost::assign::map_list_of ("stl","stlb");
 
 namespace urdf_editor
 {
@@ -16,8 +17,7 @@ namespace utils
 {
 
 ConvexHullGenerator::ConvexHullGenerator():
-    scene_(nullptr),
-    chull_mesh_(nullptr)
+    scene_(NULL)
 {
 
 }
@@ -60,7 +60,7 @@ bool ConvexHullGenerator::save(const std::string& file_path)
   Exporter exporter;
 
   // register STL binary exporter
-  auto steps = aiProcess_Triangulate | aiProcess_SortByPType | aiProcess_GenSmoothNormals |
+  unsigned int steps = aiProcess_Triangulate | aiProcess_SortByPType | aiProcess_GenSmoothNormals |
       aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals | aiProcess_FindInvalidData ;
 
   Exporter::ExportFormatEntry format_entry(STL_BIN_FORMAT_ID.c_str(),"Stereolithography (binary)",
@@ -91,7 +91,7 @@ bool ConvexHullGenerator::save(const std::string& file_path)
   int ext_count = exporter.GetExportFormatCount();
   std::string ext_id = OUTPUT_EXTENSION_MAP.at(ext);
   bool supported = false;
-  for(auto i = 0u; i < ext_count; i++)
+  for(unsigned int i = 0u; i < ext_count; i++)
   {
     const aiExportFormatDesc* desc = exporter.GetExportFormatDescription(i);
     if(std::string(desc->id).compare(ext_id) == 0) // find binary
