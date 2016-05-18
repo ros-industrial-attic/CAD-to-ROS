@@ -132,6 +132,17 @@ void URDFEditor::closeEvent( QCloseEvent *event )
 
 void URDFEditor::on_actionToggle_Collision_Visualization_triggered(bool checked)
 {
-  ROS_INFO("Toggled collision visualization");
+  ROS_DEBUG("Toggled collision-model display");
   urdf_tree_->requestCollisionVisualizationEnabled(checked);
+}
+
+void URDFEditor::on_action_ToggleVisual_triggered(bool checked)
+{
+  ROS_DEBUG("Toggled visual-model display");
+  urdf_tree_->requestVisualizationEnabled(checked);
+}
+
+void URDFEditor::on_actionAbout_triggered()
+{
+  QMessageBox::about(this, "About", "Visualization toggle icons from https://icons8.com/.");
 }

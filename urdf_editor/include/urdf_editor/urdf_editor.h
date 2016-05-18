@@ -36,6 +36,10 @@ private slots:
 
   void on_actionToggle_Collision_Visualization_triggered(bool checked);
 
+  void on_action_ToggleVisual_triggered(bool checked);
+
+  void on_actionAbout_triggered();
+
 private:
   Ui::URDFEditor *ui;
   QList<QString> link_names;

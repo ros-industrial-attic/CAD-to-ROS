@@ -97,6 +97,11 @@ namespace urdf_editor
     rviz_widget_->enableCollisionVisualization(b);
   }
 
+  void URDFProperty::requestVisualizationEnabled(bool b)
+  {
+    rviz_widget_->enableVisualization(b);
+  }
+
   bool URDFProperty::loadURDF(QString file_path)
   {
     urdf::ModelInterfaceSharedPtr model = urdf::parseURDFFile(file_path.toStdString());
