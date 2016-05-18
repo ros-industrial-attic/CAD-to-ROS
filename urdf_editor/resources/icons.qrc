@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>collision_vis_off.ico</file>
+        <file>collision_vis_on.ico</file>
+    </qresource>
+</RCC>
