@@ -129,3 +129,9 @@ void URDFEditor::closeEvent( QCloseEvent *event )
     event->accept();
   }
 }
+
+void URDFEditor::on_actionToggle_Collision_Visualization_triggered(bool checked)
+{
+  ROS_INFO("Toggled collision visualization");
+  urdf_tree_->requestCollisionVisualizationEnabled(checked);
+}

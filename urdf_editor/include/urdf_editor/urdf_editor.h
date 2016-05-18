@@ -34,6 +34,8 @@ private slots:
 
   void on_action_Exit_triggered();
 
+  void on_actionToggle_Collision_Visualization_triggered(bool checked);
+
 private:
   Ui::URDFEditor *ui;
   QList<QString> link_names;

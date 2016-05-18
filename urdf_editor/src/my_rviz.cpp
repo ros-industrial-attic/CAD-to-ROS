@@ -82,4 +82,9 @@ namespace urdf_editor
     return true;
   }
 
+  void MyRviz::enableCollisionVisualization(bool b)
+  {
+    robot_display_->subProp("Collision Enabled")->setValue (b ? "true" : "false");
+  }
+
 }

@@ -123,7 +123,7 @@
      <x>0</x>
      <y>0</y>
      <width>1039</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -152,6 +152,8 @@
    <addaction name="separator"/>
    <addaction name="action_Save"/>
    <addaction name="actionSave_As"/>
+   <addaction name="separator"/>
+   <addaction name="actionToggle_Collision_Visualization"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_Open">
@@ -214,6 +216,22 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="actionToggle_Collision_Visualization">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resources/icons.qrc">
+     <normaloff>:/icons/collision_vis_off.ico</normaloff>
+     <normalon>:/icons/collision_vis_on.ico</normalon>:/icons/collision_vis_off.ico</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;ToggleCollision</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggles the Collision Display On and Off</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -223,6 +241,8 @@
    <header location="global">urdf_editor/urdf_property_tree.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../resources/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

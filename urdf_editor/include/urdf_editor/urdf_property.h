@@ -34,6 +34,8 @@ namespace urdf_editor
 
     bool unsavedChanges;
 
+    void requestCollisionVisualizationEnabled(bool b);
+
   private slots:
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 

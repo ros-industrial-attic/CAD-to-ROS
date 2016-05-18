@@ -35,6 +35,9 @@ namespace urdf_editor
 
     bool clear();
 
+  public Q_SLOTS:
+    void enableCollisionVisualization(bool b);
+
   private:
     rviz::VisualizationManager *manager_;
     rviz::RenderPanel *render_panel_;
