@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(urdf_builder)
 
-add_definitions(-std=c++0x)
-
 find_package(catkin REQUIRED
   COMPONENTS
     moveit_ros_visualization

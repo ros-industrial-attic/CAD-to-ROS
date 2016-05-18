@@ -173,10 +173,10 @@ namespace urdf_editor
     cylinder->radius = 0.5*DEFAULT_SIDE_LENGHT;
     mesh->scale = urdf::Vector3(1,1,1);
 
-    geometries_map_ = {{int(urdf::Geometry::SPHERE),sphere},
-                       {int(urdf::Geometry::BOX),box},
-                       {int(urdf::Geometry::CYLINDER),cylinder},
-                       {int(urdf::Geometry::MESH),mesh}};
+    geometries_map_.insert(std::make_pair(int(urdf::Geometry::SPHERE),sphere));
+    geometries_map_.insert(std::make_pair(int(urdf::Geometry::BOX),box));
+    geometries_map_.insert(std::make_pair(int(urdf::Geometry::CYLINDER),cylinder));
+    geometries_map_.insert(std::make_pair(int(urdf::Geometry::MESH),mesh));
 
     geometries_map_[int(geometry_->type)] = geometry_;
 
@@ -274,32 +274,20 @@ namespace urdf_editor
     sub_items = top_item_->subProperties();
 
     // find property func
-    auto find_property = [&sub_items](const std::string& name)
+    struct
     {
-      for(auto& p : sub_items)
+      QtVariantProperty *operator() (const std::string &name, QList<QtProperty *> &sub_items)
       {
-        if(p->propertyName().toStdString() == name)
+        foreach(QtProperty *p, sub_items)
         {
-          return static_cast<QtVariantProperty *>(p);
+          if(p->propertyName().toStdString() == name)
+          {
+            return static_cast<QtVariantProperty *>(p);
+          }
         }
+        return NULL;
       }
-      return static_cast<QtVariantProperty *>(nullptr);
-    };
-
-    // set property func
-    auto set_property_value = [this, &find_property,&sub_items](const std::string& name,  double v)
-    {
-      QtVariantProperty* prop = find_property(name);
-
-      if(prop == nullptr)
-      {
-        prop = manager_->addProperty(QVariant::Double, tr(name.c_str()));
-      }
-      prop->setEnabled(true);
-      prop->setValue(v);
-      return prop;
-    };
-
+    } find_property;
 
     // create geometry specific sub-properties
     switch(geometry_->type)
@@ -311,13 +299,24 @@ namespace urdf_editor
         item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Size"));
 
         // create box properties
-        std::vector<std::string> names = {"Length X (m)", "Length Y (m)", "Length Z (m)"};
-        std::vector<double> vals = {box->dim.x, box->dim.y, box->dim.z};
+        std::vector<std::string> names;
+        names.push_back("Length X (m)");
+        names.push_back("Length Y (m)");
+        names.push_back("Length Z (m)");
+
+        std::vector<double> vals;
+        vals.push_back(box->dim.x);
+        vals.push_back(box->dim.y);
+        vals.push_back(box->dim.z);
 
         QtVariantProperty* sub_item;
-        for(auto i = 0u; i < names.size() ; i++)
+        for(unsigned int i = 0u; i < names.size() ; i++)
         {
-          sub_item = set_property_value(names[i],vals[i]);
+          sub_item = find_property(names[i], sub_items);
+          if (sub_item == NULL)
+            sub_item = manager_->addProperty(QVariant::Double, tr(names[i].c_str()));
+          sub_item->setEnabled(true);
+          sub_item->setValue(vals[i]);
           item->addSubProperty(sub_item);
         }
         top_item_->addSubProperty(item);
@@ -329,12 +328,21 @@ namespace urdf_editor
         boost::shared_ptr<urdf::Cylinder> cylinder = boost::static_pointer_cast<urdf::Cylinder>(geometry_);
 
         // create cylinder properties
-        std::vector<std::string> names = {"Radius (m)", "Length (m)"};
-        std::vector<double> vals = {cylinder->radius, cylinder->length};
+        std::vector<std::string> names;
+        names.push_back("Radius (m)");
+        names.push_back("Length (m)");
+        std::vector<double> vals;
+        vals.push_back(cylinder->radius);
+        vals.push_back(cylinder->length);
+
         QtVariantProperty* sub_item;
-        for(auto i = 0u; i < names.size() ; i++)
+        for(unsigned int i = 0u; i < names.size() ; i++)
         {
-          sub_item = set_property_value(names[i],vals[i]);
+          sub_item = find_property(names[i], sub_items);
+          if (sub_item == NULL)
+            sub_item = manager_->addProperty(QVariant::Double, tr(names[i].c_str()));
+          sub_item->setEnabled(true);
+          sub_item->setValue(vals[i]);
           top_item_->addSubProperty(sub_item);
         }
       }
@@ -343,7 +351,11 @@ namespace urdf_editor
       case urdf::Geometry::SPHERE:
       {
         boost::shared_ptr<urdf::Sphere> sphere = boost::static_pointer_cast<urdf::Sphere>(geometry_);
-        QtVariantProperty* sub_item = set_property_value("Radius (m)",sphere->radius);
+        QtVariantProperty* sub_item = find_property("Radius (m)", sub_items);
+        if (sub_item == NULL)
+          sub_item = manager_->addProperty(QVariant::Double, tr("Radius (m)"));
+        sub_item->setEnabled(true);
+        sub_item->setValue(sphere->radius);
         top_item_->addSubProperty(sub_item);
       }
       break;
@@ -353,8 +365,8 @@ namespace urdf_editor
         boost::shared_ptr<urdf::Mesh> mesh = boost::static_pointer_cast<urdf::Mesh>(geometry_);
 
         // file name
-        item = find_property("File Name");
-        if(item == nullptr)
+        item = find_property("File Name", sub_items);
+        if(item == NULL)
         {
           item = manager_->addProperty(FileBrowserVariantManager::filePathTypeId(), tr("File Name"));
           top_item_->addSubProperty(item);
@@ -363,12 +375,24 @@ namespace urdf_editor
 
         // set mesh properties
         item = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Scale"));
-        std::vector<std::string> names = {"X", "Y", "Z"};
-        std::vector<double> vals = {mesh->scale.x, mesh->scale.y,mesh->scale.z};
+        std::vector<std::string> names;
+        names.push_back("X");
+        names.push_back("Y");
+        names.push_back("Z");
+
+        std::vector<double> vals;
+        vals.push_back(mesh->scale.x);
+        vals.push_back(mesh->scale.y);
+        vals.push_back(mesh->scale.z);
+
         QtVariantProperty* sub_item;
-        for(auto i = 0u; i < names.size() ; i++)
+        for(unsigned int i = 0u; i < names.size() ; i++)
         {
-          sub_item = set_property_value(names[i],vals[i]);
+          sub_item = find_property(names[i], sub_items);
+          if (sub_item == NULL)
+            sub_item = manager_->addProperty(QVariant::Double, tr(names[i].c_str()));
+          sub_item->setEnabled(true);
+          sub_item->setValue(vals[i]);
           item->addSubProperty(sub_item);
         }
         top_item_->addSubProperty(item);

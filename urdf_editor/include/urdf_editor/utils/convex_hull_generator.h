@@ -8,6 +8,7 @@
 #include <assimp/material.h>
 #include <boost/shared_ptr.hpp>
 #include <urdf_editor/assimp/stl_exporter.h>
+#include <vector>
 
 namespace urdf_editor
 {
