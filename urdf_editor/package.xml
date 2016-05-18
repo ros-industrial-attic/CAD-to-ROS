@@ -8,7 +8,19 @@
   <license>BSD</license>
 
   <url></url>
+
+  <author>Shehab Abdelgawad</author>
+  <author>Adam Allevato</author>
   <author>Levi Armstrong</author>
+  <author>Patrick Beeson</author>
+  <author>Seth Gee</author>
+  <author>Alex Goins</author>
+  <author>Stephen Hart</author>
+  <author>G.A. vd. Hoorn</author>
+  <author>Jonathan Meyer</author>
+  <author>Jorge Nicho</author>
+  <author>Shawn Schaerer</author>
+  <author>Andy Zelenak</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
