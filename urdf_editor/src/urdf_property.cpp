@@ -94,6 +94,8 @@ namespace urdf_editor
 
   bool URDFProperty::loadURDF(QString file_path)
   {
+    // TODO: refactor to single-exit method, or use exceptions and
+    //       make sure to set 'loading_ = false'.
     loading_ = true;
 
     urdf::ModelInterfaceSharedPtr model;
@@ -109,6 +111,7 @@ namespace urdf_editor
       if (!pipe)
       {
         ROS_ERROR("Error Loading Files: XACRO file or parser not found " );
+        loading_ = false;
         return false;
       }
       char buffer[128] = {0};
@@ -122,6 +125,7 @@ namespace urdf_editor
       if (urdf_string.empty())
       {
         ROS_ERROR("Error Loading Files: Unable to parse XACRO file " );
+        loading_ = false;
         return false;
       }
       model = urdf::parseURDF(urdf_string);
@@ -132,10 +136,16 @@ namespace urdf_editor
     }
 
     if (!tree_widget_->loadRobotModel(model))
+    {
+      loading_ = false;
       return false;
+    }
 
     if (!rviz_widget_->loadRobot(model))
+    {
+      loading_ = false;
       return false;
+    }
 
     rviz_widget_->updateBaseLink(model->getRoot()->name);
 
