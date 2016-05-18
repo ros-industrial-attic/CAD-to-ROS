@@ -123,7 +123,7 @@
      <x>0</x>
      <y>0</y>
      <width>1039</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -138,7 +138,14 @@
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -152,6 +159,9 @@
    <addaction name="separator"/>
    <addaction name="action_Save"/>
    <addaction name="actionSave_As"/>
+   <addaction name="separator"/>
+   <addaction name="action_ToggleVisual"/>
+   <addaction name="actionToggle_Collision_Visualization"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_Open">
@@ -214,6 +224,46 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="actionToggle_Collision_Visualization">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resources/icons.qrc">
+     <normaloff>:/icons/collision_vis_off.ico</normaloff>
+     <normalon>:/icons/collision_vis_on.ico</normalon>:/icons/collision_vis_off.ico</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;ToggleCollision</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggles the Collision Display On and Off</string>
+   </property>
+  </action>
+  <action name="action_ToggleVisual">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../resources/icons.qrc">
+     <normaloff>:/icons/visual_off.png</normaloff>
+     <normalon>:/icons/visual_on.png</normalon>:/icons/visual_off.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;ToggleVisual</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggles the Visual Display On and Off</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -223,6 +273,8 @@
    <header location="global">urdf_editor/urdf_property_tree.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../resources/icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

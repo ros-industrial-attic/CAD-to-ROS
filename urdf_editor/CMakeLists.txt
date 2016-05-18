@@ -127,6 +127,11 @@ catkin_package(
 qt4_wrap_cpp(editor_MOCS ${editor_HDRS})
 qt4_wrap_ui(editor_UIS_H ${editor_UIS})
 
+qt4_add_resources(
+  editor_RESOURCES
+  resources/icons.qrc
+)
+
 include_directories(
   ${editor_INCLUDE_DIRECTORIES}
   ${catkin_INCLUDE_DIRS}
@@ -138,7 +143,8 @@ include_directories(
 add_executable(${PROJECT_NAME}
   ${editor_UIS_H}
   ${editor_MOCS}
-  ${editor_SRCS})
+  ${editor_SRCS}
+  ${editor_RESOURCES})
 
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}

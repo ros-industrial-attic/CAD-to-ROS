@@ -92,6 +92,16 @@ namespace urdf_editor
     unsavedChanges = false;
   }
 
+  void URDFProperty::requestCollisionVisualizationEnabled(bool b)
+  {
+    rviz_widget_->enableCollisionVisualization(b);
+  }
+
+  void URDFProperty::requestVisualizationEnabled(bool b)
+  {
+    rviz_widget_->enableVisualization(b);
+  }
+
   bool URDFProperty::loadURDF(QString file_path)
   {
     // TODO: refactor to single-exit method, or use exceptions and
