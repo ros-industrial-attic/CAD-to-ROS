@@ -35,7 +35,7 @@ URDFEditor::~URDFEditor()
 
 void URDFEditor::on_action_Open_triggered()
 {
-  QString file_path = QFileDialog::getOpenFileName(this, tr("Open ROS URDF File"), QFileInfo(file_path_).dir().absolutePath(), tr("URDF Files (*.urdf)"));
+  QString file_path = QFileDialog::getOpenFileName(this, tr("Open ROS URDF File"), QFileInfo(file_path_).dir().absolutePath(), tr("URDF Files (*.urdf *.xacro)"));
   if (!file_path.isEmpty())
   {
     file_path_ = file_path;
