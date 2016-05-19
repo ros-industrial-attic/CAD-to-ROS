@@ -6,19 +6,52 @@ find_package(catkin REQUIRED
     moveit_ros_visualization
     qt_property_browser
     roscpp
-    rviz)
-
+    rviz
+    pcl_ros)
+    
 find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
 
 find_package(urdfdom REQUIRED)
 find_package(urdfdom_headers REQUIRED)
 
+find_package(OCE REQUIRED)
+include_directories(${OCE_INCLUDE_DIRS})
+
+find_package(PkgConfig REQUIRED)
+find_package(ASSIMP QUIET)
+if (NOT ASSIMP_FOUND)
+  pkg_check_modules(ASSIMP assimp)
+endif()
+if (ASSIMP_FOUND)
+  if( NOT ${ASSIMP_VERSION} VERSION_LESS "2.0.1150" )
+    add_definitions(-DASSIMP_UNIFIED_HEADER_NAMES)
+    message(STATUS "Assimp version has unified headers")
+  else()
+    message(STATUS "Assimp version does not have unified headers")
+  endif()
+  include_directories(${ASSIMP_INCLUDE_DIRS})
+  link_directories(${ASSIMP_LIBRARY_DIRS})
+else() 
+  message(STATUS "could not find assimp (perhaps available thorugh ROS package?), so assimping assimp v2")
+  set(ASSIMP_LIBRARIES assimp)
+  set(ASSIMP_LIBRARY_DIRS)
+  set(ASSIMP_CXX_FLAGS)
+  set(ASSIMP_CFLAGS_OTHER)
+  set(ASSIMP_LINK_FLAGS)
+  set(ASSIMP_INCLUDE_DIRS)
+endif()
+
 set(editor_SRCS
   src/common.cpp
   src/main.cpp
   src/my_rviz.cpp
   src/urdf_editor.cpp
+  src/urdf_transforms.cpp
+  src/codecs/step_to_stl.cpp
+  src/utils/convex_hull_generator.cpp
+  src/assimp/stl_exporter.cpp
+  src/assimp/default_io_stream.cpp
 
   # properties
   src/joint_axis_property.cpp
@@ -36,6 +69,12 @@ set(editor_SRCS
   src/link_visual_property.cpp
   src/origin_property.cpp
   src/urdf_property.cpp
+  src/urdf_property_tree.cpp
+  src/urdf_property_tree_link_item.cpp
+  src/urdf_property_tree_joint_item.cpp
+
+  # qt extensions
+  src/qt_file_browser.cpp
 )
 
 set(editor_HDRS
@@ -58,6 +97,12 @@ set(editor_HDRS
   include/urdf_editor/link_visual_property.h
   include/urdf_editor/origin_property.h
   include/urdf_editor/urdf_property.h
+  include/urdf_editor/urdf_property_tree.h
+  include/urdf_editor/urdf_property_tree_link_item.h
+  include/urdf_editor/urdf_property_tree_joint_item.h
+  
+  # qt extensions
+  include/urdf_editor/qt_file_browser.h
 )
 
 set(editor_UIS
@@ -82,17 +127,24 @@ catkin_package(
 qt4_wrap_cpp(editor_MOCS ${editor_HDRS})
 qt4_wrap_ui(editor_UIS_H ${editor_UIS})
 
+qt4_add_resources(
+  editor_RESOURCES
+  resources/icons.qrc
+)
+
 include_directories(
   ${editor_INCLUDE_DIRECTORIES}
   ${catkin_INCLUDE_DIRS}
   ${QT_INCLUDE_DIR}
   ${urdfdom_INCLUDE_DIR}
-  ${urdfdom_headers_INCLUDE_DIR})
+  ${urdfdom_headers_INCLUDE_DIR}
+  ${ASSIMP_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}
   ${editor_UIS_H}
   ${editor_MOCS}
-  ${editor_SRCS})
+  ${editor_SRCS}
+  ${editor_RESOURCES})
 
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -100,7 +152,9 @@ target_link_libraries(${PROJECT_NAME}
   ${urdfdom_headers_LIBRARIES}
   ${QT_LIBRARIES}
   ${QT_QTCORE_LIBRARY}
-  ${QT_QTGUI_LIBRARY})
+  ${QT_QTGUI_LIBRARY}
+  TKPrim TKSTEP TKSTL
+  ${ASSIMP_LIBRARIES})
 
 ## Install
 install(TARGETS ${PROJECT_NAME}

@@ -5,7 +5,6 @@
 
 #include <urdf_editor/property_types.h>
 
-
 namespace Ui
 {
 class URDFEditor;
@@ -34,6 +33,12 @@ private slots:
   void on_action_New_triggered();
 
   void on_action_Exit_triggered();
+
+  void on_actionToggle_Collision_Visualization_triggered(bool checked);
+
+  void on_action_ToggleVisual_triggered(bool checked);
+
+  void on_actionAbout_triggered();
 
 private:
   Ui::URDFEditor *ui;

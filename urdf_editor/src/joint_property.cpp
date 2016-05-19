@@ -15,6 +15,8 @@
 #include <urdf_model/pose.h>
 #include <urdf_model/joint.h>
 
+#include <urdf_editor/urdf_transforms.h>
+
 
 namespace urdf_editor
 {
@@ -57,7 +59,7 @@ namespace urdf_editor
     {
       origin_property_.reset(new OriginProperty(joint->parent_to_joint_origin_transform));
       QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+                this, SLOT(onOriginChanged(QtProperty *, const QVariant &)));
     }
 
     p_norm = joint_->axis.x * joint_->axis.x;
@@ -67,43 +69,44 @@ namespace urdf_editor
     {
       axis_property_.reset(new JointAxisProperty(joint_->axis));
       QObject::connect(axis_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+                this, SLOT(onAxisChanged(QtProperty *, const QVariant &)));
     }
 
     if (joint_->calibration)
     {
       calibration_property_.reset(new JointCalibrationProperty(joint_->calibration));
       QObject::connect(calibration_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+                this, SLOT(onCalibrationChanged(QtProperty *, const QVariant &)));
     }
 
     if (joint_->dynamics)
     {
       dynamics_property_.reset(new JointDynamicsProperty(joint_->dynamics));
       QObject::connect(dynamics_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+                this, SLOT(onDynamicsChanged(QtProperty *, const QVariant &)));
     }
 
     if (joint_->limits)
     {
       limits_property_.reset(new JointLimitsProperty(joint_->limits));
       QObject::connect(limits_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+                this, SLOT(onLimitsChanged(QtProperty *, const QVariant &)));
     }
 
     if (joint_->mimic)
     {
       mimic_property_.reset(new JointMimicProperty(joint_->mimic, joint_names_));
       QObject::connect(mimic_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+                this, SLOT(onMimicChanged(QtProperty *, const QVariant &)));
     }
 
     if (joint_->safety)
     {
       safety_property_.reset(new JointSafetyProperty(joint_->safety));
       QObject::connect(safety_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+                this, SLOT(onSafetyChanged(QtProperty *, const QVariant &)));
     }
+
 
     loading_ = false;
   }
@@ -201,6 +204,32 @@ namespace urdf_editor
     }
 
   }
+  /*! Get the joint name */
+  QString JointProperty::getName()
+  {
+    return QString::fromStdString(joint_->name);
+  }
+
+  QString JointProperty::getParent() const
+  {
+    return QString::fromStdString(joint_->parent_link_name);
+  }
+
+  QString JointProperty::getChild() const
+  {
+    return QString::fromStdString(joint_->child_link_name);
+  }
+
+  bool JointProperty::setParent(const QString &link_name)
+  {
+    if (link_names_.contains(link_name))
+    {
+      parent_item_->setValue(link_names_.indexOf(link_name));
+      emit parentLinkChanged(this, link_name);
+      return true;
+    }
+    return false;
+  }
 
   void JointProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
@@ -244,6 +273,7 @@ namespace urdf_editor
     else if (name == "Parent")
     {
       joint_->parent_link_name = link_names_[val.toInt()].toStdString();
+      emit parentLinkChanged(this, link_names_[val.toInt()]);
     }
     else if (name == "Child")
     {
@@ -251,15 +281,70 @@ namespace urdf_editor
       // TODO: When child is changed need to change additional data within joint_
     }
 
-    emit JointProperty::valueChanged();
+    emit JointProperty::valueChanged(this);
   }
 
-  void JointProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
+  void JointProperty::onOriginChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
 
-    emit JointProperty::valueChanged();
+    emit JointProperty::originChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onAxisChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::axisChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onCalibrationChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::calibrationChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onDynamicsChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::dynamicsChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onLimitsChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::limitsChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onMimicChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::mimicChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onSafetyChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::safetyChanged(this);
+    emit JointProperty::valueChanged(this);
   }
 
    /*!
@@ -490,4 +575,6 @@ namespace urdf_editor
   {
     return safety_property_;
   }
+
+
 }

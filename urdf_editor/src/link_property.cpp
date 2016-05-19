@@ -25,6 +25,9 @@ namespace urdf_editor
     //top_item_ = manager_->addProperty(QtVariantPropertyManager::groupTypeId(), tr("Link Properties"));
 
     name_item_ = manager_->addProperty(QVariant::String, tr("Name"));
+    visibility_item_ = manager_->addProperty(QVariant::Bool, tr("Show in Editor"));
+    // all links start visible
+    visibility_item_->setValue(true);
 
     if (link_->inertial)
     {
@@ -38,6 +41,8 @@ namespace urdf_editor
       visual_property_.reset(new LinkVisualProperty(link_->visual));
       QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      QObject::connect(visual_property_.get(), SIGNAL(geometryChanged(int)),
+                this, SLOT(onVisualGeometryChanged(int)));
     }
 
     if (link_->collision)
@@ -45,6 +50,8 @@ namespace urdf_editor
       collision_property_.reset(new LinkCollisionProperty(link_->collision));
       QObject::connect(collision_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      QObject::connect(collision_property_.get(), SIGNAL(geometryChanged(int)),
+                this, SLOT(onCollisionGeometryChanged(int)));
     }
 
     loading_ = true;
@@ -60,6 +67,8 @@ namespace urdf_editor
   {
     loading_ = true;
     name_item_->setValue(QString::fromStdString(link_->name));
+    // link visibility checkbox state is already persisted for us, no need
+    // to update it manually
 
     if (inertial_property_)
       inertial_property_->loadData();
@@ -79,6 +88,7 @@ namespace urdf_editor
     property_editor->clear();
     property_editor->setFactoryForManager(manager_, factory_);
     property_editor->addProperty(name_item_);
+    property_editor->addProperty(visibility_item_);
 
     if (inertial_property_)
     {
@@ -110,6 +120,8 @@ namespace urdf_editor
     {
       link_->inertial.reset(new urdf::Inertial());
       inertial_property_.reset(new LinkInertialProperty(link_->inertial));
+      QObject::connect(inertial_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
   }
 
@@ -138,7 +150,10 @@ namespace urdf_editor
     if(!link_->visual)
     {
       link_->visual.reset(new urdf::Visual());
+      link_->visual_array.push_back(link_->visual);
       visual_property_.reset(new LinkVisualProperty(link_->visual));
+      QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -171,7 +186,12 @@ namespace urdf_editor
     if(!link_->collision)
     {
       link_->collision.reset(new urdf::Collision());
+      link_->collision_array.push_back(link_->collision);
       collision_property_.reset(new LinkCollisionProperty(link_->collision));
+      QObject::connect(collision_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
+
     }
   }
   
@@ -210,7 +230,17 @@ namespace urdf_editor
 
       emit LinkProperty::linkNameChanged(this, val);
     }
-    emit LinkProperty::valueChanged();
+
+    if (name == "Show in Editor")
+    {
+      // broadcast state change
+      emit LinkProperty::linkVisibilityChanged(QString::fromStdString(link_->name), val.toBool());
+
+      // stop event: not a real property, so don't need to bubble up.
+      return;
+    }
+
+    emit LinkProperty::valueChanged(this);
   }
 
   void LinkProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
@@ -218,6 +248,28 @@ namespace urdf_editor
     if (loading_)
       return;
 
-    emit LinkProperty::valueChanged();
+    emit LinkProperty::valueChanged(this);
+  }
+
+  /*! Get the link name */
+  QString LinkProperty::getName()
+  {
+    return QString::fromStdString(link_->name);
+  }
+
+  void LinkProperty::onVisualGeometryChanged(int type)
+  {
+    if (loading_)
+      return;
+
+    emit LinkProperty::valueChanged(this);
+  }
+
+  void LinkProperty::onCollisionGeometryChanged(int type)
+  {
+    if (loading_)
+      return;
+
+    emit LinkProperty::valueChanged(this);
   }
 }
