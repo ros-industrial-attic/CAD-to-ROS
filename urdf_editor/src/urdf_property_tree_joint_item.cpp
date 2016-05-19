@@ -24,6 +24,8 @@ namespace urdf_editor
               this, SLOT(on_jointNameChanged(JointProperty*,const QVariant &)));
     QObject::connect(property_.get(), SIGNAL(parentLinkChanged(JointProperty *, const QVariant &)),
               this, SLOT(on_jointParentLinkChanged(JointProperty*,QVariant)));
+    QObject::connect(property_.get(), SIGNAL(typeChanged(JointProperty*)),
+              this, SIGNAL(typeChanged(JointProperty*)));
     QObject::connect(property_.get(), SIGNAL(originChanged(JointProperty*)),
               this, SIGNAL(originChanged(JointProperty*)));
     QObject::connect(property_.get(), SIGNAL(axisChanged(JointProperty*)),

@@ -112,6 +112,7 @@ namespace urdf_editor
   signals:
     void jointNameChanged(JointProperty *property, const QVariant &val);
     void parentLinkChanged(JointProperty *property, const QVariant &val);
+    void typeChanged(JointProperty *property);
     void originChanged(JointProperty *property);
     void axisChanged(JointProperty *property);
     void calibrationChanged(JointProperty *property);

@@ -68,6 +68,7 @@ namespace urdf_editor
     void jointDeletion();
     void jointNameChanged(JointProperty *property, QString current_name, QString new_name);
     void jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name);
+    void jointTypeChanged(JointProperty *property);
     void jointOriginChanged(JointProperty *property);
     void jointAxisChanged(JointProperty *property);
     void jointCalibrationChanged(JointProperty *property);
