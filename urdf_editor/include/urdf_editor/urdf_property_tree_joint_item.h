@@ -34,6 +34,7 @@ namespace urdf_editor
   signals:
     void jointNameChanged(JointProperty *property, QString current_name, QString new_name);
     void parentLinkChanged(JointProperty *property, QString current_name, QString new_name);
+    void typeChanged(JointProperty *property);
     void originChanged(JointProperty *property);
     void axisChanged(JointProperty *property);
     void calibrationChanged(JointProperty *property);

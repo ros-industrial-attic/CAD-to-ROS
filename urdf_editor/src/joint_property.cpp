@@ -269,11 +269,12 @@ namespace urdf_editor
         joint_->type = urdf::Joint::FIXED;
         break;
       }
+      emit JointProperty::typeChanged(this);
     }
     else if (name == "Parent")
     {
       joint_->parent_link_name = link_names_[val.toInt()].toStdString();
-      emit parentLinkChanged(this, link_names_[val.toInt()]);
+      emit JointProperty::parentLinkChanged(this, link_names_[val.toInt()]);
     }
     else if (name == "Child")
     {

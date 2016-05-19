@@ -41,9 +41,16 @@ namespace urdf_editor
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
 
     void on_propertyWidget_customContextMenuRequested(const QPoint &pos);
+    void on_propertyWidget_jointNameChanged(JointProperty *property, QString current_name, QString new_name);
     void on_propertyWidget_jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name);
+    void on_propertyWidget_jointTypeChanged(JointProperty *property);
     void on_propertyWidget_jointOriginChanged(JointProperty *property);
     void on_propertyWidget_jointAxisChanged(JointProperty *property);
+    void on_propertyWidget_jointCalibrationChanged(JointProperty *property);
+    void on_propertyWidget_jointDynamicsChanged(JointProperty *property);
+    void on_propertyWidget_jointLimitsChanged(JointProperty *property);
+    void on_propertyWidget_jointMimicChanged(JointProperty *property);
+    void on_propertyWidget_jointSafetyChanged(JointProperty *property);
 
     void on_propertyWidget_linkValueChanged(LinkProperty *property);
 

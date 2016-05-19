@@ -54,12 +54,27 @@ namespace urdf_editor
     connect(tree_widget_, SIGNAL(itemClicked(QTreeWidgetItem*,int)),
             this, SLOT(on_treeWidget_itemClicked(QTreeWidgetItem*,int)));
 
+    connect(tree_widget_, SIGNAL(jointNameChanged(JointProperty*,QString,QString)),
+            this, SLOT(on_propertyWidget_jointNameChanged(JointProperty*,QString,QString)));
     connect(tree_widget_, SIGNAL(jointParentLinkChanged(JointProperty*,QString,QString)),
             this, SLOT(on_propertyWidget_jointParentLinkChanged(JointProperty*,QString,QString)));
+    connect(tree_widget_, SIGNAL(jointTypeChanged(JointProperty*)),
+            this, SLOT(on_propertyWidget_jointTypeChanged(JointProperty*)));
     connect(tree_widget_, SIGNAL(jointOriginChanged(JointProperty*)),
             this, SLOT(on_propertyWidget_jointOriginChanged(JointProperty*)));
     connect(tree_widget_, SIGNAL(jointAxisChanged(JointProperty*)),
             this, SLOT(on_propertyWidget_jointAxisChanged(JointProperty*)));
+    connect(tree_widget_, SIGNAL(jointCalibrationChanged(JointProperty*)),
+            this, SLOT(on_propertyWidget_jointCalibrationChanged(JointProperty*)));
+    connect(tree_widget_, SIGNAL(jointDynamicsChanged(JointProperty*)),
+                this, SLOT(on_propertyWidget_jointDynamicsChanged(JointProperty*)));
+    connect(tree_widget_, SIGNAL(jointLimitsChanged(JointProperty*)),
+                this, SLOT(on_propertyWidget_jointLimitsChanged(JointProperty*)));
+    connect(tree_widget_, SIGNAL(jointMimicChanged(JointProperty*)),
+                this, SLOT(on_propertyWidget_jointMimicChanged(JointProperty*)));
+    connect(tree_widget_, SIGNAL(jointSafetyChanged(JointProperty*)),
+                this, SLOT(on_propertyWidget_jointSafetyChanged(JointProperty*)));
+
 
     connect(tree_widget_, SIGNAL(linkValueChanged(LinkProperty*)),
             this, SLOT(on_propertyWidget_linkValueChanged(LinkProperty*)));
@@ -587,6 +602,11 @@ namespace urdf_editor
       unsavedChanges = true;
   }
 
+  void URDFProperty::on_propertyWidget_jointNameChanged(JointProperty *property, QString current_name, QString new_name)
+  {
+    redrawRobotModel();
+  }
+
   void URDFProperty::on_propertyWidget_jointParentLinkChanged(JointProperty *property, QString current_name, QString new_name)
   {
     tf_transformer_->updateLink(current_name.toStdString(), property->getChild().toStdString(), new_name.toStdString(), property->getChild().toStdString());
@@ -610,6 +630,11 @@ namespace urdf_editor
     rviz_widget_->updateBaseLink(tree_widget_->getRobotModel()->getRoot()->name);
   }
 
+  void URDFProperty::on_propertyWidget_jointTypeChanged(JointProperty *property)
+  {
+    redrawRobotModel();
+  }
+
   void URDFProperty::on_propertyWidget_jointOriginChanged(JointProperty *property)
   {
     redrawRobotModel();
@@ -620,6 +645,31 @@ namespace urdf_editor
   {
     redrawRobotModel();
     tf_transformer_->updateLink(property);
+  }
+
+  void URDFProperty::on_propertyWidget_jointCalibrationChanged(JointProperty *property)
+  {
+    redrawRobotModel();
+  }
+
+  void URDFProperty::on_propertyWidget_jointDynamicsChanged(JointProperty *property)
+  {
+    redrawRobotModel();
+  }
+
+  void URDFProperty::on_propertyWidget_jointLimitsChanged(JointProperty *property)
+  {
+    redrawRobotModel();
+  }
+
+  void URDFProperty::on_propertyWidget_jointMimicChanged(JointProperty *property)
+  {
+    redrawRobotModel();
+  }
+
+  void URDFProperty::on_propertyWidget_jointSafetyChanged(JointProperty *property)
+  {
+    redrawRobotModel();
   }
 
 }

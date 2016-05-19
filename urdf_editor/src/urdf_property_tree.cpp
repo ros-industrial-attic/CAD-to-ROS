@@ -335,6 +335,7 @@ namespace urdf_editor
             this, SLOT(on_jointParentLinkChanged(JointProperty*, QString, QString)));
 
     // Pass the signal through
+    connect(item, SIGNAL(typeChanged(JointProperty*)), this, SIGNAL(jointTypeChanged(JointProperty*)));
     connect(item, SIGNAL(originChanged(JointProperty*)), this, SIGNAL(jointOriginChanged(JointProperty*)));
     connect(item, SIGNAL(axisChanged(JointProperty*)), this, SIGNAL(jointAxisChanged(JointProperty*)));
     connect(item, SIGNAL(calibrationChanged(JointProperty*)), this, SIGNAL(jointCalibrationChanged(JointProperty*)));
