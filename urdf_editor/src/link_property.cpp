@@ -27,29 +27,19 @@ namespace urdf_editor
     name_item_ = manager_->addProperty(QVariant::String, tr("Name"));
 
     if (link_->inertial)
-    {
-      inertial_property_.reset(new LinkInertialProperty(link_->inertial));
-      QObject::connect(inertial_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+      createInertialProperty();
 
     if (link_->visual)
-    {
-      visual_property_.reset(new LinkVisualProperty(link_->visual));
-      QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-      QObject::connect(visual_property_.get(), SIGNAL(geometryChanged(int)),
-                this, SLOT(onVisualGeometryChanged(int)));
-    }
+      createVisualPropertyHelper(link_->visual);
+    else if (!link_->visual_array.empty())
+      for (int i; i < link_->visual_array.size(); i++)
+        createVisualPropertyHelper(link->visual_array[i]);
 
     if (link_->collision)
-    {
-      collision_property_.reset(new LinkCollisionProperty(link_->collision));
-      QObject::connect(collision_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-      QObject::connect(collision_property_.get(), SIGNAL(geometryChanged(int)),
-                this, SLOT(onCollisionGeometryChanged(int)));
-    }
+      createCollisionPropertyHelper(link_->collision);
+    else if (!link_->collision_array.empty())
+      for (int i; i < link_->collision_array.size(); i++)
+        createCollisionPropertyHelper(link->collision_array[i]);
 
     loading_ = true;
   }
@@ -68,11 +58,13 @@ namespace urdf_editor
     if (inertial_property_)
       inertial_property_->loadData();
 
-    if (visual_property_)
-      visual_property_->loadData();
+    if (!visual_property_.empty())
+      foreach (LinkVisualPropertySharedPtr visual, visual_property_)
+        visual->loadData();
 
-    if (collision_property_)
-      collision_property_->loadData();
+    if (!collision_property_.empty())
+      foreach (LinkCollisionPropertySharedPtr collision, collision_property_)
+        collision->loadData();
 
     loading_ = false;
   }
@@ -90,16 +82,22 @@ namespace urdf_editor
       property_editor->addProperty(inertial_property_->getTopItem());
     }
 
-    if (visual_property_)
+    if (!visual_property_.empty())
     {
-      visual_property_->loadFactoryForManager(property_editor);
-      property_editor->addProperty(visual_property_->getTopItem());
+      foreach (LinkVisualPropertySharedPtr visual, visual_property_)
+      {
+        visual->loadFactoryForManager(property_editor);
+        property_editor->addProperty(visual->getTopItem());
+      }
     }
 
-    if (collision_property_)
+    if (!collision_property_.empty())
     {
-      collision_property_->loadFactoryForManager(property_editor);
-      property_editor->addProperty(collision_property_->getTopItem());
+      foreach (LinkCollisionPropertySharedPtr collision, collision_property_)
+      {
+        collision->loadFactoryForManager(property_editor);
+        property_editor->addProperty(collision->getTopItem());
+      }
     }
   }
 
@@ -110,13 +108,13 @@ namespace urdf_editor
 
   void LinkProperty::createInertialProperty()
   {
-    if(!link_->inertial)
-    {
+    if (link_->inertial == NULL)
       link_->inertial.reset(new urdf::Inertial());
-      inertial_property_.reset(new LinkInertialProperty(link_->inertial));
-      QObject::connect(inertial_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+
+    inertial_property_.reset(new LinkInertialProperty(link_->inertial));
+    QObject::connect(inertial_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+              this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
   }
 
   LinkInertialPropertySharedPtr LinkProperty::getInertialProperty()
@@ -132,7 +130,7 @@ namespace urdf_editor
    */
   bool LinkProperty::hasVisualProperty()
   {
-    return (visual_property_ != NULL);
+    return (!visual_property_.empty());
   }
 
   /*!
@@ -141,22 +139,47 @@ namespace urdf_editor
    */
   void LinkProperty::createVisualProperty()
   {
-    if(!link_->visual)
+    urdf::VisualSharedPtr visual(new urdf::Visual());
+    if (link_->visual != NULL)
     {
-      link_->visual.reset(new urdf::Visual());
+      link_->visual_array.clear();
       link_->visual_array.push_back(link_->visual);
-      visual_property_.reset(new LinkVisualProperty(link_->visual));
-      QObject::connect(visual_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      link_->visual_array.push_back(visual);
+      createVisualPropertyHelper(link_->visual_array.back());
+
+      link_->visual.reset();
     }
+    else if (link_->visual == NULL & link_->visual_array.empty())
+    {
+      link_->visual = visual;
+      createVisualPropertyHelper(link_->visual);
+    }
+    else
+    {
+      link_->visual_array.push_back(visual);
+      createVisualPropertyHelper(link_->visual_array.back());
+    }
+  }
+
+  /*!
+   *@brief Creates the visual property helper function
+   *
+   */
+  void LinkProperty::createVisualPropertyHelper(urdf::VisualSharedPtr data)
+  {
+    visual_property_.push_back(LinkVisualPropertySharedPtr(new LinkVisualProperty(data)));
+    QObject::connect(visual_property_.back().get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+              this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+    QObject::connect(visual_property_.back().get(), SIGNAL(geometryChanged(int)),
+              this, SLOT(onVisualGeometryChanged(int)));
   }
   
    /*!
-   *@brief Get the visual property Object
+   *@brief Get the list of visual property Objects
    * 
-   *@return LinkVisualPropertySharedPtr
+   *@return std::vector<LinkVisualPropertySharedPtr>
    */
-  LinkVisualPropertySharedPtr LinkProperty::getVisualProperty()
+  std::vector<LinkVisualPropertySharedPtr> LinkProperty::getVisualProperties()
   {
     return visual_property_;
   }
@@ -168,7 +191,7 @@ namespace urdf_editor
    */
   bool LinkProperty::hasCollisionProperty()
   {
-    return (collision_property_ != NULL);
+    return (!collision_property_.empty());
   }
 
   /*!
@@ -177,24 +200,47 @@ namespace urdf_editor
    */
   void LinkProperty::createCollisionProperty()
   {
-    if(!link_->collision)
+    urdf::CollisionSharedPtr collision(new urdf::Collision());
+    if (link_->collision != NULL)
     {
-      link_->collision.reset(new urdf::Collision());
+      link_->collision_array.clear();
       link_->collision_array.push_back(link_->collision);
-      collision_property_.reset(new LinkCollisionProperty(link_->collision));
-      QObject::connect(collision_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      link_->collision_array.push_back(collision);
+      createCollisionPropertyHelper(link_->collision_array.back());
 
-
+      link_->collision.reset();
     }
+    else if (link_->collision == NULL & link_->collision_array.empty())
+    {
+      link_->collision = collision;
+      createCollisionPropertyHelper(link_->collision);
+    }
+    else
+    {
+      link_->collision_array.push_back(collision);
+      createCollisionPropertyHelper(link_->collision_array.back());
+    }
+  }
+
+  /*!
+   *@brief Creates the collision property helper function
+   *
+   */
+  void LinkProperty::createCollisionPropertyHelper(urdf::CollisionSharedPtr data)
+  {
+    collision_property_.push_back(LinkCollisionPropertySharedPtr(new LinkCollisionProperty(data)));
+    QObject::connect(collision_property_.back().get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+              this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+    QObject::connect(collision_property_.back().get(), SIGNAL(geometryChanged(int)),
+              this, SLOT(onCollisionGeometryChanged(int)));
   }
   
    /*!
-   *@brief Get the collision property Object
+   *@brief Get the list of collision property Objects
    * 
-   *@return LinkCollisionPropertySharedPtr
+   *@return std::vector<LinkCollisionPropertySharedPtr>
    */
-  LinkCollisionPropertySharedPtr LinkProperty::getCollisionProperty()
+  std::vector<LinkCollisionPropertySharedPtr> LinkProperty::getCollisionProperties()
   {
     return collision_property_;
   }

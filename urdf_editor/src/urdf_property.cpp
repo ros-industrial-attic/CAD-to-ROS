@@ -223,8 +223,6 @@ namespace urdf_editor
 
     if (tree_widget_->isJoint(selt))
     {
-       qDebug() << QString("The member ctree_to_joint_property_  contains the link %1").arg(selt->text(0));
-       
        JointPropertySharedPtr activeJoint = tree_widget_->asJointTreeItem(selt)->getProperty();
        QMenu menu(property_editor_.get());
        
@@ -443,7 +441,7 @@ namespace urdf_editor
       // only.
       else if (selb->property()->propertyName() == PROPERTY_VISUAL_TEXT)
       {
-        LinkVisualPropertySharedPtr activeVisual = activeLink->getVisualProperty();
+        LinkVisualPropertySharedPtr activeVisual = activeLink->getVisualProperties()[0]; //TODO: Need to figure out how to get index
         QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
         QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
         QAction *material = menu.addAction(PROPERTY_MATERIAL_TEXT);
@@ -497,7 +495,7 @@ namespace urdf_editor
       // only.
       else if (selb->property()->propertyName() == PROPERTY_COLLISION_TEXT)
       {
-        LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperty();
+        LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperties()[0]; //TODO: Need to figure out how to get index
         QAction *origin = menu.addAction(PROPERTY_ORIGIN_TEXT);
         QAction *geometry = menu.addAction(PROPERTY_GEOMETRY_TEXT);
         // if this link already has an 'origin' element, don't allow user to
@@ -541,7 +539,7 @@ namespace urdf_editor
       {
         if(selb->parent()->property()->propertyName().compare("Collision")==0)
         {
-          LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperty();
+          LinkCollisionPropertySharedPtr activeCollision = activeLink->getCollisionProperties()[0]; //TODO: Need to figure out how to get index
           LinkGeometryPropertySharedPtr geometry =  activeCollision->getGeometryProperty();
 
           QAction *generate_chull = menu.addAction(QString("Generate Convex"));

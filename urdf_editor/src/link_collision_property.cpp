@@ -35,22 +35,10 @@ namespace urdf_editor
     r_norm += origin.rotation.y * origin.rotation.y;
     r_norm += origin.rotation.z * origin.rotation.z;
     if (p_norm > 0.0 || r_norm > 0.0)
-    {
-      origin_property_.reset(new OriginProperty(collision_->origin));
-      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-
-      top_item_->addSubProperty(origin_property_->getTopItem());
-    }
+      createOriginProperty();
 
     if (collision_->geometry)
-    {
-      geometry_property_.reset(new LinkGeometryProperty(collision_->geometry));
-      QObject::connect(geometry_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-
-      top_item_->addSubProperty(geometry_property_->getTopItem());
-    }
+      createGeometryProperty();
 
     loading_ = false;
   }
@@ -65,6 +53,9 @@ namespace urdf_editor
     if (!origin_property_)
     {
       origin_property_.reset(new OriginProperty(collision_->origin));
+      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(origin_property_->getTopItem());
     }
   }
@@ -95,18 +86,22 @@ namespace urdf_editor
   {
     if (!geometry_property_)
     {
-      urdf::SphereSharedPtr geometry(new urdf::Sphere());
-      geometry->radius = 0.1;
-      collision_->geometry = geometry;  //Create the URDF Geometry element
-      collision_->geometry->type = collision_->geometry->SPHERE;
+      if (collision_->geometry == NULL)
+      {
+        urdf::SphereSharedPtr geometry(new urdf::Sphere());
+        geometry->radius = 0.1;
+        collision_->geometry = geometry;  //Create the URDF Geometry element
+        collision_->geometry->type = collision_->geometry->SPHERE;
+      }
 
       geometry_property_.reset(new LinkGeometryProperty(collision_->geometry));
-      top_item_->addSubProperty(geometry_property_->getTopItem());
-
       QObject::connect(geometry_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
 
+      top_item_->addSubProperty(geometry_property_->getTopItem());
+
       onChildValueChanged(geometry_property_->getTopItem(),QVariant::fromValue(0));
+
     }
   } 
   

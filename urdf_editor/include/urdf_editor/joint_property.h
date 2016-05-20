@@ -7,6 +7,8 @@
 #include <urdf_editor/property_types.h>
 #include <urdf_editor/qt_types.h>
 #include <urdf_editor/urdf_types_ext.h>
+#include <urdf_editor/urdf_types.h>
+#include <urdf_model/joint.h>
 
 
 namespace urdf_editor
