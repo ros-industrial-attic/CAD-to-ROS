@@ -102,9 +102,6 @@ namespace urdf_editor
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
 
       top_item_->addSubProperty(geometry_property_->getTopItem());
-
-      onChildValueChanged(geometry_property_->getTopItem(),QVariant::fromValue(0));
-
     }
   }
   

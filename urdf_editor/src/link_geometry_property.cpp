@@ -200,6 +200,11 @@ namespace urdf_editor
     delete factory_;
   }
 
+  void LinkGeometryProperty::setType(GeometryType type)
+  {
+    type_item_->setValue(type);
+  }
+
   bool LinkGeometryProperty::generateConvexMesh(std::string& error_message)
   {
 

@@ -37,8 +37,8 @@ namespace urdf_editor
     if (p_norm > 0.0 || r_norm > 0.0)
       createOriginProperty();
 
-    if (collision_->geometry)
-      createGeometryProperty();
+     // The geometry property is not optional
+    createGeometryProperty();
 
     loading_ = false;
   }
@@ -99,9 +99,6 @@ namespace urdf_editor
                 this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
 
       top_item_->addSubProperty(geometry_property_->getTopItem());
-
-      onChildValueChanged(geometry_property_->getTopItem(),QVariant::fromValue(0));
-
     }
   } 
   

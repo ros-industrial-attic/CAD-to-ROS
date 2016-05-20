@@ -152,6 +152,7 @@ namespace urdf_editor
     else if (link_->visual == NULL & link_->visual_array.empty())
     {
       link_->visual = visual;
+      link_->visual_array.push_back(visual);
       createVisualPropertyHelper(link_->visual);
     }
     else
@@ -172,6 +173,10 @@ namespace urdf_editor
               this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     QObject::connect(visual_property_.back().get(), SIGNAL(geometryChanged(int)),
               this, SLOT(onVisualGeometryChanged(int)));
+
+    // This is required because properties are changed during creation but connection are not setup until
+    // after the object is created.
+    emit LinkProperty::valueChanged(this);
   }
   
    /*!
@@ -213,6 +218,7 @@ namespace urdf_editor
     else if (link_->collision == NULL & link_->collision_array.empty())
     {
       link_->collision = collision;
+      link_->collision_array.push_back(collision);
       createCollisionPropertyHelper(link_->collision);
     }
     else
@@ -233,6 +239,10 @@ namespace urdf_editor
               this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
     QObject::connect(collision_property_.back().get(), SIGNAL(geometryChanged(int)),
               this, SLOT(onCollisionGeometryChanged(int)));
+
+    // This is required because properties are changed during creation but connection are not setup until
+    // after the object is created.
+    emit LinkProperty::valueChanged(this);
   }
   
    /*!
