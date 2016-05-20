@@ -33,8 +33,8 @@ namespace urdf_editor
     /*! Create Visual property */
     void createVisualProperty();
    
-    /*! Get the Inertial Property */
-    LinkVisualPropertySharedPtr getVisualProperty();
+    /*! Get the list of Visual Properties */
+    std::vector<LinkVisualPropertySharedPtr> getVisualProperties();
     
     /*! Check if has collision property */
     bool hasCollisionProperty();
@@ -42,8 +42,8 @@ namespace urdf_editor
     /*! Create Collision property */
     void createCollisionProperty();
    
-    /*! Get the Collision Property */
-    LinkCollisionPropertySharedPtr getCollisionProperty();
+    /*! Get the list of Collision Properties */
+    std::vector<LinkCollisionPropertySharedPtr> getCollisionProperties();
 
     /*! Get the link name */
     QString getName();
@@ -60,14 +60,17 @@ namespace urdf_editor
     void valueChanged(LinkProperty *property);
 
   private:
+    void createVisualPropertyHelper(urdf::VisualSharedPtr data);
+    void createCollisionPropertyHelper(urdf::CollisionSharedPtr data);
+
     urdf::LinkSharedPtr link_;
     QtVariantPropertyManager *manager_;
     QtVariantEditorFactory *factory_;
     QtProperty *top_item_;
     bool loading_;
     LinkInertialPropertySharedPtr inertial_property_;
-    LinkVisualPropertySharedPtr visual_property_; // this needs to be array since multiple visuals models are allowed.
-    LinkCollisionPropertySharedPtr collision_property_; // this needs to be array since multiple collisions models are allowed.
+    std::vector<LinkVisualPropertySharedPtr> visual_property_;
+    std::vector<LinkCollisionPropertySharedPtr> collision_property_;
     QtVariantProperty *name_item_;
   };
 }

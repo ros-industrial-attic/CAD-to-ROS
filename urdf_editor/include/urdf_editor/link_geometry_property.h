@@ -12,6 +12,8 @@ namespace urdf_editor
   {
     Q_OBJECT
   public:
+    enum GeometryType {SPHERE, BOX, CYLINDER, MESH};
+
     LinkGeometryProperty(urdf::GeometrySharedPtr geometry);
     ~LinkGeometryProperty();
 
@@ -22,8 +24,10 @@ namespace urdf_editor
 
     QtProperty *getTopItem() { return top_item_; }
 
-    inline urdf::GeometrySharedPtr getGeometry() { return geometry_; } 
-    inline void setGeometry(urdf::GeometrySharedPtr ptr) { geometry_ = ptr; }
+    void setType(GeometryType type);
+
+    inline urdf::GeometrySharedPtr getGeometry() { return geometry_; }
+
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
