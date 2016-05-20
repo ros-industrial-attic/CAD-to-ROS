@@ -33,7 +33,7 @@ namespace urdf_editor
 
     //UNKNOWN, REVOLUTE, CONTINUOUS, PRISMATIC, FLOATING, PLANAR, FIXED
     type_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
-    type_item_->setAttribute(Common::attributeStr(EnumNames), QStringList() << tr("Unknown") << tr("Revolute") << tr("Continuous") << tr("Prismatic") <<  tr("Floating") << tr("Planar") << tr("Fixed"));
+    type_item_->setAttribute(Common::attributeStr(EnumNames), QStringList() << tr("Revolute") << tr("Continuous") << tr("Prismatic") <<  tr("Floating") << tr("Planar") << tr("Fixed"));
 
    // add the link list as an enum to the parent drop down menu. pass the first item into the joint data struct, if there is one
     parent_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Parent"));
@@ -121,7 +121,7 @@ namespace urdf_editor
   {
     loading_ = true;
     name_item_->setValue(QString::fromStdString(joint_->name));
-    type_item_->setValue(joint_->type);
+    type_item_->setValue(joint_->type - 1);
     parent_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
     parent_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->parent_link_name)));
     child_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
@@ -244,28 +244,25 @@ namespace urdf_editor
     }
     else if (name == "Type")
     {
-      //UNKNOWN, REVOLUTE, CONTINUOUS, PRISMATIC, FLOATING, PLANAR, FIXED
+      //REVOLUTE, CONTINUOUS, PRISMATIC, FLOATING, PLANAR, FIXED
       switch (val.toInt())
       {
       case 0:
-        joint_->type = urdf::Joint::UNKNOWN;
-        break;
-      case 1:
         joint_->type = urdf::Joint::REVOLUTE;
         break;
-      case 2:
+      case 1:
         joint_->type = urdf::Joint::CONTINUOUS;
         break;
-      case 3:
+      case 2:
         joint_->type = urdf::Joint::PRISMATIC;
         break;
-      case 4:
+      case 3:
         joint_->type = urdf::Joint::FLOATING;
         break;
-      case 5:
+      case 4:
         joint_->type = urdf::Joint::PLANAR;
         break;
-      case 6:
+      case 5:
         joint_->type = urdf::Joint::FIXED;
         break;
       }

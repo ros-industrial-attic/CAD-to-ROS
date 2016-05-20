@@ -233,6 +233,11 @@ namespace urdf_editor
 
     if (child_link)
     {
+      // Check joint type, if set to UNKNOWN change it to FIXED since
+      // UNKNOWN causes parsing error.
+      if (joint->type == urdf::Joint::UNKNOWN)
+        joint->type = urdf::Joint::FIXED;
+
       // first add the tree item
       URDFPropertyTreeJointItem *item = addJointTreeItem(parent, joint);
 
@@ -314,6 +319,7 @@ namespace urdf_editor
     urdf::JointSharedPtr new_joint(new urdf::Joint());
     new_joint->name = name.toStdString();
     new_joint->child_link_name = child_link_name.toStdString();
+    new_joint->type = urdf::Joint::FIXED;
     model_->joints_.insert(std::make_pair(name.toStdString(), new_joint));
 
     return new_joint;
