@@ -35,7 +35,7 @@ URDFEditor::~URDFEditor()
 
 void URDFEditor::on_action_Open_triggered()
 {
-  QString file_path = QFileDialog::getOpenFileName(this, tr("Open ROS URDF File"), QFileInfo(file_path_).dir().absolutePath(), tr("URDF Files (*.urdf)"));
+  QString file_path = QFileDialog::getOpenFileName(this, tr("Open ROS URDF File"), QFileInfo(file_path_).dir().absolutePath(), tr("URDF Files (*.urdf *.xacro)"));
   if (!file_path.isEmpty())
   {
     file_path_ = file_path;
@@ -128,4 +128,21 @@ void URDFEditor::closeEvent( QCloseEvent *event )
   {
     event->accept();
   }
+}
+
+void URDFEditor::on_actionToggle_Collision_Visualization_triggered(bool checked)
+{
+  ROS_DEBUG("Toggled collision-model display");
+  urdf_tree_->requestCollisionVisualizationEnabled(checked);
+}
+
+void URDFEditor::on_action_ToggleVisual_triggered(bool checked)
+{
+  ROS_DEBUG("Toggled visual-model display");
+  urdf_tree_->requestVisualizationEnabled(checked);
+}
+
+void URDFEditor::on_actionAbout_triggered()
+{
+  QMessageBox::about(this, "About", "Visualization toggle icons from https://icons8.com/.");
 }

@@ -13,7 +13,8 @@
 #include <urdf_editor/joint_safety_property.h>
 
 #include <urdf_model/pose.h>
-#include <urdf_model/joint.h>
+
+#include <urdf_editor/urdf_transforms.h>
 
 
 namespace urdf_editor
@@ -31,7 +32,7 @@ namespace urdf_editor
 
     //UNKNOWN, REVOLUTE, CONTINUOUS, PRISMATIC, FLOATING, PLANAR, FIXED
     type_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Type"));
-    type_item_->setAttribute(Common::attributeStr(EnumNames), QStringList() << tr("Unknown") << tr("Revolute") << tr("Continuous") << tr("Prismatic") <<  tr("Floating") << tr("Planar") << tr("Fixed"));
+    type_item_->setAttribute(Common::attributeStr(EnumNames), QStringList() << tr("Revolute") << tr("Continuous") << tr("Prismatic") <<  tr("Floating") << tr("Planar") << tr("Fixed"));
 
    // add the link list as an enum to the parent drop down menu. pass the first item into the joint data struct, if there is one
     parent_item_ = manager_->addProperty(QtVariantPropertyManager::enumTypeId(), tr("Parent"));
@@ -54,56 +55,28 @@ namespace urdf_editor
     r_norm += origin.rotation.y * origin.rotation.y;
     r_norm += origin.rotation.z * origin.rotation.z;
     if (p_norm > 0.0 || r_norm > 0.0)
-    {
-      origin_property_.reset(new OriginProperty(joint->parent_to_joint_origin_transform));
-      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+      createOriginProperty();
 
     p_norm = joint_->axis.x * joint_->axis.x;
     p_norm += (joint_->axis.y * joint_->axis.y);
     p_norm += (joint_->axis.z * joint_->axis.z);
     if (p_norm > 0.0)
-    {
-      axis_property_.reset(new JointAxisProperty(joint_->axis));
-      QObject::connect(axis_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+      createAxisProperty();
 
     if (joint_->calibration)
-    {
-      calibration_property_.reset(new JointCalibrationProperty(joint_->calibration));
-      QObject::connect(calibration_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+      createCalibrationProperty();
 
     if (joint_->dynamics)
-    {
-      dynamics_property_.reset(new JointDynamicsProperty(joint_->dynamics));
-      QObject::connect(dynamics_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+      createDynamicsProperty();
 
     if (joint_->limits)
-    {
-      limits_property_.reset(new JointLimitsProperty(joint_->limits));
-      QObject::connect(limits_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+      createLimitsProperty();
 
     if (joint_->mimic)
-    {
-      mimic_property_.reset(new JointMimicProperty(joint_->mimic, joint_names_));
-      QObject::connect(mimic_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+      createMimicProperty();
 
     if (joint_->safety)
-    {
-      safety_property_.reset(new JointSafetyProperty(joint_->safety));
-      QObject::connect(safety_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-    }
+      createSafetyProperty();
 
     loading_ = false;
   }
@@ -118,7 +91,7 @@ namespace urdf_editor
   {
     loading_ = true;
     name_item_->setValue(QString::fromStdString(joint_->name));
-    type_item_->setValue(joint_->type);
+    type_item_->setValue(joint_->type - 1);
     parent_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
     parent_item_->setValue(link_names_.indexOf(QString::fromStdString(joint_->parent_link_name)));
     child_item_->setAttribute(Common::attributeStr(EnumNames), link_names_);
@@ -201,6 +174,32 @@ namespace urdf_editor
     }
 
   }
+  /*! Get the joint name */
+  QString JointProperty::getName()
+  {
+    return QString::fromStdString(joint_->name);
+  }
+
+  QString JointProperty::getParent() const
+  {
+    return QString::fromStdString(joint_->parent_link_name);
+  }
+
+  QString JointProperty::getChild() const
+  {
+    return QString::fromStdString(joint_->child_link_name);
+  }
+
+  bool JointProperty::setParent(const QString &link_name)
+  {
+    if (link_names_.contains(link_name))
+    {
+      parent_item_->setValue(link_names_.indexOf(link_name));
+      emit parentLinkChanged(this, link_name);
+      return true;
+    }
+    return false;
+  }
 
   void JointProperty::onValueChanged(QtProperty *property, const QVariant &val)
   {
@@ -215,35 +214,34 @@ namespace urdf_editor
     }
     else if (name == "Type")
     {
-      //UNKNOWN, REVOLUTE, CONTINUOUS, PRISMATIC, FLOATING, PLANAR, FIXED
+      //REVOLUTE, CONTINUOUS, PRISMATIC, FLOATING, PLANAR, FIXED
       switch (val.toInt())
       {
       case 0:
-        joint_->type = urdf::Joint::UNKNOWN;
-        break;
-      case 1:
         joint_->type = urdf::Joint::REVOLUTE;
         break;
-      case 2:
+      case 1:
         joint_->type = urdf::Joint::CONTINUOUS;
         break;
-      case 3:
+      case 2:
         joint_->type = urdf::Joint::PRISMATIC;
         break;
-      case 4:
+      case 3:
         joint_->type = urdf::Joint::FLOATING;
         break;
-      case 5:
+      case 4:
         joint_->type = urdf::Joint::PLANAR;
         break;
-      case 6:
+      case 5:
         joint_->type = urdf::Joint::FIXED;
         break;
       }
+      emit JointProperty::typeChanged(this);
     }
     else if (name == "Parent")
     {
       joint_->parent_link_name = link_names_[val.toInt()].toStdString();
+      emit JointProperty::parentLinkChanged(this, link_names_[val.toInt()]);
     }
     else if (name == "Child")
     {
@@ -251,15 +249,70 @@ namespace urdf_editor
       // TODO: When child is changed need to change additional data within joint_
     }
 
-    emit JointProperty::valueChanged();
+    emit JointProperty::valueChanged(this);
   }
 
-  void JointProperty::onChildValueChanged(QtProperty *property, const QVariant &val)
+  void JointProperty::onOriginChanged(QtProperty *property, const QVariant &val)
   {
     if (loading_)
       return;
 
-    emit JointProperty::valueChanged();
+    emit JointProperty::originChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onAxisChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::axisChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onCalibrationChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::calibrationChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onDynamicsChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::dynamicsChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onLimitsChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::limitsChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onMimicChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::mimicChanged(this);
+    emit JointProperty::valueChanged(this);
+  }
+
+  void JointProperty::onSafetyChanged(QtProperty *property, const QVariant &val)
+  {
+    if (loading_)
+      return;
+
+    emit JointProperty::safetyChanged(this);
+    emit JointProperty::valueChanged(this);
   }
 
    /*!
@@ -281,6 +334,8 @@ namespace urdf_editor
     if(! origin_property_)
     {
       origin_property_.reset(new OriginProperty(joint_->parent_to_joint_origin_transform));
+      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onOriginChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -313,6 +368,8 @@ namespace urdf_editor
     if(! axis_property_)
     {
       axis_property_.reset(new JointAxisProperty(joint_->axis));
+      QObject::connect(axis_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onAxisChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -344,8 +401,12 @@ namespace urdf_editor
   {
     if(!joint_->limits)
     {
-      joint_->limits.reset(new urdf::JointLimits());
+      if (joint_->limits == NULL)
+        joint_->limits.reset(new urdf::JointLimits());
+
       limits_property_.reset(new JointLimitsProperty(joint_->limits));
+      QObject::connect(limits_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onLimitsChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -377,8 +438,12 @@ namespace urdf_editor
   {
     if(!joint_->calibration)
     {
-      joint_->calibration.reset(new urdf::JointCalibration());
+      if (joint_->calibration == NULL)
+        joint_->calibration.reset(new urdf::JointCalibration());
+
       calibration_property_.reset(new JointCalibrationProperty(joint_->calibration));
+      QObject::connect(calibration_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onCalibrationChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -410,8 +475,12 @@ namespace urdf_editor
   {
     if(!joint_->dynamics)
     {
-      joint_->dynamics.reset(new urdf::JointDynamics());
+      if (joint_->dynamics == NULL)
+        joint_->dynamics.reset(new urdf::JointDynamics());
+
       dynamics_property_.reset(new JointDynamicsProperty(joint_->dynamics));
+      QObject::connect(dynamics_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onDynamicsChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -443,8 +512,12 @@ namespace urdf_editor
   {
     if(!joint_->mimic)
     {
-      joint_->mimic.reset(new urdf::JointMimic());
+      if (joint_->mimic == NULL)
+        joint_->mimic.reset(new urdf::JointMimic());
+
       mimic_property_.reset(new JointMimicProperty(joint_->mimic, joint_names_));
+      QObject::connect(mimic_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onMimicChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -476,8 +549,12 @@ namespace urdf_editor
   {
     if(!joint_->safety)
     {
-      joint_->safety.reset(new urdf::JointSafety());
+      if (joint_->safety == NULL)
+       joint_->safety.reset(new urdf::JointSafety());
+
       safety_property_.reset(new JointSafetyProperty(joint_->safety));
+      QObject::connect(safety_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onSafetyChanged(QtProperty *, const QVariant &)));
     }
   }
   
@@ -490,4 +567,6 @@ namespace urdf_editor
   {
     return safety_property_;
   }
+
+
 }

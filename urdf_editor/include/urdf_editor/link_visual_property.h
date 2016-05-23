@@ -23,6 +23,7 @@ namespace urdf_editor
     void createOriginProperty();
     
     bool hasGeometryProperty();
+    LinkGeometryPropertySharedPtr getGeometryProperty();
     void createGeometryProperty();
     
     bool hasMaterialProperty();
@@ -32,12 +33,16 @@ namespace urdf_editor
 
     QtProperty *getTopItem() { return top_item_; }
 
+    void removeSubProperties();
+
+
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
     void onChildValueChanged(QtProperty *property, const QVariant &val);
 
   signals:
     void valueChanged(QtProperty *property, const QVariant &val);
+    void geometryChanged(int type);
 
   private:
     urdf::VisualSharedPtr visual_;

@@ -6,11 +6,8 @@
 #include <urdf_editor/link_new_material_property.h>
 #include <urdf_editor/link_geometry_property.h>
 #include <urdf_editor/origin_property.h>
-
 #include <urdf_editor/common.h>
-
 #include <urdf_model/link.h>
-
 
 namespace urdf_editor
 {
@@ -38,35 +35,14 @@ namespace urdf_editor
     r_norm += origin.rotation.y * origin.rotation.y;
     r_norm += origin.rotation.z * origin.rotation.z;
     if (p_norm > 0.0 || r_norm > 0.0)
-    {
-      origin_property_.reset(new OriginProperty(visual_->origin));
-      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-
-      top_item_->addSubProperty(origin_property_->getTopItem());
-    }
+      createOriginProperty();
 
     if (visual_->material)
-    {
-      new_material_property_.reset(new LinkNewMaterialProperty(visual_->material));
-      QObject::connect(new_material_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+      createMaterialProperty();
 
-      top_item_->addSubProperty(new_material_property_->getTopItem());
-    }
+    // The geometry property is not optional
+    createGeometryProperty();
 
-    if (visual_->geometry)
-    {
-      geometry_property_.reset(new LinkGeometryProperty(visual_->geometry));
-      QObject::connect(geometry_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
-                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
-
-      top_item_->addSubProperty(geometry_property_->getTopItem());
-    }
-    else
-    {
-      //TODO: need to create one since it is not optional
-    }
     loading_ = false;
   }
   
@@ -80,6 +56,9 @@ namespace urdf_editor
     if (!origin_property_)
     {
       origin_property_.reset(new OriginProperty(visual_->origin));
+      QObject::connect(origin_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(origin_property_->getTopItem());
     }
   }
@@ -94,14 +73,34 @@ namespace urdf_editor
   }
 
   /*!
+   *@brief Get the geometry property Object
+   * 
+   *@return LinkGeometryPropertySharedPtr
+   */
+  LinkGeometryPropertySharedPtr LinkVisualProperty::getGeometryProperty()
+  {
+    return geometry_property_;
+  }
+
+  /*!
    * @brief Creates the geometry property 
    */
   void LinkVisualProperty::createGeometryProperty()
   {
     if (!geometry_property_)
     {
-      visual_->geometry.reset(new urdf::Geometry());  //Create the URDF Geometry element 
+      if (visual_->geometry == NULL)
+      {
+        urdf::SphereSharedPtr geometry(new urdf::Sphere());
+        geometry->radius = 0.1;
+        visual_->geometry = geometry;  //Create the URDF Geometry element
+        visual_->geometry->type = visual_->geometry->SPHERE;
+      }
+
       geometry_property_.reset(new LinkGeometryProperty(visual_->geometry));
+      QObject::connect(geometry_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(geometry_property_->getTopItem());
     }
   }
@@ -122,8 +121,13 @@ namespace urdf_editor
   {
     if (!new_material_property_)
     {
-       visual_->material.reset(new urdf::Material());  //Create the URDF Material element 
+      if (visual_->material == NULL)
+        visual_->material.reset(new urdf::Material());  //Create the URDF Material element
+
       new_material_property_.reset(new LinkNewMaterialProperty(visual_->material));
+      QObject::connect(new_material_property_.get(), SIGNAL(valueChanged(QtProperty *, const QVariant &)),
+                       this, SLOT(onChildValueChanged(QtProperty *, const QVariant &)));
+
       top_item_->addSubProperty(new_material_property_->getTopItem());
     }
   }
@@ -160,6 +164,13 @@ namespace urdf_editor
     loading_ = false;
   }
 
+  void LinkVisualProperty::removeSubProperties()
+  {
+    QList<QtProperty *> sub_items = top_item_->subProperties();
+    for (int i = 0; i < sub_items.length(); ++i)
+        top_item_->removeSubProperty(sub_items[i]);
+  }
+
   void LinkVisualProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
@@ -191,6 +202,14 @@ namespace urdf_editor
     if (loading_)
       return;
 
+    if (property->propertyName() == "Type")
+    {
+        visual_->geometry = geometry_property_->getGeometry();
+        emit LinkVisualProperty::geometryChanged(val.toInt());
+    }
+
     emit LinkVisualProperty::valueChanged(property, val);
+
+
   }
 }
