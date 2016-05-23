@@ -22,10 +22,12 @@ namespace urdf_editor
 
     void loadData();
 
+    void setLinkName(QString new_name);
+    void removeSubProperties();
+
     bool hasInertialProperty();
     void createInertialProperty();
     LinkInertialPropertySharedPtr getInertialProperty();
-
     
     /*! Check if has visual property */
     bool hasVisualProperty();

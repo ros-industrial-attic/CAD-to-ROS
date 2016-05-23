@@ -195,6 +195,119 @@ namespace urdf_editor
     return rviz_widget_->loadRobot(tree_widget_->getRobotModel());
   }
 
+  void URDFProperty::on_treeWidget_customContextMenuRequested(const QPoint &pos)
+  {
+      QTreeWidgetItem *sel = tree_widget_->selectedItems()[0];
+      QMenu *menu = new QMenu(tree_widget_);
+      menu->addAction("Add");
+      menu->addAction("Remove");
+
+      // Add menu for converting the link to base/tool0 if there are no base/tool0 before
+      if (sel->parent() == link_root_)
+      {
+          bool base_exist = link_names_.contains("base", Qt::CaseSensitive);
+          bool tool0_exist = link_names_.contains("tool0", Qt::CaseSensitive);
+          if (!base_exist || !tool0_exist)
+          {
+              menu->addSeparator();
+              QMenu *convertMenu = menu->addMenu("Convert to");
+              if (!base_exist)
+              {
+                  convertMenu->addAction("base");
+              }
+              if (!tool0_exist)
+              {
+                  convertMenu->addAction("tool0");
+              }
+          }
+      }
+
+      QAction *selected_item = menu->exec(tree_widget_->mapToGlobal(pos));
+      if (selected_item)
+      {
+        if (selected_item->text() == "Add")
+        {
+          // we can only add to the link root item or to other links
+          if (sel == link_root_ || isLink(sel))
+          {
+            addModelLink(sel);
+          }
+          // or to the joint root item or to other links
+          else if (sel == joint_root_ || isJoint(sel))
+          {
+            addModelJoint(sel);
+          }
+        }
+        else if (selected_item->text() == "tool0")
+        {
+          // Change the name of current link
+          QString new_name = "tool0";
+          LinkPropertySharedPtr activeLink = ltree_to_link_property_[sel];
+          activeLink->setLinkName(new_name);
+
+          // if this link already has an 'inertial' element, delete it
+          if (activeLink->hasInertialProperty())
+          {
+            LinkInertialPropertySharedPtr inertial_property = activeLink->getInertialProperty();
+            inertial_property->removeSubProperties();
+          }
+          // if this link already has a 'visual element, delete it
+          if (activeLink->hasVisualProperty())
+          {
+            LinkVisualPropertySharedPtr visual_property = activeLink->getVisualProperty();
+            visual_property->removeSubProperties();
+          }
+          // if this link already has a 'collision element, delete it
+          if (activeLink->hasCollisionProperty())
+          {
+            LinkCollisionPropertySharedPtr collision_property = activeLink->getCollisionProperty();
+            collision_property->removeSubProperties();
+          }
+        }
+        else if (selected_item->text() == "base")
+        {
+          // Change the name of current link
+          QString new_name = "base";
+          LinkPropertySharedPtr activeLink = ltree_to_link_property_[sel];
+          activeLink->setLinkName(new_name);
+
+          // if this link already has an 'inertial' element, delete it
+          if (activeLink->hasInertialProperty())
+          {
+            LinkInertialPropertySharedPtr inertial_property = activeLink->getInertialProperty();
+            inertial_property->removeSubProperties();
+          }
+          // if this link already has a 'visual element, delete it
+          if (activeLink->hasVisualProperty())
+          {
+            LinkVisualPropertySharedPtr visual_property = activeLink->getVisualProperty();
+            visual_property->removeSubProperties();
+          }
+          // if this link already has a 'collision element, delete it
+          if (activeLink->hasCollisionProperty())
+          {
+            LinkCollisionPropertySharedPtr collision_property = activeLink->getCollisionProperty();
+            collision_property->removeSubProperties();
+          }
+        }
+        else
+         {
+          if (isLink(sel))
+          {
+            link_names_.removeOne(sel->text(0));
+            link_root_->removeChild(sel);
+          }
+          else if (isJoint(sel))
+          {
+            joint_names_.removeOne(sel->text(0));
+            sel->parent()->removeChild(sel);
+          }
+        }
+      }
+
+      delete menu;
+  }
+
   void URDFProperty::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
   {
     if (tree_widget_->isLink(item))

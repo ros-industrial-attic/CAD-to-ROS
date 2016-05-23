@@ -164,6 +164,13 @@ namespace urdf_editor
     loading_ = false;
   }
 
+  void LinkVisualProperty::removeSubProperties()
+  {
+    QList<QtProperty *> sub_items = top_item_->subProperties();
+    for (int i = 0; i < sub_items.length(); ++i)
+        top_item_->removeSubProperty(sub_items[i]);
+  }
+
   void LinkVisualProperty::loadFactoryForManager(QtTreePropertyBrowserSharedPtr& property_editor)
   {
     property_editor->setFactoryForManager(manager_, factory_);
