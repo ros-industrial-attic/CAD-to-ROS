@@ -583,7 +583,6 @@ namespace urdf_editor
   {
     Q_UNUSED(property)
     redrawRobotModel();
-    unsavedChanges = true;
   }
 
 
