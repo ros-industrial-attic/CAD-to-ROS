@@ -192,6 +192,7 @@ namespace urdf_editor
 
   bool URDFProperty::redrawRobotModel()
   {
+    unsavedChanges = true;
     return rviz_widget_->loadRobot(tree_widget_->getRobotModel());
   }
 
