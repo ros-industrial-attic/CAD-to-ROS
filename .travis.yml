@@ -14,4 +14,5 @@ env:
 install:
   - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
 script:
+  - source .travis_ppa_oce.sh
   - source .ci_config/travis.sh
