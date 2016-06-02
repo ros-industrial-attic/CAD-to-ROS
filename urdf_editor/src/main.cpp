@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
   if (!ros::isInitialized())
   {
-    ros::init(argc, argv, "urdf_builder");
+    ros::init(argc, argv, "urdf_editor");
   }
 
   QApplication a(argc, argv);
