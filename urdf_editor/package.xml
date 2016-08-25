@@ -1,5 +1,5 @@
 <package>
-  <name>urdf_builder</name>
+  <name>urdf_editor</name>
   <version>0.0.1</version>
   <description>
      This is an editor for creating and modifying urdf files.

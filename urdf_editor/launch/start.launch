@@ -6,7 +6,7 @@
   <arg name="debug_new_win" default="true" />
 
   <arg     if="$(arg debug)" name="launch_prefix"
-    value="gdb -x $(find urdf_builder)/launch/gdb_settings.gdb --ex run --args" />
+    value="gdb -x $(find urdf_editor)/launch/gdb_settings.gdb --ex run --args" />
   <arg unless="$(arg debug)" name="launch_prefix" value="" />
 
   <!-- bit of a dance to only start in a new window if 'debug == true'
@@ -18,6 +18,6 @@
     value="$(arg launch_prefix2) $(arg launch_prefix)" />
   <arg unless="$(arg debug)" name="launch_prefix3" value="$(arg launch_prefix)" />
 
-  <node name="urdf_editor" pkg="urdf_builder" type="urdf_builder" required="true"
+  <node name="urdf_editor" pkg="urdf_editor" type="urdf_editor" required="true"
     launch-prefix="$(arg launch_prefix3)" output="screen"/>
 </launch>
