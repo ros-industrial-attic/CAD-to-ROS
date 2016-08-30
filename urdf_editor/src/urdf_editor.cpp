@@ -35,20 +35,23 @@ URDFEditor::~URDFEditor()
 
 void URDFEditor::on_action_Open_triggered()
 {
-  QString file_path = QFileDialog::getOpenFileName(this, tr("Open ROS URDF File"), QFileInfo(file_path_).dir().absolutePath(), tr("URDF Files (*.urdf *.xacro)"));
-  if (!file_path.isEmpty())
+  if (urdf_tree_->unsaved_changes_==false || (urdf_tree_->unsaved_changes_==true && unsaved_changes() ))
   {
-    file_path_ = file_path;
-    urdf_tree_->clear();
-    urdf_tree_->loadURDF(file_path);
-    ui->action_Save->setDisabled(false);
+    QString file_path = QFileDialog::getOpenFileName(this, tr("Open ROS URDF File"), QFileInfo(file_path_).dir().absolutePath(), tr("URDF Files (*.urdf *.xacro)"));
+    if (!file_path.isEmpty())
+    {
+      file_path_ = file_path;
+      urdf_tree_->clear();
+      urdf_tree_->loadURDF(file_path);
+      ui->action_Save->setDisabled(false);
+    }
   }
 }
 
 bool URDFEditor::unsaved_changes()
 {
   QMessageBox::StandardButton reply;
-  reply = QMessageBox::question(this, "Save changes?", "Save your changes before exiting?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+  reply = QMessageBox::question(this, "Save changes?", "Save your changes before closing?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 
   if (reply == QMessageBox::Yes)
   {
@@ -66,7 +69,7 @@ void URDFEditor::on_action_Save_triggered()
   QMessageBox msgBox;
   if (urdf_tree_->saveURDF(file_path_))
   {
-    urdf_tree_->unsavedChanges = false;
+    urdf_tree_->unsaved_changes_ = false;
     msgBox.setWindowTitle("Success");
     msgBox.setText("The file was saved.");
     msgBox.exec();
@@ -95,7 +98,7 @@ void URDFEditor::on_actionSave_As_triggered()
     }
     else
     {
-      urdf_tree_->unsavedChanges = false;
+      urdf_tree_->unsaved_changes_ = false;
       ui->action_Save->setDisabled(false);
     }
   }
@@ -103,9 +106,12 @@ void URDFEditor::on_actionSave_As_triggered()
 
 void URDFEditor::on_action_New_triggered()
 {
-  file_path_.clear();
-  urdf_tree_->clear();
-  ui->action_Save->setDisabled(true);
+  if (urdf_tree_->unsaved_changes_==false || (urdf_tree_->unsaved_changes_==true && unsaved_changes() ))
+  {
+    file_path_.clear();
+    urdf_tree_->clear();
+    ui->action_Save->setDisabled(true);
+  }
 }
 
 void URDFEditor::on_action_Exit_triggered()
@@ -115,7 +121,7 @@ void URDFEditor::on_action_Exit_triggered()
 
 void URDFEditor::closeEvent( QCloseEvent *event )
 {
-  if ( urdf_tree_->unsavedChanges == true ) // If there were unsaved changes
+  if ( urdf_tree_->unsaved_changes_ == true ) // If there were unsaved changes
   {
     if ( !unsaved_changes() ) // User canceled the quit
       event->ignore();
