@@ -91,5 +91,11 @@ namespace urdf_editor
   {
     robot_display_->subProp("Collision Enabled")->setValue (b ? "true" : "false");
   }
+  
+  void MyRviz::highlightLink(const std::string& link_name)
+  {
+    const QColor color(0, 255, 0, 255);
+    robot_display_->setLinkColor(link_name, color);
+  }
 
 }

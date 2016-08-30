@@ -200,6 +200,12 @@ namespace urdf_editor
     if (tree_widget_->isLink(item))
     {
       tree_widget_->asLinkTreeItem(item)->loadProperty(property_editor_);
+      
+      // Un-highlight all other links by resetting
+      rviz_widget_->loadRobot(tree_widget_->getRobotModel());
+      // Highlight the clicked link
+      QString link_name = tree_widget_->asLinkTreeItem(item)->getName();
+      rviz_widget_->highlightLink(link_name.toStdString());
     }
     else if (tree_widget_->isJoint(item))
     {
