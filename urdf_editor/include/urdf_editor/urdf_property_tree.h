@@ -62,6 +62,7 @@ namespace urdf_editor
     void linkAddition(LinkProperty *property);
     void linkDeletion();
     void linkValueChanged(LinkProperty *property);
+    void linkRightClicked(QTreeWidgetItem *item);
 
     // Joint SIGNALS
     void jointAddition(JointProperty *property);

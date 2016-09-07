@@ -89,6 +89,8 @@ namespace urdf_editor
     connect(tree_widget_, SIGNAL(linkAddition(LinkProperty*)), SLOT(on_unsavedChanges()));
 
     connect(tree_widget_, SIGNAL(linkDeletion()), SLOT(on_unsavedChanges()));
+    
+    connect(tree_widget_, SIGNAL(linkRightClicked(QTreeWidgetItem*)), SLOT(highlight_link(QTreeWidgetItem*)));
 
     // No changes to be saved, yet
     unsavedChanges = false;
@@ -201,11 +203,7 @@ namespace urdf_editor
     {
       tree_widget_->asLinkTreeItem(item)->loadProperty(property_editor_);
       
-      // Un-highlight all other links by resetting
-      rviz_widget_->loadRobot(tree_widget_->getRobotModel());
-      // Highlight the clicked link
-      QString link_name = tree_widget_->asLinkTreeItem(item)->getName();
-      rviz_widget_->highlightLink(link_name.toStdString());
+      highlight_link(item);
     }
     else if (tree_widget_->isJoint(item))
     {
@@ -216,6 +214,15 @@ namespace urdf_editor
     {
       property_editor_->clear();
     }
+  }
+  
+  void URDFProperty::highlight_link(QTreeWidgetItem *item)
+  {
+      // Un-highlight all other links by resetting
+      rviz_widget_->loadRobot(tree_widget_->getRobotModel());
+      // Highlight the clicked link
+      QString link_name = tree_widget_->asLinkTreeItem(item)->getName();
+      rviz_widget_->highlightLink(link_name.toStdString());
   }
 
   void URDFProperty::on_propertyWidget_customContextMenuRequested(const QPoint &pos)

@@ -39,6 +39,7 @@ namespace urdf_editor
 
   private slots:
     void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
+    void highlight_link(QTreeWidgetItem *item);
 
     void on_propertyWidget_customContextMenuRequested(const QPoint &pos);
     void on_propertyWidget_jointNameChanged(JointProperty *property, QString current_name, QString new_name);
