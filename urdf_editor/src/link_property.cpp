@@ -220,4 +220,10 @@ namespace urdf_editor
 
     emit LinkProperty::valueChanged();
   }
+
+  /*! Get the link name */
+  QString LinkProperty::getName()
+  {
+    return QString::fromStdString(link_->name);
+  }
 }

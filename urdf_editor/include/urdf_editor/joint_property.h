@@ -21,6 +21,18 @@ namespace urdf_editor
     void loadProperty(boost::shared_ptr<QtTreePropertyBrowser> property_editor);
 
     void loadData();
+
+    /*! Get the joint name */
+    QString getName();
+
+    /*! Get the name of the parent link */
+    QString getParentLinkName() const;
+
+    /*! Get the name of the child link */
+    QString getChildLinkName() const;
+
+    /*! Set the parent link name */
+    bool setParentLinkName(const QString &link_name);
     
     /*! Check if has origin property */
     bool hasOriginProperty();
@@ -85,8 +97,6 @@ namespace urdf_editor
     /*! Get the safety Property */
     JointSafetyPropertySharedPtr getSafetyProperty();
     
-    
-    
 
   private slots:
     void onValueChanged(QtProperty *property, const QVariant &val);
@@ -94,6 +104,7 @@ namespace urdf_editor
 
   signals:
     void jointNameChanged(JointProperty *property, const QVariant &val);
+    void parentLinkChanged(JointProperty *property, const QVariant &val);
     void valueChanged();
 
   private:
