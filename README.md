@@ -1,4 +1,4 @@
-# CAD-to-ROS
+# CAD-to-ROS (This repository is *unmaintained*.)
 
 GUI tools for ROS setup files starting with Milestone 1: URDF Editor GUI.
 
