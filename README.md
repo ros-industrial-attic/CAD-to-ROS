@@ -1,5 +1,14 @@
 # CAD-to-ROS
 
+# Repository status
+
+This repository is currently **unmaintained**.
+
+Pull requests will not be merged and issues reported will not be handled.
+
+
+# Overview
+
 GUI tools for ROS setup files starting with Milestone 1: URDF Editor GUI.
 
 See the [wiki][] for information on how to setup the development environment
