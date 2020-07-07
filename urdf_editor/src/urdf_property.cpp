@@ -82,16 +82,16 @@ namespace urdf_editor
     connect(property_editor_.get(), SIGNAL(customContextMenuRequested(QPoint)),
               this, SLOT(on_propertyWidget_customContextMenuRequested(QPoint)));
 
-    connect(tree_widget_, SIGNAL(jointAddition(JointProperty*)), SLOT(on_unsavedChanges(JointProperty*)));
+    connect(tree_widget_, SIGNAL(jointAddition(JointProperty*)), SLOT(on_unsavedChanges_(JointProperty*)));
 
-    connect(tree_widget_, SIGNAL(jointDeletion()), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(jointDeletion()), SLOT(on_unsavedChanges_()));
 
-    connect(tree_widget_, SIGNAL(linkAddition(LinkProperty*)), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(linkAddition(LinkProperty*)), SLOT(on_unsavedChanges_()));
 
-    connect(tree_widget_, SIGNAL(linkDeletion()), SLOT(on_unsavedChanges()));
+    connect(tree_widget_, SIGNAL(linkDeletion()), SLOT(on_unsavedChanges_()));
 
     // No changes to be saved, yet
-    unsavedChanges = false;
+    unsaved_changes_ = false;
   }
 
   URDFProperty::~URDFProperty()
@@ -104,7 +104,7 @@ namespace urdf_editor
     rviz_widget_->clear();
     property_editor_->clear();
     tf_transformer_->clear();
-    unsavedChanges = false;
+    unsaved_changes_ = false;
   }
 
   void URDFProperty::requestCollisionVisualizationEnabled(bool b)
@@ -192,6 +192,7 @@ namespace urdf_editor
 
   bool URDFProperty::redrawRobotModel()
   {
+    unsaved_changes_ = true;
     return rviz_widget_->loadRobot(tree_widget_->getRobotModel());
   }
 
@@ -582,14 +583,13 @@ namespace urdf_editor
   {
     Q_UNUSED(property)
     redrawRobotModel();
-    unsavedChanges = true;
   }
 
 
   void URDFProperty::on_unsavedChanges(JointProperty *property)
   {
     if (!loading_)
-      unsavedChanges = true;
+      unsaved_changes_ = true;
 
     tf_transformer_->updateLink(property);
   }
@@ -597,7 +597,7 @@ namespace urdf_editor
   void URDFProperty::on_unsavedChanges()
   {
     if (!loading_)
-      unsavedChanges = true;
+      unsaved_changes_ = true;
   }
 
   void URDFProperty::on_propertyWidget_jointNameChanged(JointProperty *property, QString current_name, QString new_name)

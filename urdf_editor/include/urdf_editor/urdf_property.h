@@ -32,7 +32,7 @@ namespace urdf_editor
 
     bool clear();
 
-    bool unsavedChanges;
+    bool unsaved_changes_;
 
     void requestCollisionVisualizationEnabled(bool b);
     void requestVisualizationEnabled(bool b);
