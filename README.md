@@ -1,4 +1,5 @@
 # CAD-to-ROS
+[![Build Status](https://travis-ci.com/ros-industrial-consortium/CAD-to-ROS.svg?branch=indigo-devel)](https://travis-ci.com/ros-industrial-consortium/CAD-to-ROS)
 
 # Repository status
 
