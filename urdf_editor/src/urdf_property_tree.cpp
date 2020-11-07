@@ -507,6 +507,7 @@ namespace urdf_editor
 
     if (isLinkRoot(sel) && link_names_.isEmpty() || isLink(sel))
     {
+      emit linkRightClicked(sel);
       add_action_->setEnabled(true);
       remove_action_->setEnabled(isLink(sel));
       expand_action_->setEnabled(true);

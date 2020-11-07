@@ -38,15 +38,21 @@ namespace urdf_editor
   public Q_SLOTS:
     /**
      * @brief Turns the robot model visual-model components on/off
-     * @param If True, turns visual display on. If False, turns visual display off.
+     * @param b If True, turns visual display on. If False, turns visual display off.
      */
     void enableVisualization(bool b);
 
     /**
      * @brief Turns the robot collision-model display on/off.
-     * @param If True, turns collision display on. If False, turns collision display off.
+     * @param b If True, turns collision display on. If False, turns collision display off.
      */
     void enableCollisionVisualization(bool b);
+ 
+    /**
+     * @brief Highlights a link as green.
+     * @param link_name The link to highlight
+     */
+    void highlightLink(const std::string& link_name);
 
   private:
     rviz::VisualizationManager *manager_;
