@@ -101,6 +101,19 @@ namespace urdf_editor
     }
   }
 
+  void LinkProperty::setLinkName(QString new_name)
+  {
+    name_item_->setValue(new_name);
+  }
+
+  void LinkProperty::removeSubProperties()
+  {
+    QList<QtProperty *> sub_items = top_item_->subProperties();
+    for (int i = 0; i < sub_items.length(); ++i)
+      if (sub_items[i]->propertyName() != "Type")
+        top_item_->removeSubProperty(sub_items[i]);
+  }
+
   bool LinkProperty::hasInertialProperty()
   {
     return (inertial_property_ != NULL);
